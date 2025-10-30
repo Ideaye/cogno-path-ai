@@ -19,10 +19,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch recent attempts
+    // Fetch recent attempts with question details
     const { data: attempts, error: attemptsError } = await supabaseClient
       .from('attempts')
-      .select('*, question_bank!inner(difficulty, concept_tag), question_bank_concepts!inner(concept_id)')
+      .select('*, question_bank(id, difficulty, concept_tag)')
       .eq('user_id', user_id)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -78,12 +78,29 @@ serve(async (req) => {
     });
     const miscalibration_ema = miscalibrationScores.reduce((sum, val) => sum + val, 0) / Math.max(miscalibrationScores.length, 1);
 
+    // Fetch concept mappings for these questions
+    const questionIds = attempts.map(a => a.question_id).filter(Boolean);
+    let conceptMappings: any[] = [];
+    
+    if (questionIds.length > 0) {
+      const { data: mappings } = await supabaseClient
+        .from('question_bank_concepts')
+        .select('question_id, concept_id')
+        .in('question_id', questionIds);
+      
+      conceptMappings = mappings || [];
+    }
+
     // Compute mastery vector by concept
     const masteryMap: Record<string, { correct: number; total: number }> = {};
     
     attempts.forEach(attempt => {
-      const conceptIds = attempt.question_bank_concepts?.map((qc: any) => qc.concept_id) || [];
-      conceptIds.forEach((conceptId: string) => {
+      // Find concepts for this question
+      const questionConcepts = conceptMappings
+        .filter(m => m.question_id === attempt.question_id)
+        .map(m => m.concept_id);
+      
+      questionConcepts.forEach((conceptId: string) => {
         if (!masteryMap[conceptId]) {
           masteryMap[conceptId] = { correct: 0, total: 0 };
         }
