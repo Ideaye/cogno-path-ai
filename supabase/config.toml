@@ -1,0 +1,4 @@
+project_id = "pfatglhlzflolmgozdiz"
+
+[functions.generate-cognitive-profile]
+verify_jwt = false
