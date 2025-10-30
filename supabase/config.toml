@@ -2,3 +2,12 @@ project_id = "pfatglhlzflolmgozdiz"
 
 [functions.generate-cognitive-profile]
 verify_jwt = false
+
+[functions.adaptive-select-next]
+verify_jwt = false
+
+[functions.compute-features]
+verify_jwt = false
+
+[functions.record-reward]
+verify_jwt = false

@@ -62,6 +62,35 @@ export type Database = {
           },
         ]
       }
+      concepts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          parent_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          parent_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          parent_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concepts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnostic_results: {
         Row: {
           confidence: number | null
@@ -113,6 +142,65 @@ export type Database = {
           },
         ]
       }
+      feature_user_daily: {
+        Row: {
+          acc_ema_long: number | null
+          acc_ema_short: number | null
+          created_at: string
+          fatigue_index: number | null
+          id: string
+          latency_ema_long: number | null
+          latency_ema_short: number | null
+          mastery_vector: Json | null
+          miscalibration_ema: number | null
+          pressure_sensitivity: number | null
+          skip_rate_win20: number | null
+          snapshot_date: string
+          switch_cost: number | null
+          user_id: string
+        }
+        Insert: {
+          acc_ema_long?: number | null
+          acc_ema_short?: number | null
+          created_at?: string
+          fatigue_index?: number | null
+          id?: string
+          latency_ema_long?: number | null
+          latency_ema_short?: number | null
+          mastery_vector?: Json | null
+          miscalibration_ema?: number | null
+          pressure_sensitivity?: number | null
+          skip_rate_win20?: number | null
+          snapshot_date: string
+          switch_cost?: number | null
+          user_id: string
+        }
+        Update: {
+          acc_ema_long?: number | null
+          acc_ema_short?: number | null
+          created_at?: string
+          fatigue_index?: number | null
+          id?: string
+          latency_ema_long?: number | null
+          latency_ema_short?: number | null
+          mastery_vector?: Json | null
+          miscalibration_ema?: number | null
+          pressure_sensitivity?: number | null
+          skip_rate_win20?: number | null
+          snapshot_date?: string
+          switch_cost?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_user_daily_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_paths: {
         Row: {
           created_at: string
@@ -135,6 +223,54 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "learning_paths_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      policy_logs: {
+        Row: {
+          action_json: Json
+          chosen_question_id: string | null
+          context_json: Json
+          created_at: string
+          id: string
+          propensity: number | null
+          reward: number | null
+          user_id: string
+        }
+        Insert: {
+          action_json: Json
+          chosen_question_id?: string | null
+          context_json: Json
+          created_at?: string
+          id?: string
+          propensity?: number | null
+          reward?: number | null
+          user_id: string
+        }
+        Update: {
+          action_json?: Json
+          chosen_question_id?: string | null
+          context_json?: Json
+          created_at?: string
+          id?: string
+          propensity?: number | null
+          reward?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_logs_chosen_question_id_fkey"
+            columns: ["chosen_question_id"]
+            isOneToOne: false
+            referencedRelation: "question_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -201,6 +337,42 @@ export type Database = {
           text?: string
         }
         Relationships: []
+      }
+      question_bank_concepts: {
+        Row: {
+          concept_id: string
+          created_at: string
+          id: string
+          question_id: string
+        }
+        Insert: {
+          concept_id: string
+          created_at?: string
+          id?: string
+          question_id: string
+        }
+        Update: {
+          concept_id?: string
+          created_at?: string
+          id?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_bank_concepts_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_bank_concepts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "question_bank"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

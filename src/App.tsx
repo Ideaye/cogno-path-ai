@@ -9,6 +9,8 @@ import AuthPage from "./components/auth/AuthPage";
 import DiagnosticTest from "./components/diagnostic/DiagnosticTest";
 import ProfileSummary from "./components/profile/ProfileSummary";
 import Dashboard from "./components/dashboard/Dashboard";
+import AdaptivePractice from "./components/adaptive/AdaptivePractice";
+import InsightsPage from "./components/insights/InsightsPage";
 
 const queryClient = new QueryClient();
 
@@ -64,11 +66,11 @@ const App = () => {
             />
             <Route
               path="/practice"
-              element={session ? <DiagnosticTest /> : <Navigate to="/" />}
+              element={session ? <AdaptivePractice /> : <Navigate to="/" />}
             />
             <Route
               path="/insights"
-              element={session ? <ProfileSummary /> : <Navigate to="/" />}
+              element={session ? <InsightsPage /> : <Navigate to="/" />}
             />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
