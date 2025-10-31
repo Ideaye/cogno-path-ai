@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/track';
-import { LayoutDashboard, Target, Dumbbell, Shield, Settings } from 'lucide-react';
+import { LayoutDashboard, Target, Dumbbell, Shield, Settings, GraduationCap } from 'lucide-react';
 
 export default function SideNav({ activeRoute }: { activeRoute: string }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -24,6 +24,7 @@ export default function SideNav({ activeRoute }: { activeRoute: string }) {
 
   const allItems = [
     { key: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { key: '/courses', label: 'Courses', icon: GraduationCap },
     { key: '/calibration', label: 'Calibration', icon: Target },
     { key: '/practice', label: 'Practice', icon: Dumbbell },
     { key: '/admin/content', label: 'Admin', icon: Shield, adminOnly: true },

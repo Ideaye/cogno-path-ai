@@ -1471,6 +1471,10 @@ export type Database = {
           justification_id: string
         }[]
       }
+      ensure_enrolled_and_set_active: {
+        Args: { p_exam_id: string }
+        Returns: undefined
+      }
       get_last_jqs_for_user_exam: {
         Args: { p_exam: string; p_user: string }
         Returns: {

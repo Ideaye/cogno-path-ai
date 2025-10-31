@@ -6,6 +6,7 @@ import PracticeNew from '@/pages/PracticeNew';
 import AdminContentNew from '@/pages/AdminContentNew';
 import SettingsNew from '@/pages/SettingsNew';
 import ProfileNew from '@/pages/ProfileNew';
+import Courses from '@/pages/Courses';
 import AuthPage from '@/components/auth/AuthPage';
 import AdminRoute from '@/components/AdminRoute';
 import { ExamOnboarding } from '@/components/onboarding/ExamOnboarding';
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
   { path: '/auth', element: <AuthPage /> },
   { path: '/onboarding', element: <ExamOnboarding /> },
   { path: '/dashboard', element: <DashboardNew /> },
+  { path: '/courses', element: <Courses /> },
   { path: '/calibration', element: <CalibrationNew /> },
   { path: '/practice', element: <PracticeNew /> },
   { path: '/admin/content', element: <AdminRoute><AdminContentNew /></AdminRoute> },
