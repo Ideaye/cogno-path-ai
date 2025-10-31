@@ -14,18 +14,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, X, Plus } from 'lucide-react';
-import { CalibrationPayload } from '@/types/domain';
 
 const STRATEGY_OPTIONS = [
-  "Pattern Hunt",
-  "Break-Down",
-  "Algebraic Setup",
-  "Unit Analysis",
-  "Visualization",
-  "Guess & Check",
-  "Elimination",
-  "Heuristic",
-  "Other"
+  'STP', 'AIDA', 'Funnel', 'A/B Testing', 'Pricing', 'Positioning',
+  'Copywriting', 'Geo', 'CRM', 'Retention', 'Diagnostics'
 ];
 
 export default function CalibrationNew() {
@@ -33,27 +25,23 @@ export default function CalibrationNew() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [activeExam, setActiveExam] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
   const [currentItem, setCurrentItem] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [lastJQS, setLastJQS] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number>(Date.now());
 
   // Form state
-  const [finalAnswer, setFinalAnswer] = useState('');
-  const [justification, setJustification] = useState('');
+  const [answerText, setAnswerText] = useState('');
   const [confidence, setConfidence] = useState([50]);
   const [strategyTags, setStrategyTags] = useState<string[]>([]);
   const [customStrategy, setCustomStrategy] = useState('');
   const [assumptions, setAssumptions] = useState('');
   const [assumptionChips, setAssumptionChips] = useState<string[]>([]);
-  const [checks, setChecks] = useState('');
+  const [checksUnits, setChecksUnits] = useState('');
   const [useCalculator, setUseCalculator] = useState(false);
-  const [usedNotes, setUsedNotes] = useState(false);
-  const [useExternalLink, setUseExternalLink] = useState(false);
-  const [externalUrl, setExternalUrl] = useState('');
-  const [difficulty, setDifficulty] = useState<string>('');
+  const [notesText, setNotesText] = useState('');
+  const [externalLink, setExternalLink] = useState('');
+  const [perceivedDifficulty, setPerceivedDifficulty] = useState<string>('');
 
   useEffect(() => {
     loadCalibrationState();
@@ -84,112 +72,44 @@ export default function CalibrationNew() {
 
       setActiveExam(enrollment);
 
-      // Get or create active session
-      let { data: existingSession } = await supabase
-        .from('train_ai_sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('block', 'calibration')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (!existingSession) {
-        const { data: newSession, error } = await supabase
-          .from('train_ai_sessions')
-          .insert([{
-            user_id: user.id,
-            block: 'calibration'
-          }])
-          .select()
-          .single();
-
-        if (error) throw error;
-        existingSession = newSession;
-      }
-
-      setSession(existingSession);
-
-      // Get items and calculate progress
+      // Get all calibration items for this exam
       const { data: items } = await supabase
-        .from('train_ai_items')
-        .select(`
-          *,
-          question_bank(text),
-          user_justifications(*)
-        `)
-        .eq('session_id', existingSession.id)
+        .from('calibration_items')
+        .select('*')
+        .eq('exam_id', enrollment.exam_id)
         .order('created_at', { ascending: true });
 
-      const completedItems = items?.filter(item => 
-        Array.isArray(item.user_justifications) && item.user_justifications.length > 0
-      ) || [];
-      const progressPercent = Math.round((completedItems.length / 24) * 100);
-      setProgress(progressPercent);
-
-      // Get last JQS
-      if (completedItems.length > 0) {
-        const lastCompleted = completedItems[completedItems.length - 1];
-        const lastJustif = Array.isArray(lastCompleted.user_justifications) 
-          ? lastCompleted.user_justifications[0] 
-          : null;
-        
-        if (lastJustif) {
-          const { data: eval_data } = await supabase
-            .from('eval_adjudications')
-            .select('jqs_0_1')
-            .eq('justification_id', lastJustif.id)
-            .maybeSingle();
-          
-          if (eval_data) {
-            setLastJQS(Number(eval_data.jqs_0_1));
-          }
-        }
+      if (!items || items.length === 0) {
+        toast({
+          title: 'No calibration items',
+          description: 'Please contact admin to add calibration prompts',
+          variant: 'destructive'
+        });
+        setLoading(false);
+        return;
       }
 
-      // Get or create current item
-      const incompleteItem = items?.find(item => 
-        !Array.isArray(item.user_justifications) || item.user_justifications.length === 0
-      );
+      // Get completed justifications
+      const { data: justifications } = await supabase
+        .from('user_justifications')
+        .select('train_ai_item_id')
+        .eq('user_id', user.id)
+        .eq('exam_id', enrollment.exam_id);
+
+      const completedCount = justifications?.length || 0;
+      const progressPercent = Math.round((completedCount / items.length) * 100);
+      setProgress(progressPercent);
+
+      // Find first incomplete item (simplified - just show items in order)
+      const incompleteItem = completedCount < items.length ? items[completedCount] : null;
       
       if (incompleteItem) {
         setCurrentItem(incompleteItem);
       } else {
-        // Create next item - get a random question from question_bank
-        const promptIndex = items?.length || 0;
-        
-        // Get a random question from question_bank for calibration
-        const { data: questions } = await supabase
-          .from('question_bank')
-          .select('id')
-          .limit(50);
-        
-        if (!questions || questions.length === 0) {
-          toast({
-            title: 'No questions available',
-            description: 'Please contact admin to add calibration questions',
-            variant: 'destructive'
-          });
-          setLoading(false);
-          return;
-        }
-        
-        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
-        
-        const { data: newItem, error } = await supabase
-          .from('train_ai_items')
-          .insert([{
-            session_id: existingSession.id,
-            question_id: randomQuestion.id
-          }])
-          .select(`
-            *,
-            question_bank(text)
-          `)
-          .single();
-
-        if (error) throw error;
-        setCurrentItem(newItem);
+        toast({
+          title: 'All items completed!',
+          description: 'You have completed all calibration items for this exam'
+        });
       }
 
       setStartTime(Date.now());
@@ -232,6 +152,7 @@ export default function CalibrationNew() {
   }
 
   function isUrlValid(url: string): boolean {
+    if (!url) return true;
     try {
       const parsed = new URL(url);
       return parsed.protocol === 'http:' || parsed.protocol === 'https:';
@@ -241,19 +162,19 @@ export default function CalibrationNew() {
   }
 
   function isFormValid(): boolean {
-    if (!finalAnswer.trim()) return false;
-    if (justification.length < 180) return false;
-    if (!difficulty) return false;
-    if (useExternalLink && !isUrlValid(externalUrl)) return false;
+    if (!answerText.trim()) return false;
+    if (answerText.length < 180) return false;
+    if (!perceivedDifficulty) return false;
+    if (externalLink && !isUrlValid(externalLink)) return false;
     return true;
   }
 
   async function handleSubmit() {
-    if (!currentItem || !session || !activeExam) return;
+    if (!currentItem || !activeExam) return;
     if (!isFormValid()) {
       toast({
         title: 'Validation failed',
-        description: 'Please fill all required fields correctly',
+        description: 'Please fill all required fields correctly (min 180 chars)',
         variant: 'destructive'
       });
       return;
@@ -267,50 +188,54 @@ export default function CalibrationNew() {
       const latencyMs = Date.now() - startTime;
       const confidenceValue = confidence[0] / 100;
 
-      // Auto-append "Guess & Check" if confidence < 40%
-      let finalStrategyTags = [...strategyTags];
-      if (confidenceValue < 0.4 && !finalStrategyTags.includes('Guess & Check')) {
-        finalStrategyTags.push('Guess & Check');
-      }
-
-      const payload: CalibrationPayload = {
-        exam_id: activeExam.exam_id,
-        train_ai_item_id: currentItem.id,
-        final_answer: finalAnswer,
-        justification: justification,
-        confidence_0_1: confidenceValue,
-        strategy_tags: finalStrategyTags,
-        assumptions: assumptionChips.join('; '),
-        checks: checks,
-        resources: {
-          calculator: useCalculator,
-          notes: usedNotes,
-          external_link: useExternalLink ? externalUrl : null
-        },
-        difficulty: parseInt(difficulty),
-        latency_ms: latencyMs,
-        is_correct: null // We don't have answer key validation yet
+      const resources = {
+        calculator: useCalculator,
+        notes: notesText || null,
+        link: externalLink || null
       };
 
-      const { data, error } = await supabase.rpc('create_calibration_attempt', {
-        p_exam_id: payload.exam_id,
-        p_train_ai_item_id: payload.train_ai_item_id,
-        p_final_answer: payload.final_answer,
-        p_justification: payload.justification,
-        p_confidence_0_1: payload.confidence_0_1,
-        p_strategy_tags: payload.strategy_tags,
-        p_assumptions: payload.assumptions,
-        p_checks: payload.checks,
-        p_resources: payload.resources,
-        p_difficulty: payload.difficulty,
-        p_latency_ms: payload.latency_ms,
-        p_is_correct: payload.is_correct
-      });
+      // Insert justification with type assertion
+      const { error: justificationError } = await supabase
+        .from('user_justifications')
+        .insert([{
+          user_id: user.id,
+          exam_id: activeExam.exam_id,
+          train_ai_item_id: currentItem.id,
+          answer: answerText,
+          justification: answerText,
+          confidence_0_1: confidenceValue,
+          strategy_tags: strategyTags,
+          assumptions: assumptionChips as any,
+          checks_units: checksUnits || null,
+          perceived_difficulty: parseInt(perceivedDifficulty)
+        } as any]);
 
-      if (error) throw error;
+      if (justificationError) throw justificationError;
 
-      // Update feature table for calibration progress
-      const newProgress = Math.min(1, (progress + (100 / 24)) / 100);
+      // Insert attempt with type assertion
+      const { error: attemptError } = await supabase
+        .from('attempts')
+        .insert([{
+          user_id: user.id,
+          question_id: currentItem.id,
+          correct: null,
+          time_taken_ms: latencyMs,
+          time_taken: latencyMs / 1000,
+          confidence_0_1: confidenceValue,
+          strategy_tags: strategyTags,
+          assumptions: assumptionChips.join('; '),
+          checks: checksUnits,
+          resources,
+          difficulty: parseInt(perceivedDifficulty),
+          final_answer: answerText,
+          latency_ms: latencyMs,
+          mode: 'calibration'
+        } as any]);
+
+      if (attemptError) throw attemptError;
+
+      // Update calibration progress
+      const newProgress = Math.min(1, (progress + 10) / 100);
       await supabase
         .from('feature_user_exam_daily')
         .upsert({
@@ -328,18 +253,16 @@ export default function CalibrationNew() {
       });
 
       // Reset form
-      setFinalAnswer('');
-      setJustification('');
+      setAnswerText('');
       setConfidence([50]);
       setStrategyTags([]);
       setAssumptionChips([]);
       setAssumptions('');
-      setChecks('');
+      setChecksUnits('');
       setUseCalculator(false);
-      setUsedNotes(false);
-      setUseExternalLink(false);
-      setExternalUrl('');
-      setDifficulty('');
+      setNotesText('');
+      setExternalLink('');
+      setPerceivedDifficulty('');
 
       // Load next item
       await loadCalibrationState();
@@ -385,62 +308,66 @@ export default function CalibrationNew() {
     );
   }
 
+  if (!currentItem) {
+    return (
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8">
+          <GlassCard className="p-12 text-center">
+            <h2 className="text-2xl font-semibold mb-4">Calibration Complete!</h2>
+            <p className="text-muted-foreground mb-6">
+              You have completed all calibration items for this exam.
+            </p>
+            <Button onClick={() => navigate('/dashboard')}>
+              Go to Dashboard
+            </Button>
+          </GlassCard>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
       <main className="flex-1 p-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold gradient-text">Calibration Lab</h1>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold text-primary">Calibration Lab</h1>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
             <span>Progress: {progress}%</span>
-            {lastJQS !== null && (
-              <span>Last JQS: {(lastJQS * 100).toFixed(0)}%</span>
-            )}
           </div>
           <Progress value={progress} className="mt-2" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Panel: Prompt */}
+          {/* Left: Prompt */}
           <GlassCard>
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4">Current Prompt</h2>
-              <p className="text-lg leading-relaxed">
-                {currentItem?.question_bank?.text || 'Loading question...'}
+              <p className="text-lg leading-relaxed whitespace-pre-wrap">
+                {currentItem.prompt}
               </p>
             </div>
           </GlassCard>
 
-          {/* Right Panel: Form */}
+          {/* Right: Form */}
           <GlassCard>
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Your Response</h2>
-              <div className="space-y-6">
-              {/* Final Answer */}
-              <div>
-                <Label htmlFor="final-answer">Final Answer *</Label>
-                <Input
-                  id="final-answer"
-                  value={finalAnswer}
-                  onChange={(e) => setFinalAnswer(e.target.value)}
-                  placeholder="Enter your final answer"
-                  disabled={submitting}
-                />
-              </div>
+            <div className="p-6 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
+              <h2 className="text-xl font-semibold">Your Response</h2>
 
-              {/* Justification */}
+              {/* Answer */}
               <div>
-                <Label htmlFor="justification">Justification *</Label>
+                <Label htmlFor="answer">Answer & Justification *</Label>
                 <Textarea
-                  id="justification"
-                  value={justification}
-                  onChange={(e) => setJustification(e.target.value)}
-                  placeholder="Explain your reasoning in detail..."
-                  className="min-h-[120px]"
+                  id="answer"
+                  value={answerText}
+                  onChange={(e) => setAnswerText(e.target.value)}
+                  placeholder="Provide your detailed answer and reasoning..."
+                  className="min-h-[150px] mt-2"
                   disabled={submitting}
                 />
-                <div className={`text-sm mt-1 ${justification.length < 180 ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {justification.length}/180 minimum characters
+                <div className={`text-sm mt-1 ${answerText.length < 180 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  {answerText.length}/180 minimum characters
                 </div>
               </div>
 
@@ -502,10 +429,10 @@ export default function CalibrationNew() {
                 </div>
               </div>
 
-              {/* Assumptions / Givens */}
+              {/* Assumptions */}
               <div>
-                <Label>Assumptions / Givens</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <Label>Assumptions</Label>
+                <div className="flex flex-wrap gap-2 mt-2 mb-2">
                   {assumptionChips.map((chip, idx) => (
                     <Badge key={idx} variant="secondary">
                       {chip}
@@ -516,11 +443,11 @@ export default function CalibrationNew() {
                     </Badge>
                   ))}
                 </div>
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2">
                   <Input
                     value={assumptions}
                     onChange={(e) => setAssumptions(e.target.value)}
-                    placeholder="Add an assumption..."
+                    placeholder="Add assumption..."
                     disabled={submitting}
                     onKeyPress={(e) => e.key === 'Enter' && addAssumptionChip()}
                   />
@@ -538,89 +465,79 @@ export default function CalibrationNew() {
 
               {/* Checks & Units */}
               <div>
-                <Label htmlFor="checks">Checks & Units</Label>
-                <Input
+                <Label htmlFor="checks">Checks / Units / Edge Cases</Label>
+                <Textarea
                   id="checks"
-                  value={checks}
-                  onChange={(e) => setChecks(e.target.value)}
-                  placeholder="e.g., Units consistent; tested n=1 edge case"
+                  value={checksUnits}
+                  onChange={(e) => setChecksUnits(e.target.value)}
+                  placeholder="Dimensional analysis, edge cases, rounding..."
+                  className="mt-2"
                   disabled={submitting}
                 />
               </div>
 
-              {/* Resources Used */}
-              <div>
+              {/* Resources */}
+              <div className="space-y-3">
                 <Label>Resources Used</Label>
-                <div className="space-y-2 mt-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="calculator"
-                      checked={useCalculator}
-                      onCheckedChange={(checked) => setUseCalculator(checked as boolean)}
-                      disabled={submitting}
-                    />
-                    <Label htmlFor="calculator" className="font-normal cursor-pointer">
-                      Calculator
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="notes"
-                      checked={usedNotes}
-                      onCheckedChange={(checked) => setUsedNotes(checked as boolean)}
-                      disabled={submitting}
-                    />
-                    <Label htmlFor="notes" className="font-normal cursor-pointer">
-                      Notes
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="external-link"
-                      checked={useExternalLink}
-                      onCheckedChange={(checked) => setUseExternalLink(checked as boolean)}
-                      disabled={submitting}
-                    />
-                    <Label htmlFor="external-link" className="font-normal cursor-pointer">
-                      External Link
-                    </Label>
-                  </div>
-                  {useExternalLink && (
-                    <Input
-                      value={externalUrl}
-                      onChange={(e) => setExternalUrl(e.target.value)}
-                      placeholder="https://..."
-                      disabled={submitting}
-                      className={!isUrlValid(externalUrl) && externalUrl ? 'border-destructive' : ''}
-                    />
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="calculator"
+                    checked={useCalculator}
+                    onCheckedChange={(checked) => setUseCalculator(checked as boolean)}
+                    disabled={submitting}
+                  />
+                  <Label htmlFor="calculator" className="cursor-pointer">Calculator</Label>
+                </div>
+                <div>
+                  <Label htmlFor="notes">Notes</Label>
+                  <Input
+                    id="notes"
+                    value={notesText}
+                    onChange={(e) => setNotesText(e.target.value)}
+                    placeholder="Any notes or references..."
+                    disabled={submitting}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="link">External Link</Label>
+                  <Input
+                    id="link"
+                    value={externalLink}
+                    onChange={(e) => setExternalLink(e.target.value)}
+                    placeholder="https://..."
+                    disabled={submitting}
+                    className="mt-1"
+                  />
+                  {externalLink && !isUrlValid(externalLink) && (
+                    <p className="text-sm text-destructive mt-1">Invalid URL</p>
                   )}
                 </div>
               </div>
 
               {/* Perceived Difficulty */}
               <div>
-                <Label>Perceived Difficulty *</Label>
+                <Label>Perceived Difficulty (1-5) *</Label>
                 <RadioGroup
-                  value={difficulty}
-                  onValueChange={setDifficulty}
-                  disabled={submitting}
+                  value={perceivedDifficulty}
+                  onValueChange={setPerceivedDifficulty}
                   className="flex gap-4 mt-2"
+                  disabled={submitting}
                 >
                   {[1, 2, 3, 4, 5].map((level) => (
                     <div key={level} className="flex items-center space-x-2">
-                      <RadioGroupItem value={level.toString()} id={`diff-${level}`} />
-                      <Label htmlFor={`diff-${level}`} className="font-normal cursor-pointer">
-                        {level}
-                      </Label>
+                      <RadioGroupItem value={String(level)} id={`diff-${level}`} />
+                      <Label htmlFor={`diff-${level}`} className="cursor-pointer">{level}</Label>
                     </div>
                   ))}
                 </RadioGroup>
               </div>
 
+              {/* Submit */}
               <Button
                 onClick={handleSubmit}
-                disabled={submitting || !isFormValid()}
-                className="w-full gradient-lime-purple text-white"
+                disabled={!isFormValid() || submitting}
+                className="w-full bg-primary text-white hover:bg-primary/90"
                 size="lg"
               >
                 {submitting ? (
@@ -629,10 +546,9 @@ export default function CalibrationNew() {
                     Submitting...
                   </>
                 ) : (
-                  'Submit Justification'
+                  'Submit Response'
                 )}
               </Button>
-              </div>
             </div>
           </GlassCard>
         </div>

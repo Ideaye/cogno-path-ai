@@ -146,6 +146,7 @@ export type Database = {
         Row: {
           assumptions: string | null
           attempt_number: number | null
+          calibration_item_id: string | null
           checks: string | null
           confidence: number | null
           confidence_0_1: number | null
@@ -159,6 +160,7 @@ export type Database = {
           latency_ms: number | null
           mode: string | null
           option_switches: number | null
+          practice_item_id: string | null
           pressure_mode: string | null
           question_id: string
           resources: Json | null
@@ -172,6 +174,7 @@ export type Database = {
         Insert: {
           assumptions?: string | null
           attempt_number?: number | null
+          calibration_item_id?: string | null
           checks?: string | null
           confidence?: number | null
           confidence_0_1?: number | null
@@ -185,6 +188,7 @@ export type Database = {
           latency_ms?: number | null
           mode?: string | null
           option_switches?: number | null
+          practice_item_id?: string | null
           pressure_mode?: string | null
           question_id: string
           resources?: Json | null
@@ -198,6 +202,7 @@ export type Database = {
         Update: {
           assumptions?: string | null
           attempt_number?: number | null
+          calibration_item_id?: string | null
           checks?: string | null
           confidence?: number | null
           confidence_0_1?: number | null
@@ -211,6 +216,7 @@ export type Database = {
           latency_ms?: number | null
           mode?: string | null
           option_switches?: number | null
+          practice_item_id?: string | null
           pressure_mode?: string | null
           question_id?: string
           resources?: Json | null
@@ -223,10 +229,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "attempts_calibration_item_id_fkey"
+            columns: ["calibration_item_id"]
+            isOneToOne: false
+            referencedRelation: "calibration_items"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "attempts_justification_id_fkey"
             columns: ["justification_id"]
             isOneToOne: false
             referencedRelation: "user_justifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attempts_practice_item_id_fkey"
+            columns: ["practice_item_id"]
+            isOneToOne: false
+            referencedRelation: "practice_items"
             referencedColumns: ["id"]
           },
           {
@@ -241,6 +261,35 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calibration_items: {
+        Row: {
+          created_at: string | null
+          exam_id: string
+          id: string
+          prompt: string
+        }
+        Insert: {
+          created_at?: string | null
+          exam_id: string
+          id?: string
+          prompt: string
+        }
+        Update: {
+          created_at?: string | null
+          exam_id?: string
+          id?: string
+          prompt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calibration_items_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
             referencedColumns: ["id"]
           },
         ]
@@ -540,6 +589,7 @@ export type Database = {
           created_at: string
           duration_min: number | null
           id: string
+          is_admin_only: boolean
           level: string | null
           name: string
           negative_marking_json: Json | null
@@ -549,6 +599,7 @@ export type Database = {
           created_at?: string
           duration_min?: number | null
           id?: string
+          is_admin_only?: boolean
           level?: string | null
           name: string
           negative_marking_json?: Json | null
@@ -558,6 +609,7 @@ export type Database = {
           created_at?: string
           duration_min?: number | null
           id?: string
+          is_admin_only?: boolean
           level?: string | null
           name?: string
           negative_marking_json?: Json | null
@@ -868,6 +920,47 @@ export type Database = {
           },
         ]
       }
+      practice_items: {
+        Row: {
+          choices: Json | null
+          correct_answer: string | null
+          created_at: string | null
+          difficulty: number | null
+          exam_id: string
+          id: string
+          stem: string
+          tags: string[] | null
+        }
+        Insert: {
+          choices?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          difficulty?: number | null
+          exam_id: string
+          id?: string
+          stem: string
+          tags?: string[] | null
+        }
+        Update: {
+          choices?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          difficulty?: number | null
+          exam_id?: string
+          id?: string
+          stem?: string
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_items_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           cognitive_profile: Json | null
@@ -1149,7 +1242,9 @@ export type Database = {
       user_justifications: {
         Row: {
           answer: string | null
+          assumptions: string[] | null
           audio_url: string | null
+          checks_units: string | null
           confidence_0_1: number | null
           created_at: string
           effort_1_5: number | null
@@ -1157,6 +1252,7 @@ export type Database = {
           exam_id: string | null
           id: string
           justification: string | null
+          perceived_difficulty: number | null
           strategy_tags: string[] | null
           stress_1_5: number | null
           text: string | null
@@ -1165,7 +1261,9 @@ export type Database = {
         }
         Insert: {
           answer?: string | null
+          assumptions?: string[] | null
           audio_url?: string | null
+          checks_units?: string | null
           confidence_0_1?: number | null
           created_at?: string
           effort_1_5?: number | null
@@ -1173,6 +1271,7 @@ export type Database = {
           exam_id?: string | null
           id?: string
           justification?: string | null
+          perceived_difficulty?: number | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null
@@ -1181,7 +1280,9 @@ export type Database = {
         }
         Update: {
           answer?: string | null
+          assumptions?: string[] | null
           audio_url?: string | null
+          checks_units?: string | null
           confidence_0_1?: number | null
           created_at?: string
           effort_1_5?: number | null
@@ -1189,6 +1290,7 @@ export type Database = {
           exam_id?: string | null
           id?: string
           justification?: string | null
+          perceived_difficulty?: number | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '@/components/SideNav';
 import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 
 interface Question {
@@ -77,13 +77,14 @@ export default function PracticeNew() {
 
   async function loadNextQuestion(examId: string) {
     try {
-      // Get questions from question_bank (using difficulty as numeric 0-1)
-      const { data: questions } = await supabase
-        .from('question_bank')
+      // Get questions from practice_items for this exam
+      const { data: practiceItems } = await supabase
+        .from('practice_items')
         .select('*')
-        .limit(20);
+        .eq('exam_id', examId)
+        .limit(50);
 
-      if (!questions || questions.length === 0) {
+      if (!practiceItems || practiceItems.length === 0) {
         toast({
           title: 'No questions available',
           description: 'Please contact admin to add practice questions',
@@ -93,36 +94,26 @@ export default function PracticeNew() {
       }
 
       // Pick a random question
-      const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+      const randomItem = practiceItems[Math.floor(Math.random() * practiceItems.length)];
       
       // Transform to our format
       const optionsArray: Array<{ key: string; text: string }> = [];
       
-      if (Array.isArray(randomQuestion.options)) {
-        // If it's already an array
-        for (const opt of randomQuestion.options) {
-          if (typeof opt === 'object' && opt !== null && 'key' in opt && 'text' in opt) {
-            optionsArray.push({ key: String(opt.key), text: String(opt.text) });
-          }
-        }
-      } else if (typeof randomQuestion.options === 'object' && randomQuestion.options !== null) {
-        // If it's an object, convert to array
-        Object.entries(randomQuestion.options).forEach(([key, text]) => {
-          optionsArray.push({ key, text: String(text) });
+      // Check if this is MCQ (has choices) or short answer
+      if (randomItem.choices) {
+        const choicesArray = Array.isArray(randomItem.choices) ? randomItem.choices : [];
+        choicesArray.forEach((choice: string, idx: number) => {
+          const key = String.fromCharCode(65 + idx); // A, B, C, D...
+          optionsArray.push({ key, text: choice });
         });
       }
 
       const transformedQuestion: Question = {
-        id: randomQuestion.id,
-        stem: randomQuestion.text || 'Question text',
-        options: optionsArray.length > 0 ? optionsArray : [
-          { key: 'A', text: 'Option A' },
-          { key: 'B', text: 'Option B' },
-          { key: 'C', text: 'Option C' },
-          { key: 'D', text: 'Option D' }
-        ],
-        correct_key: randomQuestion.correct_option || 'A',
-        difficulty: (randomQuestion.difficulty || 0.5) * 800 // convert 0-1 to 0-800
+        id: randomItem.id,
+        stem: randomItem.stem || 'Question text',
+        options: optionsArray.length > 0 ? optionsArray : [],
+        correct_key: randomItem.correct_answer || '',
+        difficulty: (randomItem.difficulty || 3) * 100 // 1-5 scale to 100-500
       };
       
       setCurrentQuestion(transformedQuestion);
@@ -147,35 +138,35 @@ export default function PracticeNew() {
       if (!user) throw new Error('Not authenticated');
 
       const timeTaken = Date.now() - startTime;
-      const correct = selectedKey === currentQuestion.correct_key;
+      const correct = selectedKey === currentQuestion.correct_key || currentQuestion.correct_key === '';
 
-      // Insert attempt
+      // Insert attempt with type assertion
       const { error: attemptError } = await supabase
         .from('attempts')
         .insert([{
           user_id: user.id,
           question_id: currentQuestion.id,
-          correct,
+          correct: currentQuestion.correct_key ? correct : null,
           time_taken_ms: timeTaken,
           time_taken: timeTaken / 1000
-        }]);
+        } as any]);
 
       if (attemptError) throw attemptError;
 
       // Update session stats
       setQuestionCount(prev => prev + 1);
-      if (correct) {
+      if (correct && currentQuestion.correct_key) {
         setCorrectCount(prev => prev + 1);
         setUserSkill(prev => Math.min(800, prev + 20));
-      } else {
+      } else if (currentQuestion.correct_key) {
         setUserSkill(prev => Math.max(200, prev - 20));
       }
       setTotalTime(prev => prev + timeTaken);
 
       toast({
-        title: correct ? '✓ Correct!' : '✗ Incorrect',
+        title: currentQuestion.correct_key ? (correct ? '✓ Correct!' : '✗ Incorrect') : '✓ Submitted',
         description: `Time: ${(timeTaken / 1000).toFixed(1)}s`,
-        variant: correct ? 'default' : 'destructive'
+        variant: correct || !currentQuestion.correct_key ? 'default' : 'destructive'
       });
 
       // Load next question
@@ -275,35 +266,49 @@ export default function PracticeNew() {
               {currentQuestion.stem}
             </div>
 
-            <RadioGroup value={selectedKey} onValueChange={setSelectedKey}>
-              <div className="space-y-3">
-                {currentQuestion.options.map((option) => (
-                  <div 
-                    key={option.key} 
-                    className="flex items-center space-x-3 border-2 border-border rounded-xl p-4 hover:border-lime hover:bg-lime/5 cursor-pointer transition-all"
-                  >
-                    <RadioGroupItem 
-                      value={option.key} 
-                      id={option.key}
-                      disabled={submitting}
-                      className="border-lime text-lime"
-                    />
-                    <Label 
-                      htmlFor={option.key} 
-                      className="flex-1 cursor-pointer"
+            {currentQuestion.options.length > 0 ? (
+              <RadioGroup value={selectedKey} onValueChange={setSelectedKey}>
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option) => (
+                    <div 
+                      key={option.key} 
+                      className="flex items-center space-x-3 border-2 border-border rounded-xl p-4 hover:border-lime hover:bg-lime/5 cursor-pointer transition-all"
                     >
-                      <span className="font-semibold mr-2 text-lime">{option.key}.</span>
-                      {option.text}
-                    </Label>
-                  </div>
-                ))}
+                      <RadioGroupItem 
+                        value={option.key} 
+                        id={option.key}
+                        disabled={submitting}
+                        className="border-lime text-lime"
+                      />
+                      <Label 
+                        htmlFor={option.key} 
+                        className="flex-1 cursor-pointer"
+                      >
+                        <span className="font-semibold mr-2 text-lime">{option.key}.</span>
+                        {option.text}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </RadioGroup>
+            ) : (
+              <div>
+                <Label htmlFor="answer-input">Your Answer *</Label>
+                <Textarea
+                  id="answer-input"
+                  value={selectedKey}
+                  onChange={(e) => setSelectedKey(e.target.value)}
+                  placeholder="Enter your answer here..."
+                  className="mt-2 min-h-[100px]"
+                  disabled={submitting}
+                />
               </div>
-            </RadioGroup>
+            )}
 
             <Button
               onClick={handleSubmit}
               disabled={!selectedKey || submitting}
-              className="w-full gradient-lime-purple text-white"
+              className="w-full bg-primary text-white hover:bg-primary/90"
               size="lg"
             >
               {submitting ? (
