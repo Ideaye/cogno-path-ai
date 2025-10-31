@@ -91,7 +91,7 @@ export default function SettingsNew() {
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
       <main className="flex-1 p-8 space-y-6">
-        <h1 className="text-4xl font-bold gradient-text">Settings</h1>
+        <h1 className="text-4xl font-bold text-foreground">Settings</h1>
 
         <GlassCard>
           <div className="p-6 space-y-4">
@@ -144,14 +144,14 @@ export default function SettingsNew() {
               {!linkedProviders.includes('google') && (
                 <Button
                   variant="outline"
-                  className="w-full border-lime hover:bg-lime/10"
+                  className="w-full border-primary hover:bg-primary/10"
                   onClick={() => linkIdentity('google')}
                 >
                   Link Google Account
                 </Button>
               )}
               {linkedProviders.includes('google') && (
-                <div className="p-4 border-2 border-lime rounded-xl bg-lime/5 text-sm font-medium">
+                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium">
                   ✓ Google account linked
                 </div>
               )}
@@ -159,14 +159,14 @@ export default function SettingsNew() {
               {!linkedProviders.includes('apple') && (
                 <Button
                   variant="outline"
-                  className="w-full border-lime hover:bg-lime/10"
+                  className="w-full border-primary hover:bg-primary/10"
                   onClick={() => linkIdentity('apple')}
                 >
                   Link Apple Account
                 </Button>
               )}
               {linkedProviders.includes('apple') && (
-                <div className="p-4 border-2 border-lime rounded-xl bg-lime/5 text-sm font-medium">
+                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium">
                   ✓ Apple account linked
                 </div>
               )}

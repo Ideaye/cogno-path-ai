@@ -167,7 +167,7 @@ export default function Profile() {
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
         <main className="flex-1 p-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-lime" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
     );
@@ -177,7 +177,7 @@ export default function Profile() {
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
       <main className="flex-1 p-8 space-y-6">
-        <h1 className="text-4xl font-bold gradient-text">Profile</h1>
+        <h1 className="text-4xl font-bold text-foreground">Profile</h1>
 
         <GlassCard>
           <div className="p-6 space-y-4">
@@ -193,7 +193,7 @@ export default function Profile() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" value={email} disabled />
             </div>
-            <Button className="gradient-lime-purple text-white" onClick={updateProfile}>Save Changes</Button>
+            <Button className="bg-primary hover:bg-primary-hover text-foreground" onClick={updateProfile}>Save Changes</Button>
           </div>
         </GlassCard>
 
@@ -208,7 +208,7 @@ export default function Profile() {
                   <div key={e.exam_id} className="flex items-center justify-between p-3 border rounded-xl">
                     <span>{e.name}</span>
                     {e.is_active ? (
-                      <Badge className="bg-lime text-white">Active</Badge>
+                      <Badge className="bg-primary text-foreground">Active</Badge>
                     ) : (
                       <Button
                         size="sm"
@@ -234,7 +234,7 @@ export default function Profile() {
                 size="sm"
                 onClick={downloadCalibrationReport}
                 disabled={generatingReport}
-                className="border-lime hover:bg-lime/10"
+                className="border-primary hover:bg-primary/10"
               >
                 <Download className="h-4 w-4 mr-2" />
                 {generatingReport ? 'Generating...' : 'Download Report'}

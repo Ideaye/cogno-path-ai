@@ -153,8 +153,8 @@ export default function ProfileNew() {
                         {profile.first_name?.[0]}{profile.last_name?.[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <button className="absolute bottom-0 right-0 bg-orange-accent rounded-full p-2 hover:opacity-90">
-                      <Edit2 className="h-3 w-3 text-white" />
+                    <button className="absolute bottom-0 right-0 bg-primary rounded-full p-2 hover:opacity-90">
+                      <Edit2 className="h-3 w-3 text-foreground" />
                     </button>
                   </div>
                   <div>
@@ -171,7 +171,7 @@ export default function ProfileNew() {
                     onClick={() => setActiveTab('personal')}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                       activeTab === 'personal'
-                        ? 'bg-orange-accent/10 text-orange-accent'
+                        ? 'bg-primary/10 text-primary'
                         : 'hover:bg-muted'
                     }`}
                   >
@@ -183,7 +183,7 @@ export default function ProfileNew() {
                     onClick={() => setActiveTab('security')}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                       activeTab === 'security'
-                        ? 'bg-orange-accent/10 text-orange-accent'
+                        ? 'bg-primary/10 text-primary'
                         : 'hover:bg-muted'
                     }`}
                   >
@@ -337,14 +337,14 @@ export default function ProfileNew() {
                       <Button
                         variant="outline"
                         onClick={handleDiscard}
-                        className="flex-1 h-12 border-2 border-orange-accent text-orange-accent hover:bg-orange-accent/10"
+                        className="flex-1 h-12 border-2 border-primary text-primary hover:bg-primary/10"
                       >
                         Discard Changes
                       </Button>
                       <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex-1 h-12 bg-orange-accent hover:bg-orange-accent/90 text-white"
+                        className="flex-1 h-12 bg-primary hover:bg-primary-hover text-foreground"
                       >
                         {saving ? 'Saving...' : 'Save Changes'}
                       </Button>

@@ -196,7 +196,7 @@ export default function PracticeNew() {
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
         <main className="flex-1 p-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-lime" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
     );
@@ -226,7 +226,7 @@ export default function PracticeNew() {
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
         <main className="flex-1 p-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-lime" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
     );
@@ -243,14 +243,14 @@ export default function PracticeNew() {
         <GlassCard className="mb-6 p-4">
           <div className="flex items-center justify-between">
             <div className="flex gap-6 text-sm">
-              <span className="font-medium">Question: <span className="text-lime">{questionCount + 1}</span></span>
-              <span className="font-medium">Accuracy: <span className="text-lime">{accuracy}%</span></span>
-              <span className="font-medium">Avg Time: <span className="text-lime">{avgTime}s</span></span>
+              <span className="font-medium">Question: <span className="text-primary">{questionCount + 1}</span></span>
+              <span className="font-medium">Accuracy: <span className="text-primary">{accuracy}%</span></span>
+              <span className="font-medium">Avg Time: <span className="text-primary">{avgTime}s</span></span>
             </div>
             <Button 
               variant="outline" 
               onClick={handleEndSession}
-              className="border-lime hover:bg-lime/10"
+              className="border-primary hover:bg-primary/10"
             >
               End Session
             </Button>
@@ -272,19 +272,19 @@ export default function PracticeNew() {
                   {currentQuestion.options.map((option) => (
                     <div 
                       key={option.key} 
-                      className="flex items-center space-x-3 border-2 border-border rounded-xl p-4 hover:border-lime hover:bg-lime/5 cursor-pointer transition-all"
+                      className="flex items-center space-x-3 border-2 border-border rounded-xl p-4 hover:border-primary hover:bg-primary/10 cursor-pointer transition-all"
                     >
                       <RadioGroupItem 
                         value={option.key} 
                         id={option.key}
                         disabled={submitting}
-                        className="border-lime text-lime"
+                        className="border-primary text-primary"
                       />
                       <Label 
                         htmlFor={option.key} 
                         className="flex-1 cursor-pointer"
                       >
-                        <span className="font-semibold mr-2 text-lime">{option.key}.</span>
+                        <span className="font-semibold mr-2 text-primary">{option.key}.</span>
                         {option.text}
                       </Label>
                     </div>

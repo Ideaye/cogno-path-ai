@@ -180,10 +180,10 @@ export default function AuthPage() {
         <div className="p-6 sm:p-8 space-y-6">
           {/* Logo and Title */}
           <div className="text-center space-y-3">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full gradient-lime-purple flex items-center justify-center mx-auto mb-4">
-              <Brain className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4">
+              <Brain className="h-7 w-7 sm:h-8 sm:w-8 text-foreground" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Abhyas AI</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Abhyas AI</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               {isLogin ? 'Welcome back!' : 'Start your learning journey'}
             </p>
@@ -304,7 +304,7 @@ export default function AuthPage() {
               <Button
                 type="submit"
                 disabled={loading || !email || !password || (!isLogin && !name)}
-                className="w-full gradient-lime-purple text-white"
+                className="w-full bg-primary hover:bg-primary-hover text-foreground"
                 size="lg"
               >
                 {loading ? (
@@ -344,7 +344,7 @@ export default function AuthPage() {
                     type="button"
                     onClick={handleSendOTP}
                     disabled={loading || !phone}
-                    className="w-full gradient-lime-purple text-white"
+                    className="w-full bg-primary hover:bg-primary-hover text-foreground"
                     size="lg"
                   >
                     {loading ? (
@@ -376,7 +376,7 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full gradient-lime-purple text-white"
+                    className="w-full bg-primary hover:bg-primary-hover text-foreground"
                     size="lg"
                   >
                     {loading ? (
