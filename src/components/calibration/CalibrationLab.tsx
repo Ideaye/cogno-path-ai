@@ -170,7 +170,57 @@ export function CalibrationLab() {
   const submitJustification = async () => {
     if (!itemId) return;
 
+    // Validate minimum 180 characters
+    if (justification.trim().length < 180) {
+      toast.error('Please provide a more detailed explanation (minimum 180 characters)');
+      return;
+    }
+
     try {
+      // Check user's last adjudication quality
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Get user's sessions
+        const { data: sessions } = await supabase
+          .from('train_ai_sessions')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (sessions && sessions.length > 0) {
+          // Get items from these sessions
+          const sessionIds = sessions.map(s => s.id);
+          const { data: items } = await supabase
+            .from('train_ai_items')
+            .select('id')
+            .in('session_id', sessionIds);
+
+          if (items && items.length > 0) {
+            // Get justifications from these items
+            const itemIds = items.map(i => i.id);
+            const { data: justifications } = await supabase
+              .from('user_justifications')
+              .select('id')
+              .in('train_ai_item_id', itemIds)
+              .order('created_at', { ascending: false });
+
+            if (justifications && justifications.length > 0) {
+              // Check last adjudication
+              const { data: lastAdj } = await supabase
+                .from('eval_adjudications')
+                .select('jqs_0_1')
+                .eq('justification_id', justifications[0].id)
+                .single();
+
+              if (lastAdj && lastAdj.jqs_0_1 < 0.35) {
+                toast.error('Your last justification needed improvement. Please provide more detail, explain your reasoning step-by-step, and show your work clearly.');
+                return;
+              }
+            }
+          }
+        }
+      }
+
       const { data: insertedJustification, error: insertError } = await supabase
         .from('user_justifications')
         .insert({

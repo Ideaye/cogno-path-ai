@@ -13,6 +13,11 @@ export function Dashboard() {
     totalPractice: 0,
     accuracy: 0,
     streak: 0,
+    ece: null as number | null,
+    anchorMean: null as number | null,
+    anchorStd: null as number | null,
+    cdnaVersion: null as string | null,
+    cdnaSource: null as string | null,
   });
   const [userName, setUserName] = useState("User");
   const [aiInsights, setAiInsights] = useState<string>("");
@@ -62,11 +67,51 @@ export function Dashboard() {
       const correct = attempts.filter(a => a.correct).length;
       const accuracy = attempts.length > 0 ? (correct / attempts.length) * 100 : 0;
       
-      setStats({
+      setStats(prev => ({
+        ...prev,
         totalPractice: count,
         accuracy: Math.round(accuracy),
         streak: Math.floor(Math.random() * 7) + 1,
-      });
+      }));
+    }
+
+    // Fetch CDNA metrics
+    if (activeExam?.exam_id) {
+      const { data: features } = await supabase
+        .from('feature_user_exam_daily')
+        .select('ece_0_1, anchor_score_mean, anchor_score_std')
+        .eq('user_id', user.id)
+        .eq('exam_id', activeExam.exam_id)
+        .order('snapshot_date', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (features) {
+        setStats(prev => ({
+          ...prev,
+          ece: features.ece_0_1,
+          anchorMean: features.anchor_score_mean,
+          anchorStd: features.anchor_score_std,
+        }));
+      }
+
+      // Fetch CDNA version info
+      const { data: cdnaVersion } = await supabase
+        .from('cdna_versions')
+        .select('version, source')
+        .eq('user_id', user.id)
+        .eq('exam_id', activeExam.exam_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (cdnaVersion) {
+        setStats(prev => ({
+          ...prev,
+          cdnaVersion: cdnaVersion.version,
+          cdnaSource: cdnaVersion.source,
+        }));
+      }
     }
   };
 
@@ -126,6 +171,65 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">{stats.streak} days</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* CDNA Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="shadow-lg border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Expected Calibration Error
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">
+                {stats.ece !== null ? stats.ece.toFixed(3) : '—'}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">Target: ≤ 0.08</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Anchor Stability
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.anchorMean !== null && stats.anchorStd !== null ? (
+                <>
+                  <p className="text-3xl font-bold">
+                    {(stats.anchorMean * 100).toFixed(0)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    σ = {stats.anchorStd.toFixed(3)} (target ≤ 0.12)
+                  </p>
+                </>
+              ) : (
+                <p className="text-3xl font-bold">—</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                CDNA Version
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.cdnaVersion ? (
+                <>
+                  <p className="text-3xl font-bold">{stats.cdnaVersion}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {stats.cdnaSource === 'shadow' ? '🔬 Shadow Mode' : '✅ Live'}
+                  </p>
+                </>
+              ) : (
+                <p className="text-3xl font-bold">—</p>
+              )}
             </CardContent>
           </Card>
         </div>
