@@ -23,12 +23,26 @@ interface Question {
 }
 
 const STRATEGY_CHIPS = [
-  "Elimination",
-  "Equation Setup",
-  "Diagram/Visual",
   "Estimation",
-  "Pattern Recognition",
-  "Working Backwards",
+  "Unit Analysis",
+  "First Principles",
+  "Elimination",
+  "Recall Fact",
+  "Case Breakdown",
+  "Revenue Math",
+  "Funnel Math",
+  "Time-Series",
+  "Cohort",
+  "Segmentation",
+  "A/B Reasoning",
+  "Heuristic",
+];
+
+const RESOURCE_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "calculator", label: "Calculator" },
+  { value: "notes", label: "Notes" },
+  { value: "external_link", label: "External Link" },
 ];
 
 const ERROR_CAUSES = [
@@ -55,6 +69,11 @@ export function CalibrationLab() {
   const [effort, setEffort] = useState([3]);
   const [stress, setStress] = useState([3]);
   const [errorCause, setErrorCause] = useState("");
+  const [assumptions, setAssumptions] = useState("");
+  const [checksUnits, setChecksUnits] = useState("");
+  const [resourceUsed, setResourceUsed] = useState("none");
+  const [resourceDetails, setResourceDetails] = useState("");
+  const [perceivedDifficulty, setPerceivedDifficulty] = useState(3);
   const [timer, setTimer] = useState(75);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -225,6 +244,10 @@ export function CalibrationLab() {
           effort_1_5: effort[0],
           stress_1_5: stress[0],
           error_cause: errorCause,
+          assumptions_text: assumptions,
+          checks_units: checksUnits,
+          resources_used: { type: resourceUsed, details: resourceDetails || null },
+          perceived_difficulty_1_5: perceivedDifficulty,
         }, { onConflict: 'train_ai_item_id' })
         .select()
         .single();
@@ -258,6 +281,11 @@ export function CalibrationLab() {
       setEffort([3]);
       setStress([3]);
       setErrorCause("");
+      setAssumptions("");
+      setChecksUnits("");
+      setResourceUsed("none");
+      setResourceDetails("");
+      setPerceivedDifficulty(3);
 
       nextQuestion();
     } catch (error: any) {
@@ -450,7 +478,7 @@ export function CalibrationLab() {
 
               {(currentBlock === "baseline" || currentBlock === "pressure") && (
                 <div className="space-y-2">
-                  <Label className="text-black">Confidence: {confidence[0]}%</Label>
+              <Label className="text-black">Confidence: {confidence[0]}%</Label>
                   <Slider
                     value={confidence}
                     onValueChange={setConfidence}
@@ -532,6 +560,70 @@ export function CalibrationLab() {
                   />
                 </div>
               </div>
+
+              <div>
+                <Label className="mb-2 block text-black">Assumptions Made:</Label>
+                <Textarea
+                  value={assumptions}
+                  onChange={(e) => setAssumptions(e.target.value)}
+                  placeholder="List any assumptions you made while solving..."
+                  rows={2}
+                  className="resize-none"
+                />
+              </div>
+
+              <div>
+                <Label className="mb-2 block text-black">Checks / Units / Edge Cases:</Label>
+                <input
+                  type="text"
+                  value={checksUnits}
+                  onChange={(e) => setChecksUnits(e.target.value)}
+                  placeholder="Dimensional checks, rounding decisions, edge cases verified..."
+                  className="w-full px-3 py-2 border border-input rounded-md text-black"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-black">Resources Used:</Label>
+                  <select
+                    value={resourceUsed}
+                    onChange={(e) => setResourceUsed(e.target.value)}
+                    className="w-full px-3 py-2 border border-input rounded-md text-black"
+                  >
+                    {RESOURCE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-black">Perceived Difficulty:</Label>
+                  <select
+                    value={perceivedDifficulty}
+                    onChange={(e) => setPerceivedDifficulty(Number(e.target.value))}
+                    className="w-full px-3 py-2 border border-input rounded-md text-black"
+                  >
+                    <option value={1}>1 - Very Easy</option>
+                    <option value={2}>2 - Easy</option>
+                    <option value={3}>3 - Medium</option>
+                    <option value={4}>4 - Hard</option>
+                    <option value={5}>5 - Very Hard</option>
+                  </select>
+                </div>
+              </div>
+
+              {resourceUsed !== "none" && (
+                <div>
+                  <Label className="mb-2 block text-black">Resource Details:</Label>
+                  <input
+                    type="text"
+                    value={resourceDetails}
+                    onChange={(e) => setResourceDetails(e.target.value)}
+                    placeholder={resourceUsed === "external_link" ? "URL or description..." : "Details..."}
+                    className="w-full px-3 py-2 border border-input rounded-md text-black"
+                  />
+                </div>
+              )}
 
               <div>
                 <Label className="mb-2 block text-black">If incorrect, what was the main cause?</Label>

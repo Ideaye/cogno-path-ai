@@ -1,4 +1,8 @@
-# Welcome to your Lovable project
+# Yukti AI - Personalized Test Prep Platform
+
+> **Brand**: Formerly "Abhyas AI" - now rebranded as "Yukti AI"
+
+Yukti AI is a next-generation test preparation platform powered by Cognitive DNA (CDNA) profiling, delivering personalized adaptive practice experiences for competitive exams.
 
 ## Project info
 
@@ -59,6 +63,20 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Lovable Cloud (Supabase backend)
+- Edge Functions (Deno)
+
+## Key Features
+
+- **Adaptive Practice**: Uses LinUCB bandit algorithm via `adaptive-select-next` edge function
+- **Calibration Lab**: Multi-block training with 13 strategy tags and detailed metadata
+- **Real-time Analytics**: Dashboard with parallel data fetching and React Query caching
+- **Admin Panel**: User management, exam enrollment, content ops (requires `is_admin` role)
+- **Reports**: Weekly cognitive profile PDFs with email delivery
+
+## Environment Variables
+
+Set `VITE_APP_BRAND` to customize branding (default: "Yukti AI")
 
 ## How can I deploy this project?
 

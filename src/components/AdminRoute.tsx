@@ -30,7 +30,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
   }, []);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen text-black">Loading...</div>;
   }
 
   if (!isAdmin) {

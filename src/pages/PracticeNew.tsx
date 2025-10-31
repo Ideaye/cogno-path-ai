@@ -77,43 +77,41 @@ export default function PracticeNew() {
 
   async function loadNextQuestion(examId: string) {
     try {
-      // Get questions from practice_items for this exam
-      const { data: practiceItems } = await supabase
-        .from('practice_items')
-        .select('*')
-        .eq('exam_id', examId)
-        .limit(50);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (!practiceItems || practiceItems.length === 0) {
+      // Call adaptive-select-next edge function
+      const { data, error } = await supabase.functions.invoke('adaptive-select-next', {
+        body: { user_id: user.id, mode: 'practice' }
+      });
+
+      if (error) throw error;
+      if (!data || !data.question) {
         toast({
           title: 'No questions available',
-          description: 'Please contact admin to add practice questions',
+          description: 'Unable to load next question',
           variant: 'destructive'
         });
         return;
       }
 
-      // Pick a random question
-      const randomItem = practiceItems[Math.floor(Math.random() * practiceItems.length)];
+      const q = data.question;
       
       // Transform to our format
       const optionsArray: Array<{ key: string; text: string }> = [];
       
-      // Check if this is MCQ (has choices) or short answer
-      if (randomItem.choices) {
-        const choicesArray = Array.isArray(randomItem.choices) ? randomItem.choices : [];
-        choicesArray.forEach((choice: string, idx: number) => {
-          const key = String.fromCharCode(65 + idx); // A, B, C, D...
-          optionsArray.push({ key, text: choice });
+      if (q.options && typeof q.options === 'object') {
+        Object.entries(q.options).forEach(([key, text]) => {
+          optionsArray.push({ key, text: text as string });
         });
       }
 
       const transformedQuestion: Question = {
-        id: randomItem.id,
-        stem: randomItem.stem || 'Question text',
-        options: optionsArray.length > 0 ? optionsArray : [],
-        correct_key: randomItem.correct_answer || '',
-        difficulty: (randomItem.difficulty || 3) * 100 // 1-5 scale to 100-500
+        id: q.id,
+        stem: q.text || 'Question text',
+        options: optionsArray,
+        correct_key: q.correct_option || '',
+        difficulty: (q.difficulty || 0.5) * 1000
       };
       
       setCurrentQuestion(transformedQuestion);
@@ -152,6 +150,20 @@ export default function PracticeNew() {
         } as any]);
 
       if (attemptError) throw attemptError;
+
+      // Call record-reward edge function
+      try {
+        await supabase.functions.invoke('record-reward', {
+          body: {
+            attempt_id: attemptError, // Will be the inserted ID
+            correctness: correct ? 1 : 0,
+            time_taken_ms: timeTaken,
+            confidence_0_1: 0.5
+          }
+        });
+      } catch (rewardError) {
+        console.error('Failed to record reward:', rewardError);
+      }
 
       // Update session stats
       setQuestionCount(prev => prev + 1);

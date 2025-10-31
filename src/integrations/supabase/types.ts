@@ -265,6 +265,36 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_table: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Relationships: []
+      }
       calibration_items: {
         Row: {
           created_at: string | null
@@ -320,6 +350,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      calibration_sessions: {
+        Row: {
+          block: string
+          created_at: string
+          current_item_id: string | null
+          exam_id: string
+          id: string
+          session_data: Json | null
+          timer_remaining_s: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          block: string
+          created_at?: string
+          current_item_id?: string | null
+          exam_id: string
+          id?: string
+          session_data?: Json | null
+          timer_remaining_s?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          block?: string
+          created_at?: string
+          current_item_id?: string | null
+          exam_id?: string
+          id?: string
+          session_data?: Json | null
+          timer_remaining_s?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calibration_sessions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cdna_versions: {
         Row: {
@@ -1162,6 +1236,24 @@ export type Database = {
         }
         Relationships: []
       }
+      strategy_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       train_ai_items: {
         Row: {
           created_at: string
@@ -1273,6 +1365,7 @@ export type Database = {
         Row: {
           answer: string | null
           assumptions: string[] | null
+          assumptions_text: string | null
           audio_url: string | null
           checks_units: string | null
           confidence_0_1: number | null
@@ -1283,6 +1376,8 @@ export type Database = {
           id: string
           justification: string | null
           perceived_difficulty: number | null
+          perceived_difficulty_1_5: number | null
+          resources_used: Json | null
           strategy_tags: string[] | null
           stress_1_5: number | null
           text: string | null
@@ -1292,6 +1387,7 @@ export type Database = {
         Insert: {
           answer?: string | null
           assumptions?: string[] | null
+          assumptions_text?: string | null
           audio_url?: string | null
           checks_units?: string | null
           confidence_0_1?: number | null
@@ -1302,6 +1398,8 @@ export type Database = {
           id?: string
           justification?: string | null
           perceived_difficulty?: number | null
+          perceived_difficulty_1_5?: number | null
+          resources_used?: Json | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null
@@ -1311,6 +1409,7 @@ export type Database = {
         Update: {
           answer?: string | null
           assumptions?: string[] | null
+          assumptions_text?: string | null
           audio_url?: string | null
           checks_units?: string | null
           confidence_0_1?: number | null
@@ -1321,6 +1420,8 @@ export type Database = {
           id?: string
           justification?: string | null
           perceived_difficulty?: number | null
+          perceived_difficulty_1_5?: number | null
+          resources_used?: Json | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null

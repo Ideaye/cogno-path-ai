@@ -51,13 +51,46 @@ export function useDashboardData(exam_id?: string): DashboardData {
         const since = new Date();
         since.setDate(since.getDate() - 30);
 
-        const { data: attempts } = await supabase
-          .from('attempts')
-          .select('id,correct,time_taken_ms,created_at')
-          .eq('user_id', user.id)
-          .gte('created_at', since.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(200);
+        // Parallel fetches for better performance
+        const [attemptsRes, cdnaRes, calibProgressRes, reportsRes] = await Promise.all([
+          supabase
+            .from('attempts')
+            .select('id,correct,time_taken_ms,created_at')
+            .eq('user_id', user.id)
+            .gte('created_at', since.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(200),
+          exam_id
+            ? supabase
+                .from('feature_user_exam_daily')
+                .select('ece_0_1,anchor_score_mean,anchor_score_std,snapshot_date')
+                .eq('user_id', user.id)
+                .eq('exam_id', exam_id)
+                .order('snapshot_date', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
+          exam_id
+            ? supabase
+                .from('feature_user_exam_daily')
+                .select('calibration_progress_0_1')
+                .eq('user_id', user.id)
+                .eq('exam_id', exam_id)
+                .order('snapshot_date', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
+          supabase
+            .from('calibration_reports')
+            .select('storage_path')
+            .eq('user_id', user.id)
+            .eq('report_type', 'weekly')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        ]);
+
+        const attempts = attemptsRes.data || [];
 
         const total = attempts?.length ?? 0;
         const correct = attempts?.filter((a) => a.correct).length ?? 0;
@@ -76,55 +109,36 @@ export function useDashboardData(exam_id?: string): DashboardData {
           d.setDate(d.getDate() - 1);
         }
 
-        // Fetch CDNA metrics if exam_id exists
-        let ece = null, anchorMean = null, anchorStd = null, version = null, source = null;
-        let progress = 0;
-
+        // Process CDNA metrics
+        let ece = cdnaRes.data?.ece_0_1 ?? null;
+        let anchorMean = cdnaRes.data?.anchor_score_mean ?? null;
+        let anchorStd = cdnaRes.data?.anchor_score_std ?? null;
+        let progress = calibProgressRes.data?.calibration_progress_0_1 ?? 0;
+        
+        // Get CDNA version
+        let version = null, source = null;
         if (exam_id) {
-          const { data: feat } = await supabase
-            .from('feature_user_exam_daily')
-            .select('ece_0_1,anchor_score_mean,anchor_score_std,calibration_progress_0_1')
-            .eq('user_id', user.id)
-            .eq('exam_id', exam_id)
-            .order('snapshot_date', { ascending: false })
-            .limit(1);
-
-          if (feat && feat[0]) {
-            ece = feat[0].ece_0_1;
-            anchorMean = feat[0].anchor_score_mean;
-            anchorStd = feat[0].anchor_score_std;
-            progress = feat[0].calibration_progress_0_1 ?? 0;
-          }
-
           const { data: ver } = await supabase
             .from('cdna_versions')
             .select('version,source')
             .eq('user_id', user.id)
             .eq('exam_id', exam_id)
             .order('created_at', { ascending: false })
-            .limit(1);
+            .limit(1)
+            .maybeSingle();
 
-          if (ver && ver[0]) {
-            version = ver[0].version;
-            source = ver[0].source;
+          if (ver) {
+            version = ver.version;
+            source = ver.source;
           }
         }
 
-        // Fetch latest weekly report
+        // Process weekly report
         let weeklyUrl: string | null = null;
-        const { data: rep } = await supabase
-          .from('calibration_reports')
-          .select('storage_path')
-          .eq('user_id', user.id)
-          .eq('report_type', 'weekly')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (rep?.storage_path) {
+        if (reportsRes.data?.storage_path) {
           const { data: signed } = await supabase.storage
             .from('reports')
-            .createSignedUrl(rep.storage_path, 60 * 60); // 1 hour
+            .createSignedUrl(reportsRes.data.storage_path, 60 * 60); // 1 hour
           weeklyUrl = signed?.signedUrl ?? null;
         }
 
