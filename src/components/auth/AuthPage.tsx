@@ -50,7 +50,7 @@ export default function AuthPage() {
 
         toast({
           title: "Account created!",
-          description: "Welcome to CognitivePrep.",
+          description: "Welcome to Abhyas AI.",
         });
       }
     } catch (error: any) {
@@ -72,11 +72,11 @@ export default function AuthPage() {
             <Brain className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-            CognitivePrep
+            Abhyas AI
           </h1>
           <p className="text-muted-foreground flex items-center justify-center gap-2">
             <TrendingUp className="w-4 h-4" />
-            AI-Powered Personalized Learning
+            Practice with intelligence.
           </p>
         </div>
 

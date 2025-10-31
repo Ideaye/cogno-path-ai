@@ -99,9 +99,9 @@ export function ExamOnboarding() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome to CognitivePrep</CardTitle>
+          <CardTitle>Welcome to Abhyas AI</CardTitle>
           <CardDescription>
-            Select your exam to get started with personalized AI-powered test prep
+            Calibrate. Practice. Rank up.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

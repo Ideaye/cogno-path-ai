@@ -65,7 +65,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Avatar>
             <div>
               <h2 className="font-semibold text-white">{userName}</h2>
-              <p className="text-xs text-[hsl(var(--sidebar-text))]/70">CognitivePrep</p>
+              <p className="text-xs text-[hsl(var(--sidebar-text))]/70">Abhyas AI</p>
             </div>
           </div>
           <div className="space-y-1">
