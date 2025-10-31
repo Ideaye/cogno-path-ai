@@ -11,3 +11,18 @@ verify_jwt = false
 
 [functions.record-reward]
 verify_jwt = false
+
+[functions.enqueue-llm-eval]
+verify_jwt = false
+
+[functions.eval-justification-worker]
+verify_jwt = false
+
+[functions.get-active-exam]
+verify_jwt = false
+
+[functions.manage-exam-enrollment]
+verify_jwt = false
+
+[functions.ai-insights]
+verify_jwt = false
