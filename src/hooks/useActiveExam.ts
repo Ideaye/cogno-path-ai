@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { ExamRef } from "@/types/domain";
+import { mock } from "@/lib/mock";
 
 interface ActiveExam {
   exam_id: string | null;
@@ -12,9 +13,9 @@ interface ActiveExam {
 }
 
 export function useActiveExam() {
-  const [activeExam, setActiveExam] = useState<ActiveExam | null>(null);
+  const [activeExam, setActiveExam] = useState<ExamRef | null>(null);
+  const [exams, setExams] = useState<ExamRef[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     checkActiveExam();
@@ -24,34 +25,53 @@ export function useActiveExam() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        setActiveExam(mock.activeExam);
+        setExams([mock.activeExam]);
         setLoading(false);
         return;
       }
 
       const { data: enrollment } = await supabase
         .from('user_exam_enrollments')
-        .select('exam_id, exams(*)')
+        .select('exam_id, exams(id, name, level)')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (!enrollment) {
-        // No active exam, redirect to onboarding
-        navigate('/onboarding');
-        return;
+      if (enrollment && enrollment.exams) {
+        const exam = enrollment.exams as any;
+        setActiveExam({
+          exam_id: enrollment.exam_id,
+          name: exam.name
+        });
+      } else {
+        setActiveExam(mock.activeExam);
       }
 
-      setActiveExam({
-        exam_id: enrollment.exam_id,
-        exam: enrollment.exams as any
-      });
+      // Get all exams
+      const { data: allEnrollments } = await supabase
+        .from('user_exam_enrollments')
+        .select('exam_id, exams(id, name)')
+        .eq('user_id', user.id)
+        .order('created_at');
+
+      if (allEnrollments && allEnrollments.length > 0) {
+        setExams(allEnrollments.map((e: any) => ({
+          exam_id: e.exam_id,
+          name: e.exams?.name ?? 'Unknown'
+        })));
+      } else {
+        setExams([mock.activeExam]);
+      }
     } catch (error) {
       console.error('Error checking active exam:', error);
+      setActiveExam(mock.activeExam);
+      setExams([mock.activeExam]);
     } finally {
       setLoading(false);
     }
   };
 
-  return { activeExam, loading, refreshActiveExam: checkActiveExam };
+  return { activeExam, exams, loading, refreshActiveExam: checkActiveExam };
 }

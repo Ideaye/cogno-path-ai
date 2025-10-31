@@ -132,7 +132,7 @@ export function Dashboard() {
             Welcome back, {userName}
           </h1>
           <p className="text-muted-foreground">
-            {activeExam?.exam ? `Preparing for ${activeExam.exam.name}` : 'Continue your personalized learning journey'}
+            {activeExam ? `Preparing for ${activeExam.name}` : 'Continue your personalized learning journey'}
           </p>
         </div>
 
