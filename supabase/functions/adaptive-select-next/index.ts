@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id } = await req.json();
+    const { user_id, mode } = await req.json();
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -97,13 +97,52 @@ serve(async (req) => {
     const baseDiff = 1 - accShort;
     const targetDiff = Math.max(0.1, Math.min(0.9, baseDiff + 0.1 * selectedAction.diffStep));
 
+    // Block-D drill mode: enforce rotating required_strategy
+    let requiredStrategy: string | null = null;
+    if (mode === 'drills') {
+      const strategyRotation = ['elimination', 'equation_setup', 'diagram'];
+      
+      // Fetch last policy log to determine next strategy
+      const { data: lastLog } = await supabaseClient
+        .from('policy_logs')
+        .select('action_json')
+        .eq('user_id', user_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const lastStrategy = lastLog?.action_json?.strategy;
+      const lastIdx = lastStrategy ? strategyRotation.indexOf(lastStrategy) : -1;
+      const nextIdx = (lastIdx + 1) % strategyRotation.length;
+      requiredStrategy = strategyRotation[nextIdx];
+
+      console.log(`Block-D mode: rotating to strategy ${requiredStrategy}`);
+    }
+
     // Select question matching criteria
     let question;
     if (conceptIds.length > 0) {
-      const { data: questions } = await supabaseClient
+      let query = supabaseClient
         .from('question_bank')
         .select('*, question_bank_concepts!inner(concept_id)')
-        .in('question_bank_concepts.concept_id', conceptIds)
+        .in('question_bank_concepts.concept_id', conceptIds);
+
+      // Exclude anchor items from adaptive selection
+      const { data: anchorIds } = await supabaseClient
+        .from('anchor_items')
+        .select('question_id')
+        .eq('active', true);
+      
+      if (anchorIds && anchorIds.length > 0) {
+        query = query.not('id', 'in', `(${anchorIds.map(a => `'${a.question_id}'`).join(',')})`);
+      }
+
+      // If Block-D mode, filter by required_strategy
+      if (requiredStrategy) {
+        query = query.eq('required_strategy', requiredStrategy);
+      }
+
+      const { data: questions } = await query
         .order('difficulty')
         .limit(10);
 
@@ -126,12 +165,17 @@ serve(async (req) => {
     }
 
     // Log policy decision with propensity
+    const actionWithStrategy = {
+      ...selectedAction,
+      ...(requiredStrategy && { strategy: requiredStrategy })
+    };
+
     await supabaseClient
       .from('policy_logs')
       .insert({
         user_id,
-        context_json: { ctxVec, weakestConcepts: conceptIds, targetDiff },
-        action_json: selectedAction,
+        context_json: { ctxVec, weakestConcepts: conceptIds, targetDiff, mode },
+        action_json: actionWithStrategy,
         chosen_question_id: question?.id || null,
         propensity: propensity,
       });

@@ -100,6 +100,48 @@ export type Database = {
           },
         ]
       }
+      anchor_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          exam_id: string
+          id: string
+          question_id: string
+          section: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          exam_id: string
+          id?: string
+          question_id: string
+          section: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          exam_id?: string
+          id?: string
+          question_id?: string
+          section?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anchor_items_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anchor_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "question_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attempts: {
         Row: {
           attempt_number: number | null
@@ -168,6 +210,44 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cdna_versions: {
+        Row: {
+          created_at: string
+          exam_id: string | null
+          id: string
+          source: string
+          user_id: string
+          vector_json: Json
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          exam_id?: string | null
+          id?: string
+          source: string
+          user_id: string
+          vector_json?: Json
+          version: string
+        }
+        Update: {
+          created_at?: string
+          exam_id?: string | null
+          id?: string
+          source?: string
+          user_id?: string
+          vector_json?: Json
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cdna_versions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
             referencedColumns: ["id"]
           },
         ]
@@ -248,6 +328,86 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eval_adjudications: {
+        Row: {
+          agreement_kappa: number | null
+          created_at: string
+          id: string
+          jqs_0_1: number
+          justification_id: string
+          labels_json: Json
+          rubric_version: string
+        }
+        Insert: {
+          agreement_kappa?: number | null
+          created_at?: string
+          id?: string
+          jqs_0_1: number
+          justification_id: string
+          labels_json?: Json
+          rubric_version?: string
+        }
+        Update: {
+          agreement_kappa?: number | null
+          created_at?: string
+          id?: string
+          jqs_0_1?: number
+          justification_id?: string
+          labels_json?: Json
+          rubric_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eval_adjudications_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: true
+            referencedRelation: "user_justifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eval_ratings: {
+        Row: {
+          confidence_0_1: number | null
+          created_at: string
+          id: string
+          justification_id: string
+          labels_json: Json
+          template_id: string
+        }
+        Insert: {
+          confidence_0_1?: number | null
+          created_at?: string
+          id?: string
+          justification_id: string
+          labels_json?: Json
+          template_id: string
+        }
+        Update: {
+          confidence_0_1?: number | null
+          created_at?: string
+          id?: string
+          justification_id?: string
+          labels_json?: Json
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eval_ratings_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: false
+            referencedRelation: "user_justifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eval_ratings_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -418,9 +578,12 @@ export type Database = {
         Row: {
           acc_ema_long: number | null
           acc_ema_short: number | null
+          anchor_score_mean: number | null
+          anchor_score_std: number | null
           calibration_progress_0_1: number | null
           cdna_embed: number[] | null
           created_at: string
+          ece_0_1: number | null
           exam_id: string
           fatigue_index: number | null
           id: string
@@ -437,9 +600,12 @@ export type Database = {
         Insert: {
           acc_ema_long?: number | null
           acc_ema_short?: number | null
+          anchor_score_mean?: number | null
+          anchor_score_std?: number | null
           calibration_progress_0_1?: number | null
           cdna_embed?: number[] | null
           created_at?: string
+          ece_0_1?: number | null
           exam_id: string
           fatigue_index?: number | null
           id?: string
@@ -456,9 +622,12 @@ export type Database = {
         Update: {
           acc_ema_long?: number | null
           acc_ema_short?: number | null
+          anchor_score_mean?: number | null
+          anchor_score_std?: number | null
           calibration_progress_0_1?: number | null
           cdna_embed?: number[] | null
           created_at?: string
+          ece_0_1?: number | null
           exam_id?: string
           fatigue_index?: number | null
           id?: string
@@ -668,6 +837,30 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           name?: string
+        }
+        Relationships: []
+      }
+      prompt_templates: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          text: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          role: string
+          text: string
+          version?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          text?: string
+          version?: string
         }
         Relationships: []
       }

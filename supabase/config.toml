@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.aif-retune-difficulty]
 verify_jwt = false
+
+[functions.compute-anchor-metrics]
+verify_jwt = false
+
+[functions.compute-cdna-v0-4]
+verify_jwt = false
