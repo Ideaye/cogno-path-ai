@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, Clock, Target, Percent, Download } from 'lucide-react';
+import { TrendingUp, Clock, Target, Percent, Download, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
-import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { useActiveExam } from '@/hooks/useActiveExam';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { DateRange } from '@/types/domain';
 import { track } from '@/lib/track';
+import { cn } from '@/lib/utils';
 
 export default function DashboardNew() {
   const navigate = useNavigate();
   const { activeExam, exams, loading: examsLoading } = useActiveExam();
   const { practice, cdna, calibration, reports, loading: dataLoading } = useDashboardData(activeExam?.exam_id);
   const [range, setRange] = useState<DateRange>({ from: '2025-01-01', to: '2025-01-31' });
+  const [showCDNA, setShowCDNA] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -32,7 +34,7 @@ export default function DashboardNew() {
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 transition-all" style={{ backgroundColor: '#f2f2f2' }}>
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-foreground">
             <p className="font-normal">Loading dashboard...</p>
           </div>
         </main>
@@ -48,7 +50,7 @@ export default function DashboardNew() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-foreground">
               Welcome back!
             </h1>
             {activeExam && (
@@ -58,18 +60,40 @@ export default function DashboardNew() {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            <NotificationDropdown />
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Action buttons */}
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-primary hover:bg-primary/10 text-foreground transition-all"
+              onClick={() => {
+                track('dashboard.resume_calibration_clicked');
+                navigate('/calibration');
+              }}
+            >
+              Resume Calibration
+            </Button>
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary-hover text-foreground transition-all"
+              onClick={() => {
+                track('dashboard.start_practice_clicked');
+                navigate('/practice');
+              }}
+            >
+              Start Practice
+            </Button>
+            
+            {/* Download report */}
             {reports.weeklyUrl && (
               <Button
                 variant="outline"
                 size="sm"
-                className="border-primary hover:bg-primary/10 w-full sm:w-auto transition-all"
+                className="border-primary hover:bg-primary/10 transition-all"
                 onClick={() => window.open(reports.weeklyUrl, '_blank')}
               >
-                <Download className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Download Report</span>
-                <span className="sm:hidden">Report</span>
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Report</span>
               </Button>
             )}
           </div>
@@ -122,89 +146,41 @@ export default function DashboardNew() {
               </GlassCard>
             </div>
 
-            {/* CDNA Metrics */}
+            {/* CDNA Metrics - Collapsible */}
             <GlassCard className="hover:shadow-md transition-all">
-              <div className="p-4 sm:p-6">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">CDNA Metrics</h2>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">ECE</p>
-                    <p className="text-xl sm:text-2xl font-semibold text-foreground">
-                      {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Mean</p>
-                    <p className="text-xl sm:text-2xl font-semibold text-foreground">
-                      {cdna.anchorMean !== null ? cdna.anchorMean.toFixed(2) : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Std</p>
-                    <p className="text-xl sm:text-2xl font-semibold text-foreground">
-                      {cdna.anchorStd !== null ? cdna.anchorStd.toFixed(2) : 'N/A'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Recent Activity */}
-            <GlassCard className="hover:shadow-md transition-all">
-              <div className="p-4 sm:p-6">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">Recent Activity</h2>
-                {practice.recent.length > 0 ? (
-                  <div className="space-y-2 sm:space-y-3">
-                    {practice.recent.slice(0, 5).map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <span className={item.correct ? 'text-success' : 'text-destructive font-bold'}>
-                            {item.correct ? '✓' : '✗'}
-                          </span>
-                          <span className="text-xs sm:text-sm text-muted-foreground font-normal">
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium">{item.id.slice(0, 8)}</span>
+              <Collapsible open={showCDNA} onOpenChange={setShowCDNA}>
+                <div className="p-4 sm:p-6">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between p-0 hover:bg-transparent mb-4">
+                      <h2 className="text-xl sm:text-2xl font-semibold text-foreground">CDNA Metrics</h2>
+                      <ChevronDown className={cn("h-5 w-5 transition-transform text-foreground", showCDNA && "rotate-180")} />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">ECE</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                          {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p className="font-normal">No recent activity yet</p>
-                    <p className="text-sm mt-1 font-normal">Start practicing to see your progress here!</p>
-                  </div>
-                )}
-              </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Mean</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                          {cdna.anchorMean !== null ? cdna.anchorMean.toFixed(2) : 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Std</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                          {cdna.anchorStd !== null ? cdna.anchorStd.toFixed(2) : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
             </GlassCard>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary-hover text-foreground flex-1 transition-all hover:scale-105 font-medium"
-                onClick={() => {
-                  track('dashboard.resume_calibration_clicked');
-                  navigate('/calibration');
-                }}
-              >
-                Resume Calibration
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-primary hover:bg-primary/10 flex-1 transition-all hover:scale-105 font-medium"
-                onClick={() => {
-                  track('dashboard.start_practice_clicked');
-                  navigate('/practice');
-                }}
-              >
-                Start Adaptive Practice
-              </Button>
-            </div>
           </>
         ) : (
           <GlassCard className="p-8 sm:p-12 text-center">

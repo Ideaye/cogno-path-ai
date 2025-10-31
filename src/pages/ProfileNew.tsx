@@ -8,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, User, Lock, LogOut, Edit2, CheckCircle2 } from 'lucide-react';
+import { Loader2, User, Lock, LogOut, Edit2, CheckCircle2, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 interface ProfileData {
   name: string;
@@ -30,6 +32,8 @@ export default function ProfileNew() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'personal' | 'security' | 'logout'>('personal');
+  const [showActivity, setShowActivity] = useState(false);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
     email: '',
@@ -45,6 +49,7 @@ export default function ProfileNew() {
 
   useEffect(() => {
     loadProfile();
+    loadRecentActivity();
   }, []);
 
   const loadProfile = async () => {
@@ -79,6 +84,20 @@ export default function ProfileNew() {
     }
 
     setLoading(false);
+  };
+
+  const loadRecentActivity = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: attempts } = await supabase
+      .from('attempts')
+      .select('id, correct, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    setRecentActivity(attempts || []);
   };
 
   const handleSave = async () => {
@@ -158,10 +177,10 @@ export default function ProfileNew() {
                     </button>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">
+                    <h2 className="text-xl font-bold text-foreground">
                       {profile.first_name} {profile.last_name}
                     </h2>
-                    <p className="text-sm text-muted-foreground">Student</p>
+                    <p className="text-sm text-foreground">Student</p>
                   </div>
                 </div>
 
@@ -349,13 +368,52 @@ export default function ProfileNew() {
                         {saving ? 'Saving...' : 'Save Changes'}
                       </Button>
                     </div>
+
+                    {/* Recent Activity - Collapsible */}
+                    <div className="pt-6 border-t">
+                      <Collapsible open={showActivity} onOpenChange={setShowActivity}>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="outline" className="w-full justify-between border-primary hover:bg-primary/10">
+                            Recent Activity
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", showActivity && "rotate-180")} />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-4">
+                          {recentActivity.length > 0 ? (
+                            <div className="space-y-2">
+                              {recentActivity.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <span className={item.correct ? 'text-success' : 'text-destructive font-bold'}>
+                                      {item.correct ? '✓' : '✗'}
+                                    </span>
+                                    <span className="text-sm text-foreground">
+                                      {new Date(item.created_at).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm font-medium text-foreground">{item.id.slice(0, 8)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <p className="font-normal">No recent activity yet</p>
+                              <p className="text-sm mt-1 font-normal">Start practicing to see your progress here!</p>
+                            </div>
+                          )}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
                   </div>
                 )}
 
                 {activeTab === 'security' && (
                   <div className="space-y-6">
-                    <h1 className="text-2xl lg:text-3xl font-bold">Login & Password</h1>
-                    <p className="text-muted-foreground">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Login & Password</h1>
+                    <p className="text-foreground">
                       Password management features coming soon.
                     </p>
                   </div>

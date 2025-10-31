@@ -11,8 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
-export function NotificationDropdown() {
+interface NotificationDropdownProps {
+  collapsed?: boolean;
+  className?: string;
+}
+
+export function NotificationDropdown({ collapsed = false, className }: NotificationDropdownProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   const getTypeColor = (type: string) => {
@@ -27,19 +33,33 @@ export function NotificationDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-            >
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </Badge>
+        <Button
+          variant="ghost"
+          className={cn(
+            "relative flex items-center gap-3",
+            collapsed ? "justify-center px-0 h-10 w-10" : "w-full justify-start px-4 py-3 rounded-xl hover:bg-muted/10",
+            className
           )}
+        >
+          <div className="relative">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Badge>
+            )}
+          </div>
+          {!collapsed && <span className="font-medium">Notifications</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 animate-slide-down">
+      <DropdownMenuContent 
+        align={collapsed ? "start" : "end"} 
+        side="right" 
+        className="w-80 animate-slide-down bg-white border border-black/[0.08] shadow-md z-50"
+      >
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="font-semibold">Notifications</h3>
           {unreadCount > 0 && (

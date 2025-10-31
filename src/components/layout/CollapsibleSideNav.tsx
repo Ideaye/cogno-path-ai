@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ProfileSection } from './ProfileSection';
+import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -76,13 +77,13 @@ export function CollapsibleSideNav() {
       {/* Header with toggle */}
       <div className="p-4 flex items-center justify-between border-b border-border/50">
         {!collapsed && (
-          <h1 className="text-xl font-bold text-foreground">Abhyas AI</h1>
+          <h1 className="text-xl font-bold text-white">Abhyas AI</h1>
         )}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleCollapse}
-          className="rounded-full"
+          className="rounded-full text-white hover:bg-white/10"
         >
           {collapsed ? <Menu className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </Button>
@@ -104,7 +105,7 @@ export function CollapsibleSideNav() {
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   isActive
                     ? "bg-highlight/20 text-highlight font-medium shadow-sm"
-                    : "hover:bg-muted/10 text-muted-foreground hover:text-foreground",
+                    : "hover:bg-white/10 text-white/70 hover:text-white",
                   collapsed && "justify-center"
                 )
               }
@@ -114,6 +115,11 @@ export function CollapsibleSideNav() {
             </NavLink>
           );
         })}
+
+        {/* Notification Dropdown */}
+        <div className="pt-2 border-t border-border/50 mt-2">
+          <NotificationDropdown collapsed={collapsed} />
+        </div>
       </nav>
 
       {/* Profile Section */}
