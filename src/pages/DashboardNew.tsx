@@ -34,7 +34,7 @@ export default function DashboardNew() {
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 transition-all" style={{ backgroundColor: '#f2f2f2' }}>
-          <div className="text-center py-8 text-foreground">
+          <div className="text-center py-8 text-black">
             <p className="font-normal">Loading dashboard...</p>
           </div>
         </main>
@@ -50,12 +50,12 @@ export default function DashboardNew() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-foreground">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-black">
               Welcome back!
             </h1>
             {activeExam && (
-              <p className="text-sm sm:text-base text-foreground font-normal">
-                Studying for <span className="font-medium text-foreground">{activeExam.name}</span>
+              <p className="text-sm sm:text-base text-black font-normal">
+                Studying for <span className="font-medium text-black">{activeExam.name}</span>
                 {practice.streak > 0 && ` • ${practice.streak} day streak`}
               </p>
             )}
@@ -65,7 +65,7 @@ export default function DashboardNew() {
             <Button
               size="sm"
               variant="outline"
-              className="border-primary hover:bg-primary/10 text-foreground transition-all"
+              className="border-primary hover:bg-primary/10 text-black transition-all"
               onClick={() => {
                 track('dashboard.resume_calibration_clicked');
                 navigate('/calibration');
@@ -75,7 +75,7 @@ export default function DashboardNew() {
             </Button>
             <Button
               size="sm"
-              className="bg-primary hover:bg-primary-hover text-foreground transition-all"
+              className="bg-primary hover:bg-primary-hover text-black transition-all"
               onClick={() => {
                 track('dashboard.start_practice_clicked');
                 navigate('/practice');
@@ -105,42 +105,42 @@ export default function DashboardNew() {
             <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
               <GlassCard className="p-4 sm:p-6 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm font-medium text-muted-foreground">Total Practice</span>
-                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                  <span className="text-xs sm:text-sm font-medium text-black">Total Practice</span>
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{practice.total}</h3>
-                <p className="text-xs sm:text-sm text-foreground mt-1 sm:mt-2 font-normal">
+                <h3 className="text-2xl sm:text-4xl font-semibold text-black">{practice.total}</h3>
+                <p className="text-xs sm:text-sm text-black mt-1 sm:mt-2 font-normal">
                   {practice.accuracy}% accuracy
                 </p>
               </GlassCard>
 
               <GlassCard className="p-4 sm:p-6 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Time</span>
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                  <span className="text-xs sm:text-sm font-medium text-black">Avg Time</span>
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{Math.round(practice.avgTimeMs / 1000)}s</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2 font-normal">per question</p>
+                <h3 className="text-2xl sm:text-4xl font-semibold text-black">{Math.round(practice.avgTimeMs / 1000)}s</h3>
+                <p className="text-xs sm:text-sm text-black mt-1 sm:mt-2 font-normal">per question</p>
               </GlassCard>
 
               <GlassCard className="p-4 sm:p-6 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm font-medium text-muted-foreground">Calibration</span>
-                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                  <span className="text-xs sm:text-sm font-medium text-black">Calibration</span>
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{calibration.progress}%</h3>
-                <p className="text-sm text-foreground mt-2 font-normal">
+                <h3 className="text-2xl sm:text-4xl font-semibold text-black">{calibration.progress}%</h3>
+                <p className="text-sm text-black mt-2 font-normal">
                   {calibration.progress === 100 ? 'Complete' : `${100 - calibration.progress}% to go`}
                 </p>
               </GlassCard>
 
               <GlassCard className="p-4 sm:p-6 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm font-medium text-muted-foreground">ECE Score</span>
-                  <Percent className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                  <span className="text-xs sm:text-sm font-medium text-black">ECE Score</span>
+                  <Percent className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}</h3>
-                <p className="text-xs sm:text-sm text-foreground mt-1 sm:mt-2 font-normal">
+                <h3 className="text-2xl sm:text-4xl font-semibold text-black">{cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}</h3>
+                <p className="text-xs sm:text-sm text-black mt-1 sm:mt-2 font-normal">
                   {cdna.ece !== null && cdna.ece < 0.1 ? 'Excellent' : 'Lower is better'}
                 </p>
               </GlassCard>
@@ -152,27 +152,27 @@ export default function DashboardNew() {
                 <div className="p-4 sm:p-6">
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" className="w-full justify-between p-0 hover:bg-transparent mb-4">
-                      <h2 className="text-xl sm:text-2xl font-semibold text-foreground">CDNA Metrics</h2>
-                      <ChevronDown className={cn("h-5 w-5 transition-transform text-foreground", showCDNA && "rotate-180")} />
+                      <h2 className="text-xl sm:text-2xl font-semibold text-black">CDNA Metrics</h2>
+                      <ChevronDown className={cn("h-5 w-5 transition-transform text-black", showCDNA && "rotate-180")} />
                     </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="grid gap-4 sm:grid-cols-3">
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">ECE</p>
-                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                        <p className="text-xs sm:text-sm font-medium text-black mb-1">ECE</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-black">
                           {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">Anchor Mean</p>
-                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                        <p className="text-xs sm:text-sm font-medium text-black mb-1">Anchor Mean</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-black">
                           {cdna.anchorMean !== null ? cdna.anchorMean.toFixed(2) : 'N/A'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">Anchor Std</p>
-                        <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                        <p className="text-xs sm:text-sm font-medium text-black mb-1">Anchor Std</p>
+                        <p className="text-xl sm:text-2xl font-semibold text-black">
                           {cdna.anchorStd !== null ? cdna.anchorStd.toFixed(2) : 'N/A'}
                         </p>
                       </div>
@@ -184,8 +184,8 @@ export default function DashboardNew() {
           </>
         ) : (
           <GlassCard className="p-8 sm:p-12 text-center">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">No Active Exam Selected</h2>
-            <p className="text-sm sm:text-base text-foreground mb-6 font-normal">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-black">No Active Exam Selected</h2>
+            <p className="text-sm sm:text-base text-black mb-6 font-normal">
               Select an exam from settings to start tracking your progress!
             </p>
             <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">
