@@ -159,19 +159,19 @@ export default function DashboardNew() {
                   <CollapsibleContent>
                     <div className="grid gap-4 sm:grid-cols-3">
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">ECE</p>
+                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">ECE</p>
                         <p className="text-xl sm:text-2xl font-semibold text-foreground">
                           {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Mean</p>
+                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">Anchor Mean</p>
                         <p className="text-xl sm:text-2xl font-semibold text-foreground">
                           {cdna.anchorMean !== null ? cdna.anchorMean.toFixed(2) : 'N/A'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Anchor Std</p>
+                        <p className="text-xs sm:text-sm font-medium text-foreground mb-1">Anchor Std</p>
                         <p className="text-xl sm:text-2xl font-semibold text-foreground">
                           {cdna.anchorStd !== null ? cdna.anchorStd.toFixed(2) : 'N/A'}
                         </p>
