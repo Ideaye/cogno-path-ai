@@ -62,10 +62,19 @@ serve(async (req) => {
       return mean + bonus;
     }
 
-    // Select best action
-    const selectedAction = actions.reduce((best, curr) => 
-      scoreAction(curr) > scoreAction(best) ? curr : best
-    );
+    // Compute scores for all actions
+    const scores = actions.map(a => scoreAction(a));
+    
+    // Compute softmax propensities
+    const maxScore = Math.max(...scores);
+    const expScores = scores.map(s => Math.exp(s - maxScore));
+    const sumExp = expScores.reduce((a, b) => a + b, 0);
+    const propensities = expScores.map(e => e / sumExp);
+    
+    // Select best action (greedy)
+    const bestIdx = scores.indexOf(Math.max(...scores));
+    const selectedAction = actions[bestIdx];
+    const propensity = propensities[bestIdx];
 
     // Find weakest concepts
     const masteryEntries = Object.entries(mastery);
@@ -116,7 +125,7 @@ serve(async (req) => {
       question = fallback;
     }
 
-    // Log policy decision
+    // Log policy decision with propensity
     await supabaseClient
       .from('policy_logs')
       .insert({
@@ -124,7 +133,7 @@ serve(async (req) => {
         context_json: { ctxVec, weakestConcepts: conceptIds, targetDiff },
         action_json: selectedAction,
         chosen_question_id: question?.id || null,
-        propensity: 1.0,
+        propensity: propensity,
       });
 
     console.log(`Selected question ${question?.id} with action:`, selectedAction);

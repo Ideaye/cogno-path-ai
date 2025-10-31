@@ -170,23 +170,54 @@ export function CalibrationLab() {
   const submitJustification = async () => {
     if (!itemId) return;
 
-    await supabase.from('user_justifications').insert({
-      train_ai_item_id: itemId,
-      text: justification,
-      strategy_tags: selectedStrategies,
-      effort_1_5: effort[0],
-      stress_1_5: stress[0],
-      error_cause: errorCause,
-    });
+    try {
+      const { data: insertedJustification, error: insertError } = await supabase
+        .from('user_justifications')
+        .insert({
+          train_ai_item_id: itemId,
+          text: justification,
+          strategy_tags: selectedStrategies,
+          effort_1_5: effort[0],
+          stress_1_5: stress[0],
+          error_cause: errorCause,
+        })
+        .select()
+        .single();
 
-    // Reset justification form
-    setJustification("");
-    setSelectedStrategies([]);
-    setEffort([3]);
-    setStress([3]);
-    setErrorCause("");
+      if (insertError) {
+        console.error('Error inserting justification:', insertError);
+        toast.error('Failed to save justification');
+        return;
+      }
 
-    nextQuestion();
+      // Enqueue LLM evaluation
+      if (insertedJustification?.id) {
+        const { error: enqueueError } = await supabase.functions.invoke('enqueue-llm-eval', {
+          body: { justification_id: insertedJustification.id }
+        });
+
+        if (enqueueError) {
+          console.error('Error enqueueing LLM eval:', enqueueError);
+          // Don't block user flow if enqueue fails
+        } else {
+          console.log('LLM eval enqueued for justification:', insertedJustification.id);
+        }
+      }
+
+      toast.success('Justification saved');
+
+      // Reset justification form
+      setJustification("");
+      setSelectedStrategies([]);
+      setEffort([3]);
+      setStress([3]);
+      setErrorCause("");
+
+      nextQuestion();
+    } catch (error: any) {
+      console.error('Error in submitJustification:', error);
+      toast.error(`Failed to submit: ${error.message}`);
+    }
   };
 
   const nextQuestion = () => {

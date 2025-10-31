@@ -8,8 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Zap, Clock, Target } from "lucide-react";
+import { Brain, Zap, Clock, Target, Flag, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Question {
   id: string;
@@ -17,6 +27,15 @@ interface Question {
   options: string[] | any;
   correct_option: string;
   difficulty: number;
+}
+
+type QState = "unseen" | "seen" | "flagged" | "correct" | "incorrect";
+
+interface QItem {
+  id: string;
+  label: number;
+  state: QState;
+  difficulty?: number;
 }
 
 export function AdaptivePractice() {
@@ -27,14 +46,61 @@ export function AdaptivePractice() {
   const [questionsCompleted, setQuestionsCompleted] = useState(0);
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState<string>("normal");
+  const [stackOpen, setStackOpen] = useState(true);
+  const [qStack, setQStack] = useState<QItem[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flagged, setFlagged] = useState(false);
+  const [showGatingDialog, setShowGatingDialog] = useState(false);
+  const [calibrationProgress, setCalibrationProgress] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const totalQuestions = 15;
 
+  // Check calibration progress on mount
   useEffect(() => {
-    loadNextQuestion();
+    checkCalibrationGating();
   }, []);
+
+  const checkCalibrationGating = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: active } = await supabase
+        .from('user_exam_enrollments')
+        .select('exam_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (!active?.exam_id) return;
+
+      const { data } = await supabase
+        .from('feature_user_exam_daily')
+        .select('calibration_progress_0_1')
+        .eq('user_id', user.id)
+        .eq('exam_id', active.exam_id)
+        .order('snapshot_date', { ascending: false })
+        .limit(1)
+        .single();
+
+      const p = data?.calibration_progress_0_1 ?? 0;
+      setCalibrationProgress(p);
+
+      if (p < 0.7) {
+        setShowGatingDialog(true);
+      }
+    } catch (error) {
+      console.error('Error checking calibration:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!showGatingDialog) {
+      loadNextQuestion();
+    }
+  }, [showGatingDialog]);
 
   const loadNextQuestion = async () => {
     setLoading(true);
@@ -66,7 +132,18 @@ export function AdaptivePractice() {
         setStyle(data.style || 'normal');
         setSelectedAnswer("");
         setConfidence([50]);
+        setFlagged(false);
         setStartTime(Date.now());
+
+        // Add to stack
+        const newItem: QItem = {
+          id: parsedQuestion.id,
+          label: qStack.length + 1,
+          state: "seen",
+          difficulty: parsedQuestion.difficulty
+        };
+        setQStack(prev => [...prev, newItem]);
+        setCurrentIndex(qStack.length);
       }
     } catch (error: any) {
       toast({
@@ -121,6 +198,13 @@ export function AdaptivePractice() {
       const newCompleted = questionsCompleted + 1;
       setQuestionsCompleted(newCompleted);
 
+      // Update stack state
+      setQStack(prev => prev.map((item, idx) => 
+        idx === currentIndex 
+          ? { ...item, state: (flagged ? "flagged" : isCorrect ? "correct" : "incorrect") as QState }
+          : item
+      ));
+
       // Show feedback
       toast({
         title: isCorrect ? "Correct!" : "Incorrect",
@@ -144,6 +228,15 @@ export function AdaptivePractice() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleFlag = () => {
+    setFlagged(!flagged);
+    setQStack(prev => prev.map((item, idx) => 
+      idx === currentIndex 
+        ? { ...item, state: !flagged ? "flagged" : "seen" }
+        : item
+    ));
   };
 
   if (loading && !currentQuestion) {
@@ -176,9 +269,66 @@ export function AdaptivePractice() {
 
   const progress = (questionsCompleted / totalQuestions) * 100;
 
+  const LeftStack = () => (
+    <aside className={`h-full ${stackOpen ? "w-64" : "w-12"} transition-all bg-[#0B0F19] text-gray-200 flex flex-col`}>
+      <button 
+        className="p-3 hover:bg-white/5 flex items-center justify-center"
+        onClick={() => setStackOpen(!stackOpen)}
+      >
+        {stackOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+      </button>
+      {stackOpen && (
+        <div className="flex-1 overflow-y-auto px-2 pb-2">
+          <div className="text-xs uppercase tracking-wider text-gray-400 px-2 py-3">
+            Questions
+          </div>
+          <ul className="space-y-1">
+            {qStack.map((q, idx) => (
+              <li 
+                key={q.id} 
+                className={`flex items-center justify-between rounded-md px-2 py-2 cursor-pointer hover:bg-white/5 ${idx === currentIndex ? 'bg-white/10' : ''}`}
+                onClick={() => setCurrentIndex(idx)}
+              >
+                <span className="text-sm font-medium">Q{q.label}</span>
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  q.state === "unseen" ? "bg-gray-500" :
+                  q.state === "seen" ? "bg-blue-400" :
+                  q.state === "flagged" ? "bg-amber-400" :
+                  q.state === "correct" ? "bg-emerald-500" : "bg-rose-500"
+                }`} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </aside>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 py-8">
-      <div className="max-w-3xl mx-auto">
+    <>
+      <AlertDialog open={showGatingDialog} onOpenChange={setShowGatingDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Finish Calibration</AlertDialogTitle>
+            <AlertDialogDescription>
+              Complete at least 24 justified items (you're at {Math.round(calibrationProgress * 24)}/24) to unlock full adaptive mode.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => navigate('/calibration')}>
+              Go to Calibration Lab
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => setShowGatingDialog(false)}>
+              Continue (limited)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex">
+        <LeftStack />
+        <div className="flex-1 p-4 py-8">
+          <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -253,15 +403,27 @@ export function AdaptivePractice() {
           </CardContent>
         </Card>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={loading || !selectedAnswer}
-          className="w-full"
-          size="lg"
-        >
-          {loading ? "Processing..." : "Submit Answer"}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={toggleFlag}
+            className="flex-shrink-0"
+            size="lg"
+          >
+            <Flag className={`w-4 h-4 ${flagged ? 'fill-amber-400 text-amber-400' : ''}`} />
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading || !selectedAnswer}
+            className="flex-1"
+            size="lg"
+          >
+            {loading ? "Processing..." : "Submit Answer"}
+          </Button>
+        </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

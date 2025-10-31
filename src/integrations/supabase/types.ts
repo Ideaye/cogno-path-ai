@@ -592,6 +592,7 @@ export type Database = {
           id: string
           options: Json
           reading_len: number | null
+          required_strategy: string | null
           text: string
         }
         Insert: {
@@ -603,6 +604,7 @@ export type Database = {
           id?: string
           options: Json
           reading_len?: number | null
+          required_strategy?: string | null
           text: string
         }
         Update: {
@@ -614,6 +616,7 @@ export type Database = {
           id?: string
           options?: Json
           reading_len?: number | null
+          required_strategy?: string | null
           text?: string
         }
         Relationships: []
@@ -810,7 +813,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      bump_calibration_progress: {
+        Args: { justification_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
