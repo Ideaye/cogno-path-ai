@@ -35,10 +35,20 @@ export default function Settings() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Fetch current cognitive_profile to merge
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('cognitive_profile')
+      .eq('id', user.id)
+      .single();
+
+    const currentProfile = (profile?.cognitive_profile as any) || {};
+    
     const { error } = await supabase
       .from('profiles')
       .update({
         cognitive_profile: {
+          ...currentProfile,
           weeklyReminder: checked
         }
       })

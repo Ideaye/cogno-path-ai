@@ -56,6 +56,7 @@ export function CalibrationLab() {
   const [errorCause, setErrorCause] = useState("");
   const [timer, setTimer] = useState(75);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const blockConfig = {
     intro: { title: "CDNA Calibration Lab", itemCount: 0 },
@@ -168,7 +169,7 @@ export function CalibrationLab() {
   };
 
   const submitJustification = async () => {
-    if (!itemId) return;
+    if (!itemId || isSubmitting) return;
 
     // Validate minimum 180 characters
     if (justification.trim().length < 180) {
@@ -176,71 +177,65 @@ export function CalibrationLab() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      // Check user's last adjudication quality
+      // Check user's last adjudication quality using RPC
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Get user's sessions
-        const { data: sessions } = await supabase
-          .from('train_ai_sessions')
-          .select('id')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+      if (!user) {
+        setIsSubmitting(false);
+        return;
+      }
 
-        if (sessions && sessions.length > 0) {
-          // Get items from these sessions
-          const sessionIds = sessions.map(s => s.id);
-          const { data: items } = await supabase
-            .from('train_ai_items')
-            .select('id')
-            .in('session_id', sessionIds);
+      // Get active exam
+      const { data: enrollment } = await supabase
+        .from('user_exam_enrollments')
+        .select('exam_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
 
-          if (items && items.length > 0) {
-            // Get justifications from these items
-            const itemIds = items.map(i => i.id);
-            const { data: justifications } = await supabase
-              .from('user_justifications')
-              .select('id')
-              .in('train_ai_item_id', itemIds)
-              .order('created_at', { ascending: false });
+      if (enrollment) {
+        const { data: lastJqs, error: jqsError } = await supabase
+          .rpc('get_last_jqs_for_user_exam', {
+            p_user: user.id,
+            p_exam: enrollment.exam_id
+          })
+          .maybeSingle();
 
-            if (justifications && justifications.length > 0) {
-              // Check last adjudication
-              const { data: lastAdj } = await supabase
-                .from('eval_adjudications')
-                .select('jqs_0_1')
-                .eq('justification_id', justifications[0].id)
-                .single();
+        if (jqsError) {
+          console.error('Error fetching last JQS:', jqsError);
+        }
 
-              if (lastAdj && lastAdj.jqs_0_1 < 0.35) {
-                toast.error('Your last justification needed improvement. Please provide more detail, explain your reasoning step-by-step, and show your work clearly.');
-                return;
-              }
-            }
-          }
+        if (lastJqs && lastJqs.jqs_0_1 < 0.35) {
+          toast.error('Your last justification needed improvement. Please provide more detail, explain your reasoning step-by-step, and show your work clearly.');
+          setIsSubmitting(false);
+          return;
         }
       }
 
+      // Upsert justification (one per item)
       const { data: insertedJustification, error: insertError } = await supabase
         .from('user_justifications')
-        .insert({
+        .upsert({
           train_ai_item_id: itemId,
           text: justification,
           strategy_tags: selectedStrategies,
           effort_1_5: effort[0],
           stress_1_5: stress[0],
           error_cause: errorCause,
-        })
+        }, { onConflict: 'train_ai_item_id' })
         .select()
         .single();
 
       if (insertError) {
-        console.error('Error inserting justification:', insertError);
+        console.error('Error upserting justification:', insertError);
         toast.error('Failed to save justification');
+        setIsSubmitting(false);
         return;
       }
 
-      // Enqueue LLM evaluation
+      // Enqueue LLM evaluation (idempotent)
       if (insertedJustification?.id) {
         const { error: enqueueError } = await supabase.functions.invoke('enqueue-llm-eval', {
           body: { justification_id: insertedJustification.id }
@@ -267,6 +262,8 @@ export function CalibrationLab() {
     } catch (error: any) {
       console.error('Error in submitJustification:', error);
       toast.error(`Failed to submit: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -490,7 +487,7 @@ export function CalibrationLab() {
                 className="resize-none"
               />
               <div className="text-sm text-muted-foreground text-right">
-                {justification.length}/300
+                {justification.trim().length}/300 characters (minimum 180)
               </div>
 
               <div>
@@ -548,10 +545,10 @@ export function CalibrationLab() {
 
               <Button
                 onClick={submitJustification}
-                disabled={!justification || justification.length < 20}
+                disabled={isSubmitting || !justification || justification.trim().length < 180}
                 className="w-full bg-primary hover:bg-[hsl(var(--primary-hover))] rounded-xl h-12"
               >
-                Submit Justification
+                {isSubmitting ? 'Submitting...' : 'Submit Justification'}
               </Button>
             </CardContent>
           </Card>

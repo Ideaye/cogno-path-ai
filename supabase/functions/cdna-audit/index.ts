@@ -77,12 +77,13 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(3);
 
-    // 5. Cron job status
-    const { data: cronJobs } = await supabase
-      .from('cron.job_run_details')
-      .select('*')
-      .order('start_time', { ascending: false })
-      .limit(5);
+    // 5. Cron job status using RPC fallback
+    const { data: cronJobs, error: cronError } = await supabase
+      .rpc('get_recent_cron_runs');
+
+    if (cronError) {
+      console.error('Error fetching cron runs:', cronError);
+    }
 
     // 6. Build report
     const report = {

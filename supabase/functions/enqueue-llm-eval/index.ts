@@ -19,15 +19,19 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Insert into queue
-    await supabaseClient
+    // Upsert into queue (idempotent - unique constraint on justification_id)
+    const { error: queueError } = await supabaseClient
       .from('llm_eval_queue')
-      .insert({
+      .upsert({
         justification_id,
         status: 'queued',
         payload_json: {},
         created_at: new Date().toISOString()
-      });
+      }, { onConflict: 'justification_id', ignoreDuplicates: false });
+
+    if (queueError) {
+      console.error('Queue error:', queueError);
+    }
 
     console.log(`Enqueued justification ${justification_id} for LLM evaluation`);
 

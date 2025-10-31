@@ -706,7 +706,7 @@ export type Database = {
           {
             foreignKeyName: "llm_eval_queue_justification_id_fkey"
             columns: ["justification_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "user_justifications"
             referencedColumns: ["id"]
           },
@@ -1126,7 +1126,7 @@ export type Database = {
           {
             foreignKeyName: "user_justifications_train_ai_item_id_fkey"
             columns: ["train_ai_item_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "train_ai_items"
             referencedColumns: ["id"]
           },
@@ -1144,6 +1144,25 @@ export type Database = {
       compute_item_hash: {
         Args: { correct: string; options: string[]; stem: string }
         Returns: string
+      }
+      get_last_jqs_for_user_exam: {
+        Args: { p_exam: string; p_user: string }
+        Returns: {
+          created_at: string
+          jqs_0_1: number
+        }[]
+      }
+      get_recent_cron_runs: {
+        Args: never
+        Returns: {
+          end_time: string
+          job_name: string
+          jobid: number
+          return_message: string
+          runid: number
+          start_time: string
+          status: string
+        }[]
       }
       norm_text: { Args: { t: string }; Returns: string }
     }
