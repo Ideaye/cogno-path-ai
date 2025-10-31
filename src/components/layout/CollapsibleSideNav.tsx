@@ -69,20 +69,21 @@ export function CollapsibleSideNav() {
   return (
     <aside 
       className={cn(
-        "h-screen flex flex-col transition-all duration-300 border-r border-border/50 bg-white",
+        "h-screen flex flex-col transition-all duration-300 border-r border-border/50",
         collapsed ? "w-20" : "w-72"
       )}
+      style={{ backgroundColor: '#222220' }}
     >
       {/* Header with toggle */}
       <div className="p-4 flex items-center justify-between border-b border-border/50">
         {!collapsed && (
-          <h1 className="text-xl font-bold text-black">Abhyas AI</h1>
+          <h1 className="text-xl font-bold text-white">Abhyas AI</h1>
         )}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleCollapse}
-          className="rounded-full text-black hover:bg-black/10"
+          className="rounded-full text-white hover:bg-white/10"
         >
           {collapsed ? <Menu className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </Button>
@@ -103,8 +104,8 @@ export function CollapsibleSideNav() {
                 cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   isActive
-                    ? "bg-primary/20 text-primary font-medium shadow-sm"
-                    : "hover:bg-black/5 text-black/70 hover:text-black",
+                    ? "bg-highlight/20 text-highlight font-medium shadow-sm"
+                    : "hover:bg-white/10 text-white/70 hover:text-white",
                   collapsed && "justify-center"
                 )
               }

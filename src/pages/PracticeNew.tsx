@@ -282,7 +282,7 @@ export default function PracticeNew() {
                       />
                       <Label 
                         htmlFor={option.key} 
-                        className="flex-1 cursor-pointer text-black"
+                        className="flex-1 cursor-pointer text-foreground"
                       >
                         <span className="font-semibold mr-2 text-primary">{option.key}.</span>
                         {option.text}
