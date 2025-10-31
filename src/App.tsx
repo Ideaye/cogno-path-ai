@@ -13,6 +13,7 @@ import { CalibrationLab } from "./components/calibration/CalibrationLab";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ExamOnboarding } from "./components/onboarding/ExamOnboarding";
 import Settings from "./pages/Settings";
+import AdminContent from "./pages/AdminContent";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -69,6 +70,7 @@ function App() {
             <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
             <Route path="/mock-tests" element={<ProtectedRoute><div className="p-8"><h1 className="text-2xl font-bold">Mock Tests Coming Soon</h1></div></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/admin/content" element={<ProtectedRoute><AdminContent /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>

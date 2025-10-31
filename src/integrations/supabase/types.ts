@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_items_quarantine: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          difficulty_seed_0_1: number | null
+          exam_id: string
+          generator_version: string | null
+          id: string
+          issues: string[] | null
+          originality_hash: string
+          payload_json: Json
+          quality_score: number | null
+          reading_len: number | null
+          required_strategy: string | null
+          section: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          difficulty_seed_0_1?: number | null
+          exam_id: string
+          generator_version?: string | null
+          id?: string
+          issues?: string[] | null
+          originality_hash: string
+          payload_json: Json
+          quality_score?: number | null
+          reading_len?: number | null
+          required_strategy?: string | null
+          section: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          difficulty_seed_0_1?: number | null
+          exam_id?: string
+          generator_version?: string | null
+          id?: string
+          issues?: string[] | null
+          originality_hash?: string
+          payload_json?: Json
+          quality_score?: number | null
+          reading_len?: number | null
+          required_strategy?: string | null
+          section?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      aif_validation_queue: {
+        Row: {
+          aiq_id: string
+          created_at: string | null
+          error: string | null
+          id: number
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          aiq_id: string
+          created_at?: string | null
+          error?: string | null
+          id?: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          aiq_id?: string
+          created_at?: string | null
+          error?: string | null
+          id?: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aif_validation_queue_aiq_id_fkey"
+            columns: ["aiq_id"]
+            isOneToOne: false
+            referencedRelation: "ai_items_quarantine"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attempts: {
         Row: {
           attempt_number: number | null
@@ -562,6 +648,7 @@ export type Database = {
           email: string
           exam_type: string
           id: string
+          is_admin: boolean | null
           name: string
         }
         Insert: {
@@ -570,6 +657,7 @@ export type Database = {
           email: string
           exam_type: string
           id: string
+          is_admin?: boolean | null
           name: string
         }
         Update: {
@@ -578,6 +666,7 @@ export type Database = {
           email?: string
           exam_type?: string
           id?: string
+          is_admin?: boolean | null
           name?: string
         }
         Relationships: []
@@ -588,11 +677,16 @@ export type Database = {
           correct_option: string
           created_at: string
           difficulty: number | null
+          flags_json: Json | null
           format_type: string | null
+          generator_version: string | null
           id: string
           options: Json
+          originality_hash: string | null
+          quality_score: number | null
           reading_len: number | null
           required_strategy: string | null
+          source: string | null
           text: string
         }
         Insert: {
@@ -600,11 +694,16 @@ export type Database = {
           correct_option: string
           created_at?: string
           difficulty?: number | null
+          flags_json?: Json | null
           format_type?: string | null
+          generator_version?: string | null
           id?: string
           options: Json
+          originality_hash?: string | null
+          quality_score?: number | null
           reading_len?: number | null
           required_strategy?: string | null
+          source?: string | null
           text: string
         }
         Update: {
@@ -612,11 +711,16 @@ export type Database = {
           correct_option?: string
           created_at?: string
           difficulty?: number | null
+          flags_json?: Json | null
           format_type?: string | null
+          generator_version?: string | null
           id?: string
           options?: Json
+          originality_hash?: string | null
+          quality_score?: number | null
           reading_len?: number | null
           required_strategy?: string | null
+          source?: string | null
           text?: string
         }
         Relationships: []
@@ -656,6 +760,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      question_difficulty_history: {
+        Row: {
+          created_at: string | null
+          id: number
+          new: number
+          old: number
+          question_id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          new: number
+          old: number
+          question_id: string
+          reason: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          new?: number
+          old?: number
+          question_id?: string
+          reason?: string
+        }
+        Relationships: []
       }
       train_ai_items: {
         Row: {
@@ -817,6 +948,11 @@ export type Database = {
         Args: { justification_id: string }
         Returns: undefined
       }
+      compute_item_hash: {
+        Args: { correct: string; options: string[]; stem: string }
+        Returns: string
+      }
+      norm_text: { Args: { t: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

@@ -26,3 +26,18 @@ verify_jwt = false
 
 [functions.ai-insights]
 verify_jwt = false
+
+[functions.aif-generate]
+verify_jwt = false
+
+[functions.aif-validator]
+verify_jwt = false
+
+[functions.aif-approve]
+verify_jwt = false
+
+[functions.aif-coverage-planner]
+verify_jwt = false
+
+[functions.aif-retune-difficulty]
+verify_jwt = false
