@@ -100,7 +100,7 @@ export default function SettingsNew() {
             <div className="flex items-center justify-between py-3">
               <div className="space-y-0.5">
                 <Label htmlFor="daily-email" className="text-base">Daily Email Summary</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-foreground">
                   Receive daily progress summaries via email
                 </p>
               </div>
@@ -117,7 +117,7 @@ export default function SettingsNew() {
             <div className="flex items-center justify-between py-3">
               <div className="space-y-0.5">
                 <Label htmlFor="weekly-pdf" className="text-base">Weekly PDF Report</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-foreground">
                   Get weekly performance reports as PDF via email
                 </p>
               </div>
@@ -136,7 +136,7 @@ export default function SettingsNew() {
         <GlassCard>
           <div className="p-6 space-y-4">
             <h2 className="text-xl font-semibold">Account Connections</h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground">
               Link additional login methods to your account
             </p>
 
@@ -151,7 +151,7 @@ export default function SettingsNew() {
                 </Button>
               )}
               {linkedProviders.includes('google') && (
-                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium">
+                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium text-foreground">
                   ✓ Google account linked
                 </div>
               )}
@@ -166,7 +166,7 @@ export default function SettingsNew() {
                 </Button>
               )}
               {linkedProviders.includes('apple') && (
-                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium">
+                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 text-sm font-medium text-foreground">
                   ✓ Apple account linked
                 </div>
               )}

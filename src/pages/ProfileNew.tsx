@@ -399,9 +399,9 @@ export default function ProfileNew() {
                               ))}
                             </div>
                           ) : (
-                            <div className="text-center py-8 text-muted-foreground">
-                              <p className="font-normal">No recent activity yet</p>
-                              <p className="text-sm mt-1 font-normal">Start practicing to see your progress here!</p>
+                            <div className="text-center py-8">
+                              <p className="font-normal text-foreground">No recent activity yet</p>
+                              <p className="text-sm mt-1 font-normal text-muted-foreground">Start practicing to see your progress here!</p>
                             </div>
                           )}
                         </CollapsibleContent>
