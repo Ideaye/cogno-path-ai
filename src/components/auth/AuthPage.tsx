@@ -181,10 +181,10 @@ export default function AuthPage() {
           {/* Logo and Title */}
           <div className="text-center space-y-3">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4">
-              <Brain className="h-7 w-7 sm:h-8 sm:w-8 text-foreground" />
+              <Brain className="h-7 w-7 sm:h-8 sm:w-8 text-black" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Abhyas AI</h1>
-            <p className="text-sm sm:text-base text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Abhyas AI</h1>
+            <p className="text-sm sm:text-base text-black">
               {isLogin ? 'Welcome back!' : 'Start your learning journey'}
             </p>
           </div>
@@ -223,7 +223,7 @@ export default function AuthPage() {
 
           <div className="relative">
             <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-black">
               Or continue with
             </span>
           </div>
@@ -236,7 +236,7 @@ export default function AuthPage() {
               className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                 authMethod === 'email' 
                   ? 'bg-background shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-black hover:text-black'
               }`}
             >
               <Mail className="w-4 h-4 inline mr-1" />
@@ -248,7 +248,7 @@ export default function AuthPage() {
               className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                 authMethod === 'otp' 
                   ? 'bg-background shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-black hover:text-black'
               }`}
             >
               <Smartphone className="w-4 h-4 inline mr-1" />
@@ -304,7 +304,7 @@ export default function AuthPage() {
               <Button
                 type="submit"
                 disabled={loading || !email || !password || (!isLogin && !name)}
-                className="w-full bg-primary hover:bg-primary-hover text-foreground"
+                className="w-full bg-primary hover:bg-primary-hover text-black"
                 size="lg"
               >
                 {loading ? (
@@ -335,7 +335,7 @@ export default function AuthPage() {
                       disabled={loading}
                       required
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-black">
                       Include country code (e.g., +1 for US)
                     </p>
                   </div>
@@ -344,7 +344,7 @@ export default function AuthPage() {
                     type="button"
                     onClick={handleSendOTP}
                     disabled={loading || !phone}
-                    className="w-full bg-primary hover:bg-primary-hover text-foreground"
+                    className="w-full bg-primary hover:bg-primary-hover text-black"
                     size="lg"
                   >
                     {loading ? (
@@ -376,7 +376,7 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full bg-primary hover:bg-primary-hover text-foreground"
+                    className="w-full bg-primary hover:bg-primary-hover text-black"
                     size="lg"
                   >
                     {loading ? (

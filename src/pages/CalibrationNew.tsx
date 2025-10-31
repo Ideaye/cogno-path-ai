@@ -294,8 +294,8 @@ export default function CalibrationNew() {
         <CollapsibleSideNav />
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">No Active Exam</h2>
-            <p className="text-foreground mb-6 font-normal">
+            <h2 className="text-2xl font-semibold mb-4 text-black">No Active Exam</h2>
+            <p className="text-black mb-6 font-normal">
               You need to select an active exam before starting calibration
             </p>
             <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">
@@ -313,8 +313,8 @@ export default function CalibrationNew() {
         <CollapsibleSideNav />
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Calibration Complete!</h2>
-            <p className="text-foreground mb-6 font-normal">
+            <h2 className="text-2xl font-semibold mb-4 text-black">Calibration Complete!</h2>
+            <p className="text-black mb-6 font-normal">
               You have completed all calibration items for this exam. Great job!
             </p>
             <Button onClick={() => navigate('/dashboard')} className="transition-all hover:scale-105 font-medium">
@@ -331,8 +331,8 @@ export default function CalibrationNew() {
       <CollapsibleSideNav />
       <main className="flex-1 p-8 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
         <div className="mb-6 animate-fade-in">
-          <h1 className="text-3xl font-bold text-foreground">Calibration Lab</h1>
-          <div className="flex items-center gap-4 text-sm text-foreground mt-2 font-normal">
+          <h1 className="text-3xl font-bold text-black">Calibration Lab</h1>
+          <div className="flex items-center gap-4 text-sm text-black mt-2 font-normal">
             <span>Progress: {progress}%</span>
           </div>
           <Progress value={progress} className="mt-2 max-w-md" />
@@ -341,8 +341,8 @@ export default function CalibrationNew() {
         {/* Question Block - Full Width on Top */}
         <GlassCard className="hover:shadow-md transition-all animate-fade-in">
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Current Question</h2>
-            <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal text-foreground">
+            <h2 className="text-xl font-semibold mb-4 text-black">Current Question</h2>
+            <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal text-black">
               {currentItem.prompt}
             </p>
           </div>
@@ -351,7 +351,7 @@ export default function CalibrationNew() {
         {/* Response Form Block - Full Width Below */}
         <GlassCard className="hover:shadow-md transition-all animate-fade-in">
           <div className="p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-foreground">Your Response</h2>
+            <h2 className="text-xl font-semibold text-black">Your Response</h2>
 
             {/* Answer */}
             <div>
@@ -364,7 +364,7 @@ export default function CalibrationNew() {
                 className="min-h-[150px] mt-2 transition-all focus:ring-2 focus:ring-primary/50"
                 disabled={submitting}
               />
-              <div className={`text-sm mt-1 font-normal ${answerText.length < 180 ? 'text-destructive' : 'text-foreground'}`}>
+              <div className={`text-sm mt-1 font-normal ${answerText.length < 180 ? 'text-destructive' : 'text-black'}`}>
                 {answerText.length}/180 minimum characters
               </div>
             </div>

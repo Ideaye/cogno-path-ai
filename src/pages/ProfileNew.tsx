@@ -173,14 +173,14 @@ export default function ProfileNew() {
                       </AvatarFallback>
                     </Avatar>
                     <button className="absolute bottom-0 right-0 bg-primary rounded-full p-2 hover:opacity-90">
-                      <Edit2 className="h-3 w-3 text-foreground" />
+                      <Edit2 className="h-3 w-3 text-black" />
                     </button>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">
+                    <h2 className="text-xl font-bold text-black">
                       {profile.first_name} {profile.last_name}
                     </h2>
-                    <p className="text-sm text-foreground">Student</p>
+                    <p className="text-sm text-black">Student</p>
                   </div>
                 </div>
 
@@ -249,7 +249,7 @@ export default function ProfileNew() {
                     {/* Name Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-muted-foreground">First Name</Label>
+                        <Label htmlFor="firstName" className="text-black">First Name</Label>
                         <Input
                           id="firstName"
                           value={profile.first_name}
@@ -258,7 +258,7 @@ export default function ProfileNew() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-muted-foreground">Last Name</Label>
+                        <Label htmlFor="lastName" className="text-black">Last Name</Label>
                         <Input
                           id="lastName"
                           value={profile.last_name}
@@ -270,7 +270,7 @@ export default function ProfileNew() {
 
                     {/* Email */}
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-muted-foreground">Email</Label>
+                      <Label htmlFor="email" className="text-black">Email</Label>
                       <div className="relative">
                         <Input
                           id="email"
@@ -288,7 +288,7 @@ export default function ProfileNew() {
 
                     {/* Address */}
                     <div className="space-y-2">
-                      <Label htmlFor="address" className="text-muted-foreground">Address</Label>
+                      <Label htmlFor="address" className="text-black">Address</Label>
                       <Input
                         id="address"
                         value={profile.address}
@@ -301,7 +301,7 @@ export default function ProfileNew() {
                     {/* Phone and DOB */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-muted-foreground">Phone Number</Label>
+                        <Label htmlFor="phone" className="text-black">Phone Number</Label>
                         <Input
                           id="phone"
                           type="tel"
@@ -312,7 +312,7 @@ export default function ProfileNew() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="dob" className="text-muted-foreground">Date of Birth</Label>
+                        <Label htmlFor="dob" className="text-black">Date of Birth</Label>
                         <Input
                           id="dob"
                           type="date"
@@ -326,7 +326,7 @@ export default function ProfileNew() {
                     {/* Location and Postal Code */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="location" className="text-muted-foreground">Location</Label>
+                        <Label htmlFor="location" className="text-black">Location</Label>
                         <Select value={profile.location} onValueChange={(value) => setProfile({ ...profile, location: value })}>
                           <SelectTrigger className="bg-muted/50 border-0 h-12">
                             <SelectValue placeholder="Select location" />
@@ -340,7 +340,7 @@ export default function ProfileNew() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="postalCode" className="text-muted-foreground">Postal Code</Label>
+                        <Label htmlFor="postalCode" className="text-black">Postal Code</Label>
                         <Input
                           id="postalCode"
                           value={profile.postal_code}
@@ -363,7 +363,7 @@ export default function ProfileNew() {
                       <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex-1 h-12 bg-primary hover:bg-primary-hover text-foreground"
+                        className="flex-1 h-12 bg-primary hover:bg-primary-hover text-black"
                       >
                         {saving ? 'Saving...' : 'Save Changes'}
                       </Button>
@@ -390,18 +390,18 @@ export default function ProfileNew() {
                                     <span className={item.correct ? 'text-success' : 'text-destructive font-bold'}>
                                       {item.correct ? '✓' : '✗'}
                                     </span>
-                                    <span className="text-sm text-foreground">
+                                    <span className="text-sm text-black">
                                       {new Date(item.created_at).toLocaleDateString()}
                                     </span>
-                                  </div>
-                                  <span className="text-sm font-medium text-foreground">{item.id.slice(0, 8)}</span>
+                                   </div>
+                                   <span className="text-sm font-medium text-black">{item.id.slice(0, 8)}</span>
                                 </div>
                               ))}
                             </div>
                           ) : (
                             <div className="text-center py-8">
-                              <p className="font-normal text-foreground">No recent activity yet</p>
-                              <p className="text-sm mt-1 font-normal text-muted-foreground">Start practicing to see your progress here!</p>
+                              <p className="font-normal text-black">No recent activity yet</p>
+                              <p className="text-sm mt-1 font-normal text-black">Start practicing to see your progress here!</p>
                             </div>
                           )}
                         </CollapsibleContent>
@@ -412,8 +412,8 @@ export default function ProfileNew() {
 
                 {activeTab === 'security' && (
                   <div className="space-y-6">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Login & Password</h1>
-                    <p className="text-foreground">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-black">Login & Password</h1>
+                    <p className="text-black">
                       Password management features coming soon.
                     </p>
                   </div>

@@ -125,8 +125,8 @@ export default function AdminContentNew() {
 
         {isAdmin && (
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Marketing Course Management</h3>
-            <p className="text-sm text-foreground mb-4">
+            <h3 className="text-lg font-semibold mb-4 text-black">Marketing Course Management</h3>
+            <p className="text-sm text-black mb-4">
               Reload the sample Marketing Fundamentals course items (10 practice + 6 calibration)
             </p>
             <Button 

@@ -42,9 +42,9 @@ export default function Landing() {
             </div>
             
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition">Features</a>
-              <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition">How It Works</a>
-              <a href="#innovation" className="text-sm text-muted-foreground hover:text-foreground transition">Innovation</a>
+              <a href="#features" className="text-sm text-black hover:text-black transition">Features</a>
+              <a href="#how-it-works" className="text-sm text-black hover:text-black transition">How It Works</a>
+              <a href="#innovation" className="text-sm text-black hover:text-black transition">Innovation</a>
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-4">
@@ -68,7 +68,7 @@ export default function Landing() {
             Adaptive Learning
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto font-normal">
+          <p className="text-lg sm:text-xl md:text-2xl text-black mb-8 sm:mb-12 max-w-3xl mx-auto font-normal">
             Experience the future of exam preparation with intelligent calibration, 
             personalized practice, and cognitive insights that evolve with you
           </p>
@@ -77,7 +77,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               onClick={handleGetStarted}
-              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-foreground text-lg px-8 py-6 h-auto transition-all hover:scale-105 font-medium"
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-black text-lg px-8 py-6 h-auto transition-all hover:scale-105 font-medium"
             >
               Start Learning Today
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -101,7 +101,7 @@ export default function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
               Unlock Your <span className="text-primary">Potential</span>
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-normal">
+            <p className="text-lg sm:text-xl text-black max-w-2xl mx-auto font-normal">
               Intelligent features designed to transform how you learn and excel
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function Landing() {
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">AI-Driven Calibration</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Train your confidence alongside knowledge. Our system learns your 
                 patterns to optimize both accuracy and self-assessment
               </p>
@@ -123,7 +123,7 @@ export default function Landing() {
                 <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Adaptive Practice</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Questions that evolve with your progress. Focus on what matters 
                 most with AI-selected content tailored to your learning curve
               </p>
@@ -134,7 +134,7 @@ export default function Landing() {
                 <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Cognitive Insights</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Deep analytics on your learning patterns. Understand your strengths,
                 identify gaps, and track improvement with precision metrics
               </p>
@@ -145,7 +145,7 @@ export default function Landing() {
                 <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Real-Time Feedback</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Instant insights after every question. Learn from mistakes 
                 immediately with AI-generated explanations and improvement tips
               </p>
@@ -156,7 +156,7 @@ export default function Landing() {
                 <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Progress Tracking</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Visualize your journey to mastery. Comprehensive dashboards 
                 show your growth across topics, time, and confidence levels
               </p>
@@ -167,7 +167,7 @@ export default function Landing() {
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Smart Reviews</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+              <p className="text-sm sm:text-base text-black leading-relaxed font-normal">
                 Never forget what you've learned. Spaced repetition powered by
                 AI ensures long-term retention and exam-day confidence
               </p>
@@ -184,7 +184,7 @@ export default function Landing() {
             Advanced technologies and adaptive algorithms work together to 
             revolutionize how you prepare for exams
           </h2>
-          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed font-normal">
+          <p className="text-lg sm:text-xl text-black leading-relaxed font-normal">
             We combine cutting-edge machine learning, cognitive science, and educational 
             psychology to create a learning experience that's uniquely yours
           </p>
@@ -198,7 +198,7 @@ export default function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
               How <span className="text-primary">Abhyas AI</span> Works
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground">
+            <p className="text-lg sm:text-xl text-black">
               Your path to exam mastery in three simple steps
             </p>
           </div>
@@ -210,7 +210,7 @@ export default function Landing() {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Calibrate Your Baseline</h3>
-                <p className="text-sm sm:text-base text-muted-foreground font-normal">
+                <p className="text-sm sm:text-base text-black font-normal">
                   Start with our intelligent calibration phase that assesses both your knowledge 
                   and confidence levels. This creates a personalized learning profile
                 </p>
@@ -223,7 +223,7 @@ export default function Landing() {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Practice Adaptively</h3>
-                <p className="text-sm sm:text-base text-muted-foreground font-normal">
+                <p className="text-sm sm:text-base text-black font-normal">
                   Engage with AI-selected questions that target your weak areas while 
                   reinforcing strengths. The difficulty adapts in real-time to your performance
                 </p>
@@ -236,7 +236,7 @@ export default function Landing() {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Track & Excel</h3>
-                <p className="text-sm sm:text-base text-muted-foreground font-normal">
+                <p className="text-sm sm:text-base text-black font-normal">
                   Monitor your progress with detailed analytics and cognitive insights. 
                   Watch your confidence grow as you approach exam-ready mastery
                 </p>
@@ -253,14 +253,14 @@ export default function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
               Ready to <span className="text-primary">Transform</span> Your Learning?
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-black mb-6 sm:mb-8 max-w-2xl mx-auto">
               Join thousands of students who are already mastering their exams 
               with AI-powered adaptive learning
             </p>
             <Button 
               size="lg" 
               onClick={handleGetStarted}
-              className="bg-primary hover:bg-primary-hover text-foreground text-lg px-8 sm:px-12 py-6 h-auto transition-all hover:scale-105 font-medium"
+              className="bg-primary hover:bg-primary-hover text-black text-lg px-8 sm:px-12 py-6 h-auto transition-all hover:scale-105 font-medium"
             >
               Start Learning Today
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -277,13 +277,13 @@ export default function Landing() {
               <Brain className="h-6 w-6 text-primary" />
               <span className="text-lg font-bold">Abhyas AI</span>
             </div>
-            <p className="text-sm text-muted-foreground text-center sm:text-left">
+            <p className="text-sm text-black text-center sm:text-left">
               © 2025 Abhyas AI. Empowering learners worldwide.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Privacy</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Terms</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Contact</a>
+              <a href="#" className="text-sm text-black hover:text-black transition">Privacy</a>
+              <a href="#" className="text-sm text-black hover:text-black transition">Terms</a>
+              <a href="#" className="text-sm text-black hover:text-black transition">Contact</a>
             </div>
           </div>
         </div>
