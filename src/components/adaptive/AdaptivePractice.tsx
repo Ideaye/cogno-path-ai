@@ -19,7 +19,7 @@ interface Question {
   difficulty: number;
 }
 
-export default function AdaptivePractice() {
+export function AdaptivePractice() {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [confidence, setConfidence] = useState([50]);

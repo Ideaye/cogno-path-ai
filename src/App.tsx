@@ -7,7 +7,7 @@ import AuthPage from "./components/auth/AuthPage";
 import DiagnosticTest from "./components/diagnostic/DiagnosticTest";
 import ProfileSummary from "./components/profile/ProfileSummary";
 import { Dashboard } from "./components/dashboard/Dashboard";
-import AdaptivePractice from "./components/adaptive/AdaptivePractice";
+import { AdaptivePractice } from "./components/adaptive/AdaptivePractice";
 import InsightsPage from "./components/insights/InsightsPage";
 import { CalibrationLab } from "./components/calibration/CalibrationLab";
 import { AppLayout } from "./components/layout/AppLayout";
