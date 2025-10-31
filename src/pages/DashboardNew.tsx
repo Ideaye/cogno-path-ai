@@ -107,7 +107,7 @@ export default function DashboardNew() {
                   <span className="text-sm text-muted-foreground">ECE Score</span>
                   <Percent className="h-5 w-5 text-lime" />
                 </div>
-                <h3 className="text-4xl font-bold">{cdna.ece.toFixed(3)}</h3>
+                <h3 className="text-4xl font-bold">{cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}</h3>
                 <p className="text-sm text-muted-foreground mt-2">calibration error</p>
               </GlassCard>
             </div>
@@ -119,15 +119,21 @@ export default function DashboardNew() {
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">ECE</p>
-                    <p className="text-2xl font-bold gradient-text">{cdna.ece.toFixed(3)}</p>
+                    <p className="text-2xl font-bold gradient-text">
+                      {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Anchor Mean</p>
-                    <p className="text-2xl font-bold">{cdna.anchorMean.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">
+                      {cdna.anchorMean !== null ? cdna.anchorMean.toFixed(2) : 'N/A'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Anchor Std</p>
-                    <p className="text-2xl font-bold">{cdna.anchorStd.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">
+                      {cdna.anchorStd !== null ? cdna.anchorStd.toFixed(2) : 'N/A'}
+                    </p>
                   </div>
                 </div>
               </div>
