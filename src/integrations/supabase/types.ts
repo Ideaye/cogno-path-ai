@@ -166,6 +166,100 @@ export type Database = {
           },
         ]
       }
+      exam_presets: {
+        Row: {
+          calibration_preset_json: Json | null
+          created_at: string
+          exam_id: string
+          id: string
+        }
+        Insert: {
+          calibration_preset_json?: Json | null
+          created_at?: string
+          exam_id: string
+          id?: string
+        }
+        Update: {
+          calibration_preset_json?: Json | null
+          created_at?: string
+          exam_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_presets_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_sections: {
+        Row: {
+          created_at: string
+          exam_id: string
+          id: string
+          name: string
+          order_index: number
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string
+          exam_id: string
+          id?: string
+          name: string
+          order_index: number
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string
+          exam_id?: string
+          id?: string
+          name?: string
+          order_index?: number
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_sections_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          alias: string[] | null
+          created_at: string
+          duration_min: number | null
+          id: string
+          level: string | null
+          name: string
+          negative_marking_json: Json | null
+        }
+        Insert: {
+          alias?: string[] | null
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          level?: string | null
+          name: string
+          negative_marking_json?: Json | null
+        }
+        Update: {
+          alias?: string[] | null
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          level?: string | null
+          name?: string
+          negative_marking_json?: Json | null
+        }
+        Relationships: []
+      }
       feature_user_daily: {
         Row: {
           acc_ema_long: number | null
@@ -230,6 +324,74 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_user_exam_daily: {
+        Row: {
+          acc_ema_long: number | null
+          acc_ema_short: number | null
+          calibration_progress_0_1: number | null
+          cdna_embed: number[] | null
+          created_at: string
+          exam_id: string
+          fatigue_index: number | null
+          id: string
+          latency_ema_long: number | null
+          latency_ema_short: number | null
+          mastery_vector: Json | null
+          miscalibration_ema: number | null
+          pressure_sensitivity: number | null
+          snapshot_date: string
+          strategy_strengths_json: Json | null
+          switch_cost: number | null
+          user_id: string
+        }
+        Insert: {
+          acc_ema_long?: number | null
+          acc_ema_short?: number | null
+          calibration_progress_0_1?: number | null
+          cdna_embed?: number[] | null
+          created_at?: string
+          exam_id: string
+          fatigue_index?: number | null
+          id?: string
+          latency_ema_long?: number | null
+          latency_ema_short?: number | null
+          mastery_vector?: Json | null
+          miscalibration_ema?: number | null
+          pressure_sensitivity?: number | null
+          snapshot_date: string
+          strategy_strengths_json?: Json | null
+          switch_cost?: number | null
+          user_id: string
+        }
+        Update: {
+          acc_ema_long?: number | null
+          acc_ema_short?: number | null
+          calibration_progress_0_1?: number | null
+          cdna_embed?: number[] | null
+          created_at?: string
+          exam_id?: string
+          fatigue_index?: number | null
+          id?: string
+          latency_ema_long?: number | null
+          latency_ema_short?: number | null
+          mastery_vector?: Json | null
+          miscalibration_ema?: number | null
+          pressure_sensitivity?: number | null
+          snapshot_date?: string
+          strategy_strengths_json?: Json | null
+          switch_cost?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_user_exam_daily_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
             referencedColumns: ["id"]
           },
         ]
@@ -566,6 +728,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_exam_enrollments: {
+        Row: {
+          created_at: string
+          exam_id: string
+          id: string
+          is_active: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exam_id: string
+          id?: string
+          is_active?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exam_id?: string
+          id?: string
+          is_active?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_exam_enrollments_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_justifications: {
         Row: {

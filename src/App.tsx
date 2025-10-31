@@ -11,6 +11,8 @@ import { AdaptivePractice } from "./components/adaptive/AdaptivePractice";
 import InsightsPage from "./components/insights/InsightsPage";
 import { CalibrationLab } from "./components/calibration/CalibrationLab";
 import { AppLayout } from "./components/layout/AppLayout";
+import { ExamOnboarding } from "./components/onboarding/ExamOnboarding";
+import Settings from "./pages/Settings";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -58,6 +60,7 @@ function App() {
           <Routes>
             <Route path="/" element={session ? <Navigate to="/dashboard" /> : <Navigate to="/auth" />} />
             <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/dashboard" />} />
+            <Route path="/onboarding" element={session ? <ExamOnboarding /> : <Navigate to="/auth" />} />
             <Route path="/diagnostic" element={<ProtectedRoute><DiagnosticTest /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -65,7 +68,7 @@ function App() {
             <Route path="/practice" element={<ProtectedRoute><AdaptivePractice /></ProtectedRoute>} />
             <Route path="/insights" element={<ProtectedRoute><InsightsPage /></ProtectedRoute>} />
             <Route path="/mock-tests" element={<ProtectedRoute><div className="p-8"><h1 className="text-2xl font-bold">Mock Tests Coming Soon</h1></div></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><div className="p-8"><h1 className="text-2xl font-bold">Settings Coming Soon</h1></div></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>
