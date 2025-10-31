@@ -1156,10 +1156,8 @@ export type Database = {
         Args: never
         Returns: {
           end_time: string
-          job_name: string
           jobid: number
-          return_message: string
-          runid: number
+          jobname: string
           start_time: string
           status: string
         }[]

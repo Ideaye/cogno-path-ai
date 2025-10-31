@@ -20,17 +20,18 @@ serve(async (req) => {
     );
 
     // Upsert into queue (idempotent - unique constraint on justification_id)
-    const { error: queueError } = await supabaseClient
+    const upsertRes = await supabaseClient
       .from('llm_eval_queue')
-      .upsert({
-        justification_id,
-        status: 'queued',
-        payload_json: {},
-        created_at: new Date().toISOString()
-      }, { onConflict: 'justification_id', ignoreDuplicates: false });
+      .upsert(
+        { justification_id },
+        { onConflict: 'justification_id', ignoreDuplicates: false }
+      )
+      .select('id, justification_id')
+      .single();
 
-    if (queueError) {
-      console.error('Queue error:', queueError);
+    if (upsertRes.error) {
+      // If conflict error slips through, treat as success (idempotent)
+      console.warn('Queue upsert warning:', upsertRes.error);
     }
 
     console.log(`Enqueued justification ${justification_id} for LLM evaluation`);

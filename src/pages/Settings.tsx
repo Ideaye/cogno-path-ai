@@ -2,12 +2,13 @@ import { ExamManagement } from "@/components/settings/ExamManagement";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function Settings() {
   const [weeklyReminder, setWeeklyReminder] = useState(true);
+  const debounceRef = useRef<number | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -32,35 +33,38 @@ export default function Settings() {
   const handleWeeklyReminderToggle = async (checked: boolean) => {
     setWeeklyReminder(checked);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    // Fetch current cognitive_profile to merge
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('cognitive_profile')
-      .eq('id', user.id)
-      .single();
+      // Fetch current cognitive_profile to merge
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('cognitive_profile')
+        .eq('id', user.id)
+        .single();
 
-    const currentProfile = (profile?.cognitive_profile as any) || {};
-    
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        cognitive_profile: {
-          ...currentProfile,
-          weeklyReminder: checked
-        }
-      })
-      .eq('id', user.id);
+      const currentProfile = (profile?.cognitive_profile as any) || {};
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          cognitive_profile: {
+            ...currentProfile,
+            weeklyReminder: checked
+          }
+        })
+        .eq('id', user.id);
 
-    if (error) {
-      console.error('Error updating reminder setting:', error);
-      toast.error('Failed to save reminder setting');
-      setWeeklyReminder(!checked);
-    } else {
-      toast.success(checked ? 'Weekly reminders enabled' : 'Weekly reminders disabled');
-    }
+      if (error) {
+        console.error('Error updating reminder setting:', error);
+        toast.error('Failed to save reminder setting');
+        setWeeklyReminder(!checked);
+      } else {
+        toast.success(checked ? 'Weekly reminders enabled' : 'Weekly reminders disabled');
+      }
+    }, 300);
   };
 
   return (

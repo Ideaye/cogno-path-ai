@@ -486,9 +486,9 @@ export function CalibrationLab() {
                 rows={5}
                 className="resize-none"
               />
-              <div className="text-sm text-muted-foreground text-right">
+              <p className={justification.trim().length < 180 ? 'text-amber-500 text-xs text-right' : 'text-muted-foreground text-xs text-right'}>
                 {justification.trim().length}/300 characters (minimum 180)
-              </div>
+              </p>
 
               <div>
                 <Label className="mb-2 block">Strategies Used:</Label>

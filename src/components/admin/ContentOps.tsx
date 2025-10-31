@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import AuditChips from "./AuditChips";
 
 export function ContentOps() {
   const [exams, setExams] = useState<any[]>([]);
@@ -183,6 +184,10 @@ export function ContentOps() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Content Operations</h1>
         <p className="text-muted-foreground">AI-powered question generation and management</p>
+      </div>
+
+      <div className="mb-4">
+        <AuditChips />
       </div>
 
       {/* Generate Panel */}
