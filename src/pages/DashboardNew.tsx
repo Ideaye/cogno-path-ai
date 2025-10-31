@@ -185,7 +185,7 @@ export default function DashboardNew() {
         ) : (
           <GlassCard className="p-8 sm:p-12 text-center">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">No Active Exam Selected</h2>
-            <p className="text-sm sm:text-base text-muted-foreground mb-6 font-normal">
+            <p className="text-sm sm:text-base text-foreground mb-6 font-normal">
               Select an exam from settings to start tracking your progress!
             </p>
             <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">

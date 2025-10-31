@@ -184,7 +184,7 @@ export default function AuthPage() {
               <Brain className="h-7 w-7 sm:h-8 sm:w-8 text-foreground" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Abhyas AI</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-foreground">
               {isLogin ? 'Welcome back!' : 'Start your learning journey'}
             </p>
           </div>

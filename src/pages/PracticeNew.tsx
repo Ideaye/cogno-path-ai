@@ -208,8 +208,8 @@ export default function PracticeNew() {
         <CollapsibleSideNav />
         <main className="flex-1 p-8">
           <GlassCard className="p-12 text-center">
-            <h2 className="text-2xl font-semibold mb-4">No Active Exam</h2>
-            <p className="text-muted-foreground mb-6">
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">No Active Exam</h2>
+            <p className="text-foreground mb-6">
               You need to select an active exam before starting practice.
             </p>
             <Button onClick={() => navigate('/settings')}>

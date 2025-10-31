@@ -295,7 +295,7 @@ export default function CalibrationNew() {
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">No Active Exam</h2>
-            <p className="text-muted-foreground mb-6 font-normal">
+            <p className="text-foreground mb-6 font-normal">
               You need to select an active exam before starting calibration
             </p>
             <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">
@@ -314,7 +314,7 @@ export default function CalibrationNew() {
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">Calibration Complete!</h2>
-            <p className="text-muted-foreground mb-6 font-normal">
+            <p className="text-foreground mb-6 font-normal">
               You have completed all calibration items for this exam. Great job!
             </p>
             <Button onClick={() => navigate('/dashboard')} className="transition-all hover:scale-105 font-medium">
@@ -332,7 +332,7 @@ export default function CalibrationNew() {
       <main className="flex-1 p-8 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
         <div className="mb-6 animate-fade-in">
           <h1 className="text-3xl font-bold text-foreground">Calibration Lab</h1>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2 font-normal">
+          <div className="flex items-center gap-4 text-sm text-foreground mt-2 font-normal">
             <span>Progress: {progress}%</span>
           </div>
           <Progress value={progress} className="mt-2 max-w-md" />
@@ -342,7 +342,7 @@ export default function CalibrationNew() {
         <GlassCard className="hover:shadow-md transition-all animate-fade-in">
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Current Question</h2>
-            <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal">
+            <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal text-foreground">
               {currentItem.prompt}
             </p>
           </div>
