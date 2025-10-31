@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Target, Clock, Zap, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 type Block = "intro" | "baseline" | "strategy" | "pressure" | "drills" | "wrap";
 
@@ -431,16 +432,16 @@ export function CalibrationLab() {
 
         {/* Question Card */}
         {!needsJustification ? (
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white text-black">
             <CardHeader>
-              <CardTitle className="text-lg leading-relaxed">{currentQuestion.text}</CardTitle>
+              <CardTitle className="text-lg leading-relaxed text-black">{currentQuestion.text}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
                 {currentQuestion.options.map((option, idx) => (
                   <div key={idx} className="flex items-center space-x-2">
                     <RadioGroupItem value={option} id={`option-${idx}`} />
-                    <Label htmlFor={`option-${idx}`} className="cursor-pointer">
+                    <Label htmlFor={`option-${idx}`} className="cursor-pointer text-black">
                       {option}
                     </Label>
                   </div>
@@ -449,7 +450,7 @@ export function CalibrationLab() {
 
               {(currentBlock === "baseline" || currentBlock === "pressure") && (
                 <div className="space-y-2">
-                  <Label>Confidence: {confidence[0]}%</Label>
+                  <Label className="text-black">Confidence: {confidence[0]}%</Label>
                   <Slider
                     value={confidence}
                     onValueChange={setConfidence}
@@ -470,10 +471,10 @@ export function CalibrationLab() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white text-black">
             <CardHeader>
-              <CardTitle>Explain Your Reasoning</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-black">Explain Your Reasoning</CardTitle>
+              <CardDescription className="text-black">
                 Help the AI understand your problem-solving approach (max 300 characters)
               </CardDescription>
             </CardHeader>
@@ -491,13 +492,16 @@ export function CalibrationLab() {
               </p>
 
               <div>
-                <Label className="mb-2 block">Strategies Used:</Label>
+                <Label className="mb-2 block text-black">Strategies Used:</Label>
                 <div className="flex flex-wrap gap-2">
                   {STRATEGY_CHIPS.map((strategy) => (
                     <Badge
                       key={strategy}
                       variant={selectedStrategies.includes(strategy) ? "default" : "outline"}
-                      className="cursor-pointer"
+                      className={cn(
+                        "cursor-pointer",
+                        !selectedStrategies.includes(strategy) && "text-black bg-white"
+                      )}
                       onClick={() => toggleStrategy(strategy)}
                     >
                       {strategy}
@@ -508,7 +512,7 @@ export function CalibrationLab() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Mental Effort: {effort[0]}/5</Label>
+                  <Label className="text-black">Mental Effort: {effort[0]}/5</Label>
                   <Slider
                     value={effort}
                     onValueChange={setEffort}
@@ -518,7 +522,7 @@ export function CalibrationLab() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Stress Level: {stress[0]}/5</Label>
+                  <Label className="text-black">Stress Level: {stress[0]}/5</Label>
                   <Slider
                     value={stress}
                     onValueChange={setStress}
@@ -530,12 +534,12 @@ export function CalibrationLab() {
               </div>
 
               <div>
-                <Label className="mb-2 block">If incorrect, what was the main cause?</Label>
+                <Label className="mb-2 block text-black">If incorrect, what was the main cause?</Label>
                 <RadioGroup value={errorCause} onValueChange={setErrorCause}>
                   {ERROR_CAUSES.map((cause) => (
                     <div key={cause.value} className="flex items-center space-x-2">
                       <RadioGroupItem value={cause.value} id={cause.value} />
-                      <Label htmlFor={cause.value} className="cursor-pointer">
+                      <Label htmlFor={cause.value} className="cursor-pointer text-black">
                         {cause.label}
                       </Label>
                     </div>
