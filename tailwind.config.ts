@@ -22,6 +22,8 @@ export default {
         lime: "hsl(var(--lime))",
         lavender: "hsl(var(--lavender))",
         "soft-purple": "hsl(var(--soft-purple))",
+        "blue-accent": "hsl(var(--blue-accent))",
+        "teal-accent": "hsl(var(--teal-accent))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

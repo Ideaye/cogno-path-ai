@@ -42,6 +42,8 @@ All colors MUST be HSL.
     --lime: 82 92% 55%;
     --lavender: 270 60% 70%;
     --soft-purple: 258 80% 65%;
+    --blue-accent: 210 100% 60%;
+    --teal-accent: 174 72% 56%;
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.18);
   }
@@ -108,18 +110,22 @@ All colors MUST be HSL.
   }
 
   .gradient-lime-purple {
-    background: linear-gradient(135deg, hsl(var(--lime)), hsl(var(--soft-purple)));
+    background: linear-gradient(135deg, hsl(var(--blue-accent)), hsl(var(--primary)));
   }
 
   .gradient-purple-lavender {
-    background: linear-gradient(135deg, hsl(var(--soft-purple)), hsl(var(--lavender)));
+    background: linear-gradient(135deg, hsl(var(--teal-accent)), hsl(var(--lavender)));
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--lime)), hsl(var(--soft-purple)));
+    background: linear-gradient(135deg, hsl(var(--blue-accent)), hsl(var(--primary)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .gradient-subtle {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--blue-accent) / 0.1));
   }
 
   .glass-input {
