@@ -400,23 +400,22 @@ export default function CalibrationNew() {
           <Progress value={progress} className="mt-2" />
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Prompt</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Panel: Prompt */}
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Current Prompt</h2>
+              <p className="text-lg leading-relaxed">
                 {currentItem?.question_bank?.text || 'Loading question...'}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </GlassCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Response</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Right Panel: Form */}
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-6">Your Response</h2>
+              <div className="space-y-6">
               {/* Final Answer */}
               <div>
                 <Label htmlFor="final-answer">Final Answer *</Label>
@@ -621,7 +620,8 @@ export default function CalibrationNew() {
               <Button
                 onClick={handleSubmit}
                 disabled={submitting || !isFormValid()}
-                className="w-full"
+                className="w-full gradient-lime-purple text-white"
+                size="lg"
               >
                 {submitting ? (
                   <>
@@ -632,11 +632,11 @@ export default function CalibrationNew() {
                   'Submit Justification'
                 )}
               </Button>
+              </div>
             </div>
-          </div>
-        </GlassCard>
-      </div>
-    </main>
-  </div>
-);
+          </GlassCard>
+        </div>
+      </main>
+    </div>
+  );
 }
