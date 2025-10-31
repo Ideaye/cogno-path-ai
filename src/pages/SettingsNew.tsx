@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/track';
-import SideNav from '@/components/SideNav';
-import { Card } from '@/components/ui/card';
+import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
+import { GlassCard } from '@/components/ui/glass-card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -88,87 +88,91 @@ export default function SettingsNew() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <SideNav activeRoute="/settings" />
-      <main className="flex-1 p-6 space-y-6">
-        <div className="text-2xl font-semibold">Settings</div>
+    <div className="flex min-h-screen w-full">
+      <CollapsibleSideNav />
+      <main className="flex-1 p-8 space-y-6">
+        <h1 className="text-4xl font-bold gradient-text">Settings</h1>
 
-        <Card className="p-6 space-y-4">
-          <div className="text-lg font-medium">Report Preferences</div>
-          
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="daily-email">Daily Email Summary</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive daily progress summaries via email
-              </p>
-            </div>
-            <Switch 
-              id="daily-email"
-              checked={dailyEmail} 
-              onCheckedChange={(v) => { 
-                setDailyEmail(v); 
-                savePreference('daily_email', v); 
-              }}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="weekly-pdf">Weekly PDF Report</Label>
-              <p className="text-sm text-muted-foreground">
-                Get weekly performance reports as PDF via email
-              </p>
-            </div>
-            <Switch 
-              id="weekly-pdf"
-              checked={weeklyPdf} 
-              onCheckedChange={(v) => { 
-                setWeeklyPdf(v); 
-                savePreference('weekly_pdf', v); 
-              }}
-            />
-          </div>
-        </Card>
-
-        <Card className="p-6 space-y-4">
-          <div className="text-lg font-medium">Account Connections</div>
-          <p className="text-sm text-muted-foreground">
-            Link additional login methods to your account
-          </p>
-
-          <div className="space-y-2">
-            {!linkedProviders.includes('google') && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => linkIdentity('google')}
-              >
-                Link Google Account
-              </Button>
-            )}
-            {linkedProviders.includes('google') && (
-              <div className="p-3 border rounded bg-muted/30 text-sm">
-                ✓ Google account linked
+        <GlassCard>
+          <div className="p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Report Preferences</h2>
+            
+            <div className="flex items-center justify-between py-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="daily-email" className="text-base">Daily Email Summary</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive daily progress summaries via email
+                </p>
               </div>
-            )}
+              <Switch 
+                id="daily-email"
+                checked={dailyEmail} 
+                onCheckedChange={(v) => { 
+                  setDailyEmail(v); 
+                  savePreference('daily_email', v); 
+                }}
+              />
+            </div>
 
-            {!linkedProviders.includes('apple') && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => linkIdentity('apple')}
-              >
-                Link Apple Account
-              </Button>
-            )}
-            {linkedProviders.includes('apple') && (
-              <div className="p-3 border rounded bg-muted/30 text-sm">
-                ✓ Apple account linked
+            <div className="flex items-center justify-between py-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="weekly-pdf" className="text-base">Weekly PDF Report</Label>
+                <p className="text-sm text-muted-foreground">
+                  Get weekly performance reports as PDF via email
+                </p>
               </div>
-            )}
+              <Switch 
+                id="weekly-pdf"
+                checked={weeklyPdf} 
+                onCheckedChange={(v) => { 
+                  setWeeklyPdf(v); 
+                  savePreference('weekly_pdf', v); 
+                }}
+              />
+            </div>
           </div>
-        </Card>
+        </GlassCard>
+
+        <GlassCard>
+          <div className="p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Account Connections</h2>
+            <p className="text-sm text-muted-foreground">
+              Link additional login methods to your account
+            </p>
+
+            <div className="space-y-3">
+              {!linkedProviders.includes('google') && (
+                <Button
+                  variant="outline"
+                  className="w-full border-lime hover:bg-lime/10"
+                  onClick={() => linkIdentity('google')}
+                >
+                  Link Google Account
+                </Button>
+              )}
+              {linkedProviders.includes('google') && (
+                <div className="p-4 border-2 border-lime rounded-xl bg-lime/5 text-sm font-medium">
+                  ✓ Google account linked
+                </div>
+              )}
+
+              {!linkedProviders.includes('apple') && (
+                <Button
+                  variant="outline"
+                  className="w-full border-lime hover:bg-lime/10"
+                  onClick={() => linkIdentity('apple')}
+                >
+                  Link Apple Account
+                </Button>
+              )}
+              {linkedProviders.includes('apple') && (
+                <div className="p-4 border-2 border-lime rounded-xl bg-lime/5 text-sm font-medium">
+                  ✓ Apple account linked
+                </div>
+              )}
+            </div>
+          </div>
+        </GlassCard>
       </main>
     </div>
   );

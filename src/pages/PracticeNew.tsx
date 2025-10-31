@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SideNav from '@/components/SideNav';
+import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GlassCard } from '@/components/ui/glass-card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
@@ -201,10 +202,10 @@ export default function PracticeNew() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/practice" />
-        <main className="flex-1 p-6 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-lime" />
         </main>
       </div>
     );
@@ -212,22 +213,18 @@ export default function PracticeNew() {
 
   if (!activeExam) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/practice" />
-        <main className="flex-1 p-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>No Active Exam</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                You need to select an active exam before starting practice.
-              </p>
-              <Button onClick={() => navigate('/settings')}>
-                Go to Settings
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8">
+          <GlassCard className="p-12 text-center">
+            <h2 className="text-2xl font-semibold mb-4">No Active Exam</h2>
+            <p className="text-muted-foreground mb-6">
+              You need to select an active exam before starting practice.
+            </p>
+            <Button onClick={() => navigate('/settings')}>
+              Go to Settings
+            </Button>
+          </GlassCard>
         </main>
       </div>
     );
@@ -235,10 +232,10 @@ export default function PracticeNew() {
 
   if (!currentQuestion) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/practice" />
-        <main className="flex-1 p-6 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-lime" />
         </main>
       </div>
     );
@@ -248,45 +245,54 @@ export default function PracticeNew() {
   const avgTime = questionCount > 0 ? Math.round(totalTime / questionCount / 1000) : 0;
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <SideNav activeRoute="/practice" />
-      <main className="flex-1 p-6">
+    <div className="flex min-h-screen w-full">
+      <CollapsibleSideNav />
+      <main className="flex-1 p-8">
         {/* Stats header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex gap-6 text-sm">
-            <span>Question: {questionCount + 1}</span>
-            <span>Accuracy: {accuracy}%</span>
-            <span>Avg Time: {avgTime}s</span>
+        <GlassCard className="mb-6 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-6 text-sm">
+              <span className="font-medium">Question: <span className="text-lime">{questionCount + 1}</span></span>
+              <span className="font-medium">Accuracy: <span className="text-lime">{accuracy}%</span></span>
+              <span className="font-medium">Avg Time: <span className="text-lime">{avgTime}s</span></span>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={handleEndSession}
+              className="border-lime hover:bg-lime/10"
+            >
+              End Session
+            </Button>
           </div>
-          <Button variant="outline" onClick={handleEndSession}>
-            End Session
-          </Button>
-        </div>
+        </GlassCard>
 
         {/* Question card */}
-        <Card className="max-w-3xl mx-auto">
-          <CardHeader>
-            <CardTitle>Question {questionCount + 1}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-lg whitespace-pre-wrap">
+        <GlassCard className="max-w-3xl mx-auto">
+          <div className="p-8 space-y-6">
+            <h2 className="text-2xl font-semibold">Question {questionCount + 1}</h2>
+            
+            <div className="text-lg whitespace-pre-wrap leading-relaxed">
               {currentQuestion.stem}
             </div>
 
             <RadioGroup value={selectedKey} onValueChange={setSelectedKey}>
               <div className="space-y-3">
                 {currentQuestion.options.map((option) => (
-                  <div key={option.key} className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent cursor-pointer">
+                  <div 
+                    key={option.key} 
+                    className="flex items-center space-x-3 border-2 border-border rounded-xl p-4 hover:border-lime hover:bg-lime/5 cursor-pointer transition-all"
+                  >
                     <RadioGroupItem 
                       value={option.key} 
                       id={option.key}
                       disabled={submitting}
+                      className="border-lime text-lime"
                     />
                     <Label 
                       htmlFor={option.key} 
                       className="flex-1 cursor-pointer"
                     >
-                      <span className="font-medium mr-2">{option.key}.</span>
+                      <span className="font-semibold mr-2 text-lime">{option.key}.</span>
                       {option.text}
                     </Label>
                   </div>
@@ -297,7 +303,7 @@ export default function PracticeNew() {
             <Button
               onClick={handleSubmit}
               disabled={!selectedKey || submitting}
-              className="w-full"
+              className="w-full gradient-lime-purple text-white"
               size="lg"
             >
               {submitting ? (
@@ -309,8 +315,8 @@ export default function PracticeNew() {
                 'Submit Answer'
               )}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </GlassCard>
       </main>
     </div>
   );

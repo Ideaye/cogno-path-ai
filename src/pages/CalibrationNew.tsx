@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '@/components/SideNav';
 import { supabase } from '@/integrations/supabase/client';
+import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
+import { GlassCard } from '@/components/ui/glass-card';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -357,10 +357,10 @@ export default function CalibrationNew() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/calibration" />
-        <main className="flex-1 p-6 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-lime" />
         </main>
       </div>
     );
@@ -368,33 +368,29 @@ export default function CalibrationNew() {
 
   if (!activeExam) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/calibration" />
-        <main className="flex-1 p-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>No Active Exam</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                You need to select an active exam before starting calibration.
-              </p>
-              <Button onClick={() => navigate('/settings')}>
-                Go to Settings
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8">
+          <GlassCard className="p-12 text-center">
+            <h2 className="text-2xl font-semibold mb-4">No Active Exam</h2>
+            <p className="text-muted-foreground mb-6">
+              You need to select an active exam before starting calibration.
+            </p>
+            <Button onClick={() => navigate('/settings')}>
+              Go to Settings
+            </Button>
+          </GlassCard>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <SideNav activeRoute="/calibration" />
-      <main className="flex-1 p-6">
+    <div className="flex min-h-screen w-full">
+      <CollapsibleSideNav />
+      <main className="flex-1 p-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold mb-2">Calibration Lab</h1>
+          <h1 className="text-3xl font-bold gradient-text">Calibration Lab</h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span>Progress: {progress}%</span>
             {lastJQS !== null && (
@@ -636,10 +632,11 @@ export default function CalibrationNew() {
                   'Submit Justification'
                 )}
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
-  );
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+    </main>
+  </div>
+);
 }

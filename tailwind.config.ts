@@ -19,6 +19,9 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        lime: "hsl(var(--lime))",
+        lavender: "hsl(var(--lavender))",
+        "soft-purple": "hsl(var(--soft-purple))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -59,6 +62,7 @@ export default {
         },
       },
       borderRadius: {
+        xl: "24px",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",

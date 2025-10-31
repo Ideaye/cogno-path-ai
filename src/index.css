@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 222 47% 7%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 7%;
@@ -31,14 +31,19 @@ All colors MUST be HSL.
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 258 90% 58%;
-    --sidebar-bg: 222 55% 5%;
-    --sidebar-text: 220 13% 91%;
+    --sidebar-bg: 0 0% 100%;
+    --sidebar-text: 222 47% 7%;
     --chart-1: 258 90% 58%;
     --chart-2: 158 64% 52%;
     --chart-3: 38 92% 50%;
     --chart-4: 198 93% 60%;
     --chart-5: 340 82% 52%;
-    --radius: 1rem;
+    --radius: 1.5rem;
+    --lime: 82 92% 55%;
+    --lavender: 270 60% 70%;
+    --soft-purple: 258 80% 65%;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.18);
   }
   .dark {
     --background: 222 47% 11%;
@@ -64,13 +69,16 @@ All colors MUST be HSL.
     --border: 217 33% 18%;
     --input: 217 33% 18%;
     --ring: 258 90% 58%;
-    --sidebar-bg: 222 55% 5%;
-    --sidebar-text: 220 13% 91%;
+    --sidebar-bg: 222 47% 11%;
+    --sidebar-text: 210 40% 98%;
     --chart-1: 258 90% 58%;
     --chart-2: 158 64% 52%;
     --chart-3: 38 92% 50%;
     --chart-4: 198 93% 60%;
     --chart-5: 340 82% 52%;
+    --lime: 82 92% 55%;
+    --lavender: 270 60% 70%;
+    --soft-purple: 258 80% 65%;
   }
 }
 
@@ -81,5 +89,47 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .dark .glass-card {
+    background: rgba(34, 42, 53, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gradient-lime-purple {
+    background: linear-gradient(135deg, hsl(var(--lime)), hsl(var(--soft-purple)));
+  }
+
+  .gradient-purple-lavender {
+    background: linear-gradient(135deg, hsl(var(--soft-purple)), hsl(var(--lavender)));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--lime)), hsl(var(--soft-purple)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .dark .glass-input {
+    background: rgba(34, 42, 53, 0.5);
   }
 }

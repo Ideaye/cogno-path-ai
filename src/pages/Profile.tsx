@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/track';
-import SideNav from '@/components/SideNav';
-import { Card } from '@/components/ui/card';
+import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
+import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 
 export default function Profile() {
   const { toast } = useToast();
@@ -164,94 +164,98 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <SideNav activeRoute="/profile" />
-        <main className="flex-1 p-6 flex items-center justify-center">
-          <div>Loading...</div>
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-lime" />
         </main>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <SideNav activeRoute="/profile" />
-      <main className="flex-1 p-6 space-y-6">
-        <div className="text-2xl font-semibold">Profile</div>
+    <div className="flex min-h-screen w-full">
+      <CollapsibleSideNav />
+      <main className="flex-1 p-8 space-y-6">
+        <h1 className="text-4xl font-bold gradient-text">Profile</h1>
 
-        <Card className="p-6 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" value={email} disabled />
-          </div>
-          <Button onClick={updateProfile}>Save Changes</Button>
-        </Card>
-
-        <Card className="p-6 space-y-4">
-          <div className="text-lg font-medium">Exam Enrollments</div>
-          {exams.length === 0 ? (
-            <div className="text-muted-foreground">No exams enrolled</div>
-          ) : (
+        <GlassCard>
+          <div className="p-6 space-y-4">
             <div className="space-y-2">
-              {exams.map((e) => (
-                <div key={e.exam_id} className="flex items-center justify-between p-3 border rounded">
-                  <div className="flex items-center gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" value={email} disabled />
+            </div>
+            <Button className="gradient-lime-purple text-white" onClick={updateProfile}>Save Changes</Button>
+          </div>
+        </GlassCard>
+
+        <GlassCard>
+          <div className="p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Exam Enrollments</h2>
+            {exams.length === 0 ? (
+              <div className="text-muted-foreground">No exams enrolled</div>
+            ) : (
+              <div className="space-y-2">
+                {exams.map((e) => (
+                  <div key={e.exam_id} className="flex items-center justify-between p-3 border rounded-xl">
                     <span>{e.name}</span>
-                    {e.is_active && <Badge variant="default">Active</Badge>}
+                    {e.is_active ? (
+                      <Badge className="bg-lime text-white">Active</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setActiveExam(e.exam_id)}
+                      >
+                        Set Active
+                      </Button>
+                    )}
                   </div>
-                  {!e.is_active && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setActiveExam(e.exam_id)}
-                    >
-                      Set Active
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-
-        <Card className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-medium">Calibration Timeline</div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={downloadCalibrationReport}
-              disabled={generatingReport}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              {generatingReport ? 'Generating...' : 'Download Report'}
-            </Button>
+                ))}
+              </div>
+            )}
           </div>
-          {justifications.length === 0 ? (
-            <div className="text-muted-foreground">No calibration data yet</div>
-          ) : (
-            <div className="space-y-2">
-              {justifications.map((j, i) => (
-                <div key={i} className="flex items-center justify-between p-2 border-b">
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(j.created_at).toLocaleDateString()}
-                  </span>
-                  <Badge variant={j.jqs >= 0.5 ? 'default' : 'secondary'}>
-                    JQS: {j.jqs.toFixed(2)}
-                  </Badge>
-                </div>
-              ))}
+        </GlassCard>
+
+        <GlassCard>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Calibration Timeline</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadCalibrationReport}
+                disabled={generatingReport}
+                className="border-lime hover:bg-lime/10"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {generatingReport ? 'Generating...' : 'Download Report'}
+              </Button>
             </div>
-          )}
-        </Card>
+            {justifications.length === 0 ? (
+              <div className="text-muted-foreground">No calibration data yet</div>
+            ) : (
+              <div className="space-y-2">
+                {justifications.map((j, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(j.created_at).toLocaleDateString()}
+                    </span>
+                    <Badge variant="outline">JQS: {j.jqs.toFixed(2)}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </GlassCard>
       </main>
     </div>
   );
