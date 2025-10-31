@@ -76,7 +76,7 @@ export function CollapsibleSideNav() {
       {/* Header with toggle */}
       <div className="p-4 flex items-center justify-between border-b border-border/50">
         {!collapsed && (
-          <h1 className="text-xl font-bold gradient-text">Abhyas AI</h1>
+          <h1 className="text-xl font-bold text-foreground">Abhyas AI</h1>
         )}
         <Button
           variant="ghost"

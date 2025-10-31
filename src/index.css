@@ -9,84 +9,69 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 95%;
-    --foreground: 222 47% 7%;
+    --foreground: 0 0% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 7%;
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 7%;
-    --primary: 258 90% 58%;
-    --primary-hover: 259 83% 51%;
-    --primary-muted: 258 90% 85%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 17% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 17% 98%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 258 90% 58%;
-    --accent-foreground: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 270 100% 80%;
+    --primary-hover: 270 100% 75%;
+    --primary-muted: 270 100% 90%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 98%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 270 100% 80%;
+    --accent-foreground: 0 0% 10%;
     --success: 158 64% 52%;
     --success-bg: 152 81% 96%;
     --destructive: 0 84% 60%;
     --warning: 38 92% 50%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 258 90% 58%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 270 100% 80%;
     --sidebar-bg: 60 1% 13%;
-    --sidebar-text: 210 40% 98%;
+    --sidebar-text: 0 0% 100%;
     --highlight: 270 100% 80%;
-    --chart-1: 258 90% 58%;
+    --chart-1: 270 100% 80%;
     --chart-2: 158 64% 52%;
     --chart-3: 38 92% 50%;
-    --chart-4: 198 93% 60%;
-    --chart-5: 340 82% 52%;
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 40%;
     --radius: 1.5rem;
-    --lime: 82 92% 55%;
-    --lavender: 270 60% 70%;
-    --soft-purple: 258 80% 65%;
-    --blue-accent: 210 100% 60%;
-    --teal-accent: 174 72% 56%;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.18);
   }
   .dark {
     --background: 0 0% 13.5%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 100%;
     --card: 0 0% 16%;
-    --card-foreground: 210 40% 98%;
+    --card-foreground: 0 0% 100%;
     --popover: 0 0% 16%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 258 90% 58%;
-    --primary-hover: 259 83% 51%;
-    --primary-muted: 258 90% 85%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 20%;
-    --secondary-foreground: 210 40% 98%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 270 100% 80%;
+    --primary-hover: 270 100% 75%;
+    --primary-muted: 270 100% 90%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 20%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 258 90% 58%;
-    --accent-foreground: 0 0% 100%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 270 100% 80%;
+    --accent-foreground: 0 0% 10%;
     --success: 158 64% 52%;
     --success-bg: 152 81% 20%;
     --destructive: 0 63% 31%;
     --warning: 38 92% 50%;
     --border: 0 0% 25%;
     --input: 0 0% 20%;
-    --ring: 258 90% 58%;
-    --sidebar-bg: 0 0% 16%;
-    --sidebar-text: 210 40% 98%;
-    --chart-1: 258 90% 58%;
+    --ring: 270 100% 80%;
+    --sidebar-bg: 60 1% 13%;
+    --sidebar-text: 0 0% 100%;
+    --chart-1: 270 100% 80%;
     --chart-2: 158 64% 52%;
     --chart-3: 38 92% 50%;
-    --chart-4: 198 93% 60%;
-    --chart-5: 340 82% 52%;
-    --lime: 82 92% 55%;
-    --lavender: 270 60% 70%;
-    --soft-purple: 258 80% 65%;
-    --blue-accent: 210 100% 60%;
-    --teal-accent: 174 72% 56%;
-    --orange-accent: 25 95% 53%;
-    --glass-bg: rgba(34, 34, 32, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 40%;
   }
 }
 
@@ -111,46 +96,14 @@ All colors MUST be HSL.
 
 @layer components {
   .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 24px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   }
 
   .dark .glass-card {
     background: rgba(34, 34, 32, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .gradient-lime-purple {
-    background: linear-gradient(135deg, hsl(var(--blue-accent)), hsl(var(--primary)));
-  }
-
-  .gradient-purple-lavender {
-    background: linear-gradient(135deg, hsl(var(--teal-accent)), hsl(var(--lavender)));
-  }
-
-  .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--blue-accent)), hsl(var(--primary)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .gradient-subtle {
-    background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--blue-accent) / 0.1));
-  }
-
-  .glass-input {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-
-  .dark .glass-input {
-    background: rgba(34, 34, 32, 0.5);
   }
 }

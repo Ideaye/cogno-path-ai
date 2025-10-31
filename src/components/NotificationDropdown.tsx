@@ -41,7 +41,7 @@ export function NotificationDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 animate-slide-down">
         <div className="flex items-center justify-between px-4 py-3 border-b">
-          <h3 className="font-semibold">Notifications 🔔</h3>
+          <h3 className="font-semibold">Notifications</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
@@ -59,7 +59,7 @@ export function NotificationDropdown() {
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-3 opacity-40" />
-              <p className="text-sm text-muted-foreground">No notifications yet 📭</p>
+              <p className="text-sm text-muted-foreground">No notifications yet</p>
               <p className="text-xs text-muted-foreground mt-1">
                 We'll notify you of important updates
               </p>

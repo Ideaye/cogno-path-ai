@@ -80,11 +80,11 @@ export default function CalibrationNew() {
         .order('created_at', { ascending: true });
 
       if (!items || items.length === 0) {
-        toast({
-          title: '⚠️ No calibration items',
-          description: 'Please contact admin to add calibration prompts',
-          variant: 'destructive'
-        });
+      toast({
+        title: 'No calibration items',
+        description: 'Please contact admin to add calibration prompts',
+        variant: 'destructive'
+      });
         setLoading(false);
         return;
       }
@@ -113,7 +113,7 @@ export default function CalibrationNew() {
     } catch (error) {
       console.error('Error loading calibration:', error);
       toast({
-        title: '❌ Error',
+        title: 'Error',
         description: 'Failed to load calibration items',
         variant: 'destructive'
       });
@@ -172,7 +172,7 @@ export default function CalibrationNew() {
   async function handleSubmit() {
     if (!isFormValid()) {
       toast({
-        title: '⚠️ Incomplete Form',
+        title: 'Incomplete Form',
         description: 'Please fill all required fields (marked with *)',
         variant: 'destructive'
       });
@@ -247,7 +247,7 @@ export default function CalibrationNew() {
         });
 
       toast({
-        title: '✅ Saved successfully',
+        title: 'Saved successfully',
         description: 'Your calibration response has been recorded'
       });
 
@@ -268,7 +268,7 @@ export default function CalibrationNew() {
     } catch (error) {
       console.error('Error submitting:', error);
       toast({
-        title: '❌ Error',
+        title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to submit',
         variant: 'destructive'
       });
@@ -294,11 +294,11 @@ export default function CalibrationNew() {
         <CollapsibleSideNav />
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4">📚 No Active Exam</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">No Active Exam</h2>
             <p className="text-muted-foreground mb-6 font-normal">
-              You need to select an active exam before starting calibration 🎯
+              You need to select an active exam before starting calibration
             </p>
-            <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105">
+            <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">
               Go to Settings
             </Button>
           </GlassCard>
@@ -313,11 +313,11 @@ export default function CalibrationNew() {
         <CollapsibleSideNav />
         <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <GlassCard className="p-12 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4">🎉 Calibration Complete!</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">Calibration Complete!</h2>
             <p className="text-muted-foreground mb-6 font-normal">
-              You have completed all calibration items for this exam. Great job! 🌟
+              You have completed all calibration items for this exam. Great job!
             </p>
-            <Button onClick={() => navigate('/dashboard')} className="transition-all hover:scale-105">
+            <Button onClick={() => navigate('/dashboard')} className="transition-all hover:scale-105 font-medium">
               Go to Dashboard
             </Button>
           </GlassCard>
@@ -331,17 +331,17 @@ export default function CalibrationNew() {
       <CollapsibleSideNav />
       <main className="flex-1 p-8 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
         <div className="mb-6 animate-fade-in">
-          <h1 className="text-3xl font-bold text-primary">🧪 Calibration Lab</h1>
+          <h1 className="text-3xl font-bold text-foreground">Calibration Lab</h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2 font-normal">
-            <span>🎯 Progress: {progress}%</span>
+            <span>Progress: {progress}%</span>
           </div>
-          <Progress value={progress} className="mt-2" />
+          <Progress value={progress} className="mt-2 max-w-md" />
         </div>
 
         {/* Question Block - Full Width on Top */}
-        <GlassCard className="hover:scale-[1.01] transition-transform animate-fade-in">
+        <GlassCard className="hover:shadow-md transition-all animate-fade-in">
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">💡 Current Prompt</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Current Question</h2>
             <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal">
               {currentItem.prompt}
             </p>
@@ -349,9 +349,9 @@ export default function CalibrationNew() {
         </GlassCard>
 
         {/* Response Form Block - Full Width Below */}
-        <GlassCard className="hover:scale-[1.01] transition-transform animate-fade-in">
+        <GlassCard className="hover:shadow-md transition-all animate-fade-in">
           <div className="p-6 space-y-6">
-            <h2 className="text-xl font-semibold">✍️ Your Response</h2>
+            <h2 className="text-xl font-semibold text-foreground">Your Response</h2>
 
             {/* Answer */}
             <div>
@@ -379,7 +379,7 @@ export default function CalibrationNew() {
                 max={100}
                 step={5}
                 disabled={submitting}
-                className="mt-2"
+                className="mt-2 max-w-sm"
               />
             </div>
 
@@ -475,7 +475,7 @@ export default function CalibrationNew() {
                   <div key={level} className="flex items-center space-x-2 transition-all hover:scale-110">
                     <RadioGroupItem value={String(level)} id={`diff-${level}`} />
                     <Label htmlFor={`diff-${level}`} className="cursor-pointer font-normal">
-                      {level} {level === 1 ? '😊' : level === 5 ? '😰' : ''}
+                      {level}
                     </Label>
                   </div>
                 ))}

@@ -65,22 +65,21 @@ export default function Landing() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 sm:mb-8">
             Master Your Exam with{' '}
             <span className="text-primary">AI-Powered</span>{' '}
-            <span className="text-lime">Adaptive</span>{' '}
-            Learning 🚀
+            Adaptive Learning
           </h1>
           
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto font-normal">
             Experience the future of exam preparation with intelligent calibration, 
-            personalized practice, and cognitive insights that evolve with you 🎯
+            personalized practice, and cognitive insights that evolve with you
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
               size="lg" 
               onClick={handleGetStarted}
-              className="w-full sm:w-auto gradient-lime-purple text-white text-lg px-8 py-6 h-auto transition-all hover:scale-105 font-medium"
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-foreground text-lg px-8 py-6 h-auto transition-all hover:scale-105 font-medium"
             >
-              Start Learning Today 🎓
+              Start Learning Today
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -100,75 +99,75 @@ export default function Landing() {
         <div className="container mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-              Unlock Your <span className="text-primary">Potential</span> ✨
+              Unlock Your <span className="text-primary">Potential</span>
             </h2>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-normal">
-              Intelligent features designed to transform how you learn and excel 🎯
+              Intelligent features designed to transform how you learn and excel
             </p>
           </div>
 
           <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all animate-fade-in">
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all animate-fade-in">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition-colors">
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">🧠 AI-Driven Calibration</h3>
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">AI-Driven Calibration</h3>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Train your confidence alongside knowledge. Our system learns your 
                 patterns to optimize both accuracy and self-assessment
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lime/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-lime/20 transition">
-                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-lime" />
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Adaptive Practice</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Adaptive Practice</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Questions that evolve with your progress. Focus on what matters 
                 most with AI-selected content tailored to your learning curve
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-lavender/20 transition">
-                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-lavender" />
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Cognitive Insights</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Cognitive Insights</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Deep analytics on your learning patterns. Understand your strengths,
                 identify gaps, and track improvement with precision metrics
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-blue-accent/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-blue-accent/20 transition">
-                <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-blue-accent" />
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Real-Time Feedback</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Real-Time Feedback</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Instant insights after every question. Learn from mistakes 
                 immediately with AI-generated explanations and improvement tips
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-teal-accent/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-teal-accent/20 transition">
-                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-teal-accent" />
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Progress Tracking</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Progress Tracking</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Visualize your journey to mastery. Comprehensive dashboards 
                 show your growth across topics, time, and confidence levels
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-soft-purple/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-soft-purple/20 transition">
-                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-soft-purple" />
+            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Smart Reviews</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Smart Reviews</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Never forget what you've learned. Spaced repetition powered by
                 AI ensures long-term retention and exam-day confidence
               </p>
@@ -181,12 +180,11 @@ export default function Landing() {
       <section id="innovation" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 sm:mb-8">
-            <span className="text-primary">Innovation</span> is central to our ethos.{' '}
-            <span className="text-blue-accent">Advanced technologies</span> and{' '}
-            <span className="text-lime">adaptive algorithms</span> work together to{' '}
-            <span className="text-lavender">revolutionize</span> how you prepare for exams
+            <span className="text-primary">Innovation</span> is central to our ethos.
+            Advanced technologies and adaptive algorithms work together to 
+            revolutionize how you prepare for exams
           </h2>
-          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
+          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed font-normal">
             We combine cutting-edge machine learning, cognitive science, and educational 
             psychology to create a learning experience that's uniquely yours
           </p>
@@ -206,39 +204,39 @@ export default function Landing() {
           </div>
 
           <div className="space-y-6 sm:space-y-8">
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl sm:text-3xl font-bold text-primary">1</span>
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Calibrate Your Baseline</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Calibrate Your Baseline</h3>
+                <p className="text-sm sm:text-base text-muted-foreground font-normal">
                   Start with our intelligent calibration phase that assesses both your knowledge 
                   and confidence levels. This creates a personalized learning profile
                 </p>
               </div>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lime/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl sm:text-3xl font-bold text-lime">2</span>
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl sm:text-3xl font-bold text-primary">2</span>
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Practice Adaptively</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Practice Adaptively</h3>
+                <p className="text-sm sm:text-base text-muted-foreground font-normal">
                   Engage with AI-selected questions that target your weak areas while 
                   reinforcing strengths. The difficulty adapts in real-time to your performance
                 </p>
               </div>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lavender/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl sm:text-3xl font-bold text-lavender">3</span>
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl sm:text-3xl font-bold text-primary">3</span>
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Track & Excel</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Track & Excel</h3>
+                <p className="text-sm sm:text-base text-muted-foreground font-normal">
                   Monitor your progress with detailed analytics and cognitive insights. 
                   Watch your confidence grow as you approach exam-ready mastery
                 </p>
@@ -262,7 +260,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               onClick={handleGetStarted}
-              className="gradient-lime-purple text-white text-lg px-8 sm:px-12 py-6 h-auto"
+              className="bg-primary hover:bg-primary-hover text-foreground text-lg px-8 sm:px-12 py-6 h-auto transition-all hover:scale-105 font-medium"
             >
               Start Learning Today
               <ArrowRight className="ml-2 h-5 w-5" />
