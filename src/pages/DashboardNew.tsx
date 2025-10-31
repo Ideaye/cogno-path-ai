@@ -54,7 +54,7 @@ export default function DashboardNew() {
               Welcome back!
             </h1>
             {activeExam && (
-              <p className="text-sm sm:text-base text-muted-foreground font-normal">
+              <p className="text-sm sm:text-base text-foreground font-normal">
                 Studying for <span className="font-medium text-foreground">{activeExam.name}</span>
                 {practice.streak > 0 && ` • ${practice.streak} day streak`}
               </p>
@@ -109,7 +109,7 @@ export default function DashboardNew() {
                   <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                 </div>
                 <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{practice.total}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2 font-normal">
+                <p className="text-xs sm:text-sm text-foreground mt-1 sm:mt-2 font-normal">
                   {practice.accuracy}% accuracy
                 </p>
               </GlassCard>
@@ -129,7 +129,7 @@ export default function DashboardNew() {
                   <Target className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                 </div>
                 <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{calibration.progress}%</h3>
-                <p className="text-sm text-muted-foreground mt-2 font-normal">
+                <p className="text-sm text-foreground mt-2 font-normal">
                   {calibration.progress === 100 ? 'Complete' : `${100 - calibration.progress}% to go`}
                 </p>
               </GlassCard>
@@ -140,7 +140,7 @@ export default function DashboardNew() {
                   <Percent className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                 </div>
                 <h3 className="text-2xl sm:text-4xl font-semibold text-foreground">{cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2 font-normal">
+                <p className="text-xs sm:text-sm text-foreground mt-1 sm:mt-2 font-normal">
                   {cdna.ece !== null && cdna.ece < 0.1 ? 'Excellent' : 'Lower is better'}
                 </p>
               </GlassCard>

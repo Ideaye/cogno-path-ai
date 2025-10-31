@@ -364,7 +364,7 @@ export default function CalibrationNew() {
                 className="min-h-[150px] mt-2 transition-all focus:ring-2 focus:ring-primary/50"
                 disabled={submitting}
               />
-              <div className={`text-sm mt-1 font-normal ${answerText.length < 180 ? 'text-destructive' : 'text-muted-foreground'}`}>
+              <div className={`text-sm mt-1 font-normal ${answerText.length < 180 ? 'text-destructive' : 'text-foreground'}`}>
                 {answerText.length}/180 minimum characters
               </div>
             </div>
