@@ -100,7 +100,7 @@ serve(async (req) => {
       JSON.stringify({ ok: true, emailsSent }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in send-daily-summary:", error);
     return new Response(
       JSON.stringify({ error: error.message }),

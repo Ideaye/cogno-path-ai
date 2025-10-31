@@ -99,7 +99,8 @@ serve(async (req) => {
     const filename = `${user_id}/weekly-${new Date().toISOString().slice(0, 10)}.pdf`;
     const { data: upload, error } = await supabase.storage
       .from("reports")
-      .upload(filename, new Blob([pdfBytes], { type: "application/pdf" }), {
+      .upload(filename, pdfBytes, {
+        contentType: "application/pdf",
         upsert: true,
       });
 
@@ -140,7 +141,7 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in generate-weekly-report:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
