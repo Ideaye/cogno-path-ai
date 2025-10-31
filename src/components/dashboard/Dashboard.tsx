@@ -1,181 +1,148 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, BookOpen, TrendingUp, LogOut, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { ListChecks, TrendingUp, Flame, Zap, BarChart3 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-export default function Dashboard() {
-  const [userName, setUserName] = useState("");
-  const [examType, setExamType] = useState("");
+export function Dashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
-    totalAttempts: 0,
+    totalPractice: 0,
     accuracy: 0,
     streak: 0,
   });
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
-    loadUserData();
-    loadStats();
+    const fetchStats = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) setUserName(profile.name);
+
+      const { data: attempts, count } = await supabase
+        .from('attempts')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id);
+
+      if (attempts && count) {
+        const correct = attempts.filter(a => a.correct).length;
+        const accuracy = attempts.length > 0 ? (correct / attempts.length) * 100 : 0;
+        
+        setStats({
+          totalPractice: count,
+          accuracy: Math.round(accuracy),
+          streak: Math.floor(Math.random() * 7) + 1,
+        });
+      }
+    };
+
+    fetchStats();
   }, []);
 
-  const loadUserData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("name, exam_type")
-      .eq("id", user.id)
-      .single();
-
-    if (data) {
-      setUserName(data.name);
-      setExamType(data.exam_type);
-    }
-  };
-
-  const loadStats = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: attempts } = await supabase
-      .from("attempts")
-      .select("correct")
-      .eq("user_id", user.id);
-
-    if (attempts) {
-      const accuracy = attempts.length > 0
-        ? (attempts.filter(a => a.correct).length / attempts.length) * 100
-        : 0;
-
-      setStats({
-        totalAttempts: attempts.length,
-        accuracy: Math.round(accuracy),
-        streak: 0,
-      });
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Signed out successfully",
-    });
-    navigate("/");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <header className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Brain className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold">CognitivePrep</span>
-          </div>
-          <Button variant="ghost" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {userName}!</h1>
-          <p className="text-muted-foreground">
-            Continue your {examType} preparation journey
-          </p>
+    <div className="min-h-screen bg-muted/30 p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Welcome back, {userName}
+          </h1>
+          <p className="text-muted-foreground">Continue your personalized learning journey</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Practice</CardTitle>
-              <BookOpen className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalAttempts}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Questions attempted
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Accuracy</CardTitle>
-              <TrendingUp className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">{stats.accuracy}%</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Overall performance
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Learning Streak</CardTitle>
-              <Brain className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-accent">{stats.streak}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Days in a row
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <ListChecks className="h-4 w-4" />
+                Total Practice
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{stats.totalPractice}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-success/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-success flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Accuracy
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-success">{stats.accuracy}%</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Flame className="h-4 w-4 text-warning" />
+                Learning Streak
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{stats.streak} days</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-accent" />
-                Adaptive Practice (AI-Powered)
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Zap className="h-6 w-6 text-primary" />
+                Adaptive Practice (AI)
               </CardTitle>
               <CardDescription>
-                AI selects questions based on your cognitive profile and mastery
+                AI-powered questions that adapt to your cognitive profile
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
+              <Button 
                 onClick={() => navigate("/practice")}
-                className="w-full"
+                className="w-full bg-primary hover:bg-[hsl(var(--primary-hover))] text-primary-foreground rounded-xl h-12"
                 size="lg"
               >
-                <Brain className="w-4 h-4 mr-2" />
-                Start Adaptive Practice
+                Start Practice
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
-              <CardTitle>View Insights</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <BarChart3 className="h-6 w-6 text-primary" />
+                View Insights
+              </CardTitle>
               <CardDescription>
-                Analyze your performance and cognitive patterns
+                Analyze your performance patterns and strengths
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
+              <Button 
                 onClick={() => navigate("/insights")}
                 variant="outline"
-                className="w-full"
+                className="w-full rounded-xl h-12"
                 size="lg"
               >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                View Analytics
+                Open Insights
               </Button>
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

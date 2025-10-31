@@ -1,0 +1,481 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Target, Clock, Zap, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+type Block = "intro" | "baseline" | "strategy" | "pressure" | "drills" | "wrap";
+
+interface Question {
+  id: string;
+  text: string;
+  options: string[];
+  correct_option: string;
+}
+
+const STRATEGY_CHIPS = [
+  "Elimination",
+  "Equation Setup",
+  "Diagram/Visual",
+  "Estimation",
+  "Pattern Recognition",
+  "Working Backwards",
+];
+
+const ERROR_CAUSES = [
+  { value: "misread", label: "Misread Question" },
+  { value: "arithmetic", label: "Arithmetic Error" },
+  { value: "formula", label: "Wrong Formula" },
+  { value: "inference", label: "Faulty Inference" },
+  { value: "time", label: "Ran Out of Time" },
+  { value: "trap", label: "Fell for Trap" },
+  { value: "none", label: "None (Got it Right)" },
+];
+
+export function CalibrationLab() {
+  const navigate = useNavigate();
+  const [currentBlock, setCurrentBlock] = useState<Block>("intro");
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [itemId, setItemId] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+  const [confidence, setConfidence] = useState([50]);
+  const [justification, setJustification] = useState("");
+  const [selectedStrategies, setSelectedStrategies] = useState<string[]>([]);
+  const [effort, setEffort] = useState([3]);
+  const [stress, setStress] = useState([3]);
+  const [errorCause, setErrorCause] = useState("");
+  const [timer, setTimer] = useState(75);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  const blockConfig = {
+    intro: { title: "CDNA Calibration Lab", itemCount: 0 },
+    baseline: { title: "Block A — Baseline (Timed)", itemCount: 8 },
+    strategy: { title: "Block B — Strategy & Justification", itemCount: 24 },
+    pressure: { title: "Block C — Pressure Sprint", itemCount: 6 },
+    drills: { title: "Block D — Targeted Drills", itemCount: 8 },
+    wrap: { title: "Calibration Summary", itemCount: 0 },
+  };
+
+  const totalItems = blockConfig[currentBlock].itemCount;
+  const progress = totalItems > 0 ? (currentQuestionIndex / totalItems) * 100 : 0;
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((t) => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timer]);
+
+  const startBlock = async (block: Block) => {
+    if (block === "intro" || block === "wrap") {
+      setCurrentBlock(block);
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Create session
+    const { data: session, error: sessionError } = await supabase
+      .from('train_ai_sessions')
+      .insert({ user_id: user.id, block })
+      .select()
+      .single();
+
+    if (sessionError || !session) {
+      toast.error("Failed to start session");
+      return;
+    }
+
+    setSessionId(session.id);
+
+    // Fetch questions
+    const { data: fetchedQuestions } = await supabase
+      .from('question_bank')
+      .select('id, text, options, correct_option')
+      .limit(blockConfig[block].itemCount);
+
+    if (fetchedQuestions) {
+      setQuestions(fetchedQuestions as Question[]);
+      setCurrentBlock(block);
+      setCurrentQuestionIndex(0);
+      
+      if (block === "baseline") {
+        setTimer(75);
+        setIsTimerRunning(true);
+      } else if (block === "pressure") {
+        setTimer(360);
+        setIsTimerRunning(true);
+      }
+    }
+  };
+
+  const submitAnswer = async () => {
+    if (!sessionId || !questions[currentQuestionIndex]) return;
+
+    const question = questions[currentQuestionIndex];
+    const isCorrect = selectedAnswer === question.correct_option;
+
+    // Create train_ai_item
+    const { data: item } = await supabase
+      .from('train_ai_items')
+      .insert({
+        session_id: sessionId,
+        question_id: question.id,
+        ended_at: new Date().toISOString(),
+        timer_s: currentBlock === "baseline" ? 75 - timer : undefined,
+      })
+      .select()
+      .single();
+
+    if (item) {
+      setItemId(item.id);
+    }
+
+    // Record attempt
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from('attempts').insert({
+        user_id: user.id,
+        question_id: question.id,
+        mode: 'lab',
+        time_taken: currentBlock === "baseline" ? (75 - timer) * 1000 : undefined,
+        correct: isCorrect,
+        confidence: confidence[0] / 100,
+      });
+    }
+
+    // For strategy block, show justification form
+    if (currentBlock === "strategy") {
+      // Stay on same question to collect justification
+      return;
+    }
+
+    nextQuestion();
+  };
+
+  const submitJustification = async () => {
+    if (!itemId) return;
+
+    await supabase.from('user_justifications').insert({
+      train_ai_item_id: itemId,
+      text: justification,
+      strategy_tags: selectedStrategies,
+      effort_1_5: effort[0],
+      stress_1_5: stress[0],
+      error_cause: errorCause,
+    });
+
+    // Reset justification form
+    setJustification("");
+    setSelectedStrategies([]);
+    setEffort([3]);
+    setStress([3]);
+    setErrorCause("");
+
+    nextQuestion();
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestionIndex + 1 >= questions.length) {
+      // Block complete
+      completeBlock();
+    } else {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedAnswer("");
+      setConfidence([50]);
+      setIsTimerRunning(false);
+      
+      if (currentBlock === "baseline") {
+        setTimer(75);
+        setIsTimerRunning(true);
+      }
+    }
+  };
+
+  const completeBlock = async () => {
+    if (sessionId) {
+      await supabase
+        .from('train_ai_sessions')
+        .update({ ended_at: new Date().toISOString() })
+        .eq('id', sessionId);
+    }
+
+    const blockOrder: Block[] = ["baseline", "strategy", "pressure", "drills"];
+    const currentIndex = blockOrder.indexOf(currentBlock);
+    
+    if (currentIndex < blockOrder.length - 1) {
+      setCurrentBlock("intro");
+      toast.success(`${blockConfig[currentBlock].title} completed!`);
+    } else {
+      setCurrentBlock("wrap");
+    }
+  };
+
+  const toggleStrategy = (strategy: string) => {
+    setSelectedStrategies(prev =>
+      prev.includes(strategy)
+        ? prev.filter(s => s !== strategy)
+        : [...prev, strategy]
+    );
+  };
+
+  if (currentBlock === "intro") {
+    return (
+      <div className="min-h-screen bg-muted/30 p-8 flex items-center justify-center">
+        <Card className="max-w-2xl w-full shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              <Target className="h-8 w-8 text-primary" />
+              CDNA Calibration Lab
+            </CardTitle>
+            <CardDescription className="text-base">
+              Invest ~60 minutes across 2 sittings to unlock full AI personalization
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <Button
+                onClick={() => startBlock("baseline")}
+                className="w-full justify-start h-auto py-4"
+                variant="outline"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">Block A — Baseline (Timed)</div>
+                  <div className="text-sm text-muted-foreground">8 questions, 75s each</div>
+                </div>
+              </Button>
+              <Button
+                onClick={() => startBlock("strategy")}
+                className="w-full justify-start h-auto py-4"
+                variant="outline"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">Block B — Strategy & Justification</div>
+                  <div className="text-sm text-muted-foreground">24 questions with explanations</div>
+                </div>
+              </Button>
+              <Button
+                onClick={() => startBlock("pressure")}
+                className="w-full justify-start h-auto py-4"
+                variant="outline"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">Block C — Pressure Sprint</div>
+                  <div className="text-sm text-muted-foreground">6 questions, 6 minutes total</div>
+                </div>
+              </Button>
+              <Button
+                onClick={() => startBlock("drills")}
+                className="w-full justify-start h-auto py-4"
+                variant="outline"
+              >
+                <div className="text-left">
+                  <div className="font-semibold">Block D — Targeted Drills</div>
+                  <div className="text-sm text-muted-foreground">8 focused strategy exercises</div>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (currentBlock === "wrap") {
+    return (
+      <div className="min-h-screen bg-muted/30 p-8 flex items-center justify-center">
+        <Card className="max-w-2xl w-full shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              <CheckCircle2 className="h-8 w-8 text-success" />
+              Calibration Complete!
+            </CardTitle>
+            <CardDescription className="text-base">
+              Your Cognitive DNA Engine is now calibrated
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              You've completed the calibration program. The AI now has a deep understanding of your problem-solving patterns and can provide truly personalized adaptive practice.
+            </p>
+            <Button
+              onClick={() => navigate("/practice")}
+              className="w-full bg-primary hover:bg-[hsl(var(--primary-hover))] rounded-xl h-12"
+              size="lg"
+            >
+              Proceed to Adaptive Practice
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+  if (!currentQuestion) return <div>Loading...</div>;
+
+  const needsJustification = currentBlock === "strategy" && selectedAnswer && !justification;
+
+  return (
+    <div className="min-h-screen bg-muted/30 p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{blockConfig[currentBlock].title}</h1>
+            <p className="text-muted-foreground">
+              Question {currentQuestionIndex + 1} of {totalItems}
+            </p>
+          </div>
+          {(currentBlock === "baseline" || currentBlock === "pressure") && (
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              <span className="text-xl font-mono">{Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}</span>
+            </div>
+          )}
+        </div>
+
+        <Progress value={progress} className="h-2" />
+
+        {/* Question Card */}
+        {!needsJustification ? (
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg leading-relaxed">{currentQuestion.text}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                {currentQuestion.options.map((option, idx) => (
+                  <div key={idx} className="flex items-center space-x-2">
+                    <RadioGroupItem value={option} id={`option-${idx}`} />
+                    <Label htmlFor={`option-${idx}`} className="cursor-pointer">
+                      {option}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+
+              {(currentBlock === "baseline" || currentBlock === "pressure") && (
+                <div className="space-y-2">
+                  <Label>Confidence: {confidence[0]}%</Label>
+                  <Slider
+                    value={confidence}
+                    onValueChange={setConfidence}
+                    min={0}
+                    max={100}
+                    step={10}
+                  />
+                </div>
+              )}
+
+              <Button
+                onClick={submitAnswer}
+                disabled={!selectedAnswer}
+                className="w-full bg-primary hover:bg-[hsl(var(--primary-hover))] rounded-xl h-12"
+              >
+                Submit Answer
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Explain Your Reasoning</CardTitle>
+              <CardDescription>
+                Help the AI understand your problem-solving approach (max 300 characters)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={justification}
+                onChange={(e) => setJustification(e.target.value)}
+                placeholder="Describe your approach, the strategies you used, and your reasoning..."
+                maxLength={300}
+                rows={5}
+                className="resize-none"
+              />
+              <div className="text-sm text-muted-foreground text-right">
+                {justification.length}/300
+              </div>
+
+              <div>
+                <Label className="mb-2 block">Strategies Used:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {STRATEGY_CHIPS.map((strategy) => (
+                    <Badge
+                      key={strategy}
+                      variant={selectedStrategies.includes(strategy) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleStrategy(strategy)}
+                    >
+                      {strategy}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Mental Effort: {effort[0]}/5</Label>
+                  <Slider
+                    value={effort}
+                    onValueChange={setEffort}
+                    min={1}
+                    max={5}
+                    step={1}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Stress Level: {stress[0]}/5</Label>
+                  <Slider
+                    value={stress}
+                    onValueChange={setStress}
+                    min={1}
+                    max={5}
+                    step={1}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="mb-2 block">If incorrect, what was the main cause?</Label>
+                <RadioGroup value={errorCause} onValueChange={setErrorCause}>
+                  {ERROR_CAUSES.map((cause) => (
+                    <div key={cause.value} className="flex items-center space-x-2">
+                      <RadioGroupItem value={cause.value} id={cause.value} />
+                      <Label htmlFor={cause.value} className="cursor-pointer">
+                        {cause.label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <Button
+                onClick={submitJustification}
+                disabled={!justification || justification.length < 20}
+                className="w-full bg-primary hover:bg-[hsl(var(--primary-hover))] rounded-xl h-12"
+              >
+                Submit Justification
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

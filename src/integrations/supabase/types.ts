@@ -18,31 +18,55 @@ export type Database = {
         Row: {
           attempt_number: number | null
           confidence: number | null
+          confidence_0_1: number | null
           correct: boolean
           created_at: string
+          hesitation_count: number | null
           id: string
+          mode: string | null
+          option_switches: number | null
+          pressure_mode: string | null
           question_id: string
+          revisited: boolean | null
           time_taken: number
+          time_taken_ms: number | null
+          ui_variant: string | null
           user_id: string
         }
         Insert: {
           attempt_number?: number | null
           confidence?: number | null
+          confidence_0_1?: number | null
           correct: boolean
           created_at?: string
+          hesitation_count?: number | null
           id?: string
+          mode?: string | null
+          option_switches?: number | null
+          pressure_mode?: string | null
           question_id: string
+          revisited?: boolean | null
           time_taken: number
+          time_taken_ms?: number | null
+          ui_variant?: string | null
           user_id: string
         }
         Update: {
           attempt_number?: number | null
           confidence?: number | null
+          confidence_0_1?: number | null
           correct?: boolean
           created_at?: string
+          hesitation_count?: number | null
           id?: string
+          mode?: string | null
+          option_switches?: number | null
+          pressure_mode?: string | null
           question_id?: string
+          revisited?: boolean | null
           time_taken?: number
+          time_taken_ms?: number | null
+          ui_variant?: string | null
           user_id?: string
         }
         Relationships: [
@@ -146,6 +170,8 @@ export type Database = {
         Row: {
           acc_ema_long: number | null
           acc_ema_short: number | null
+          calibration_progress_0_1: number | null
+          cdna_embed: number[] | null
           created_at: string
           fatigue_index: number | null
           id: string
@@ -156,12 +182,15 @@ export type Database = {
           pressure_sensitivity: number | null
           skip_rate_win20: number | null
           snapshot_date: string
+          strategy_strengths_json: Json | null
           switch_cost: number | null
           user_id: string
         }
         Insert: {
           acc_ema_long?: number | null
           acc_ema_short?: number | null
+          calibration_progress_0_1?: number | null
+          cdna_embed?: number[] | null
           created_at?: string
           fatigue_index?: number | null
           id?: string
@@ -172,12 +201,15 @@ export type Database = {
           pressure_sensitivity?: number | null
           skip_rate_win20?: number | null
           snapshot_date: string
+          strategy_strengths_json?: Json | null
           switch_cost?: number | null
           user_id: string
         }
         Update: {
           acc_ema_long?: number | null
           acc_ema_short?: number | null
+          calibration_progress_0_1?: number | null
+          cdna_embed?: number[] | null
           created_at?: string
           fatigue_index?: number | null
           id?: string
@@ -188,6 +220,7 @@ export type Database = {
           pressure_sensitivity?: number | null
           skip_rate_win20?: number | null
           snapshot_date?: string
+          strategy_strengths_json?: Json | null
           switch_cost?: number | null
           user_id?: string
         }
@@ -226,6 +259,88 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      llm_eval_queue: {
+        Row: {
+          created_at: string
+          id: string
+          justification_id: string
+          payload_json: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          justification_id: string
+          payload_json?: Json | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          justification_id?: string
+          payload_json?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "llm_eval_queue_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: false
+            referencedRelation: "user_justifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      llm_eval_results: {
+        Row: {
+          coherence_0_1: number | null
+          created_at: string
+          error_class: string | null
+          features_json: Json | null
+          id: string
+          jqs_0_1: number | null
+          justification_id: string
+          reasoning_style: string | null
+          step_count: number | null
+          strategy_primary: string | null
+          strategy_secondary: string[] | null
+        }
+        Insert: {
+          coherence_0_1?: number | null
+          created_at?: string
+          error_class?: string | null
+          features_json?: Json | null
+          id?: string
+          jqs_0_1?: number | null
+          justification_id: string
+          reasoning_style?: string | null
+          step_count?: number | null
+          strategy_primary?: string | null
+          strategy_secondary?: string[] | null
+        }
+        Update: {
+          coherence_0_1?: number | null
+          created_at?: string
+          error_class?: string | null
+          features_json?: Json | null
+          id?: string
+          jqs_0_1?: number | null
+          justification_id?: string
+          reasoning_style?: string | null
+          step_count?: number | null
+          strategy_primary?: string | null
+          strategy_secondary?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "llm_eval_results_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: false
+            referencedRelation: "user_justifications"
             referencedColumns: ["id"]
           },
         ]
@@ -314,6 +429,7 @@ export type Database = {
           format_type: string | null
           id: string
           options: Json
+          reading_len: number | null
           text: string
         }
         Insert: {
@@ -324,6 +440,7 @@ export type Database = {
           format_type?: string | null
           id?: string
           options: Json
+          reading_len?: number | null
           text: string
         }
         Update: {
@@ -334,6 +451,7 @@ export type Database = {
           format_type?: string | null
           id?: string
           options?: Json
+          reading_len?: number | null
           text?: string
         }
         Relationships: []
@@ -370,6 +488,125 @@ export type Database = {
             columns: ["question_id"]
             isOneToOne: false
             referencedRelation: "question_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      train_ai_items: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          question_id: string
+          session_id: string
+          started_at: string
+          timer_s: number | null
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          question_id: string
+          session_id: string
+          started_at?: string
+          timer_s?: number | null
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          question_id?: string
+          session_id?: string
+          started_at?: string
+          timer_s?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "train_ai_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "question_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "train_ai_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "train_ai_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      train_ai_sessions: {
+        Row: {
+          block: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          notes: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          block: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          block?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_justifications: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          effort_1_5: number | null
+          error_cause: string | null
+          id: string
+          strategy_tags: string[] | null
+          stress_1_5: number | null
+          text: string | null
+          train_ai_item_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          effort_1_5?: number | null
+          error_cause?: string | null
+          id?: string
+          strategy_tags?: string[] | null
+          stress_1_5?: number | null
+          text?: string | null
+          train_ai_item_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          effort_1_5?: number | null
+          error_cause?: string | null
+          id?: string
+          strategy_tags?: string[] | null
+          stress_1_5?: number | null
+          text?: string | null
+          train_ai_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_justifications_train_ai_item_id_fkey"
+            columns: ["train_ai_item_id"]
+            isOneToOne: false
+            referencedRelation: "train_ai_items"
             referencedColumns: ["id"]
           },
         ]
