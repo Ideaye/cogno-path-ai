@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 0 0% 95%;
     --foreground: 222 47% 7%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 7%;
@@ -31,8 +31,9 @@ All colors MUST be HSL.
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 258 90% 58%;
-    --sidebar-bg: 0 0% 100%;
-    --sidebar-text: 222 47% 7%;
+    --sidebar-bg: 60 1% 13%;
+    --sidebar-text: 210 40% 98%;
+    --highlight: 270 100% 80%;
     --chart-1: 258 90% 58%;
     --chart-2: 158 64% 52%;
     --chart-3: 38 92% 50%;
@@ -92,10 +93,19 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    transition-property: color, background-color, border-color, transform, opacity, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  /* Disable transitions on inputs for better UX */
+  input, textarea, select {
+    transition: border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
   }
 }
 

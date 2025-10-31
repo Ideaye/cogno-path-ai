@@ -68,9 +68,10 @@ export function CollapsibleSideNav() {
   return (
     <aside 
       className={cn(
-        "glass-card h-screen flex flex-col transition-all duration-300 border-r",
+        "h-screen flex flex-col transition-all duration-300 border-r border-border/50",
         collapsed ? "w-20" : "w-72"
       )}
+      style={{ backgroundColor: '#222220' }}
     >
       {/* Header with toggle */}
       <div className="p-4 flex items-center justify-between border-b border-border/50">
@@ -102,8 +103,8 @@ export function CollapsibleSideNav() {
                 cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   isActive
-                    ? "bg-lime/10 text-lime font-medium shadow-sm"
-                    : "hover:bg-muted/50 text-muted-foreground hover:text-foreground",
+                    ? "bg-highlight/20 text-highlight font-medium shadow-sm"
+                    : "hover:bg-muted/10 text-muted-foreground hover:text-foreground",
                   collapsed && "justify-center"
                 )
               }

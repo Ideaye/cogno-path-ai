@@ -7,6 +7,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       attribute="class" 
       defaultTheme="dark" 
       enableSystem={false}
+      forcedTheme="dark"
       storageKey="abhyas-theme"
     >
       {children}

@@ -66,21 +66,21 @@ export default function Landing() {
             Master Your Exam with{' '}
             <span className="text-primary">AI-Powered</span>{' '}
             <span className="text-lime">Adaptive</span>{' '}
-            Learning
+            Learning 🚀
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto font-normal">
             Experience the future of exam preparation with intelligent calibration, 
-            personalized practice, and cognitive insights that evolve with you
+            personalized practice, and cognitive insights that evolve with you 🎯
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
               size="lg" 
               onClick={handleGetStarted}
-              className="w-full sm:w-auto gradient-lime-purple text-white text-lg px-8 py-6 h-auto"
+              className="w-full sm:w-auto gradient-lime-purple text-white text-lg px-8 py-6 h-auto transition-all hover:scale-105 font-medium"
             >
-              Start Learning Today
+              Start Learning Today 🎓
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -100,20 +100,20 @@ export default function Landing() {
         <div className="container mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-              Unlock Your <span className="text-primary">Potential</span>
+              Unlock Your <span className="text-primary">Potential</span> ✨
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Intelligent features designed to transform how you learn and excel
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-normal">
+              Intelligent features designed to transform how you learn and excel 🎯
             </p>
           </div>
 
           <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all animate-fade-in">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition-colors">
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">AI-Driven Calibration</h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">🧠 AI-Driven Calibration</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
                 Train your confidence alongside knowledge. Our system learns your 
                 patterns to optimize both accuracy and self-assessment
               </p>
