@@ -24,15 +24,22 @@ serve(async (req) => {
 
     // Process up to 5 queued items
     for (let batch = 0; batch < 5; batch++) {
-      const { data: job, error: jobError } = await supabase
+      // First select a queued job
+      const { data: queuedJobs } = await supabase
+        .from('aif_validation_queue')
+        .select('id, aiq_id')
+        .eq('status', 'queued')
+        .limit(1);
+
+      if (!queuedJobs || queuedJobs.length === 0) break;
+      
+      const job = queuedJobs[0];
+      
+      // Then update it to processing
+      await supabase
         .from('aif_validation_queue')
         .update({ status: 'processing', updated_at: new Date().toISOString() })
-        .eq('status', 'queued')
-        .select('id, aiq_id')
-        .limit(1)
-        .single();
-
-      if (jobError || !job) break;
+        .eq('id', job.id);
 
       try {
         const { data: qItem } = await supabase
