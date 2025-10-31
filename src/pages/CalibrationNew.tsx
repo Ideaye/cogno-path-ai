@@ -92,6 +92,7 @@ export default function CalibrationNew() {
         .from('train_ai_items')
         .select(`
           *,
+          question_bank(text),
           user_justifications(*)
         `)
         .eq('session_id', existingSession.id)
@@ -131,18 +132,37 @@ export default function CalibrationNew() {
       if (incompleteItem) {
         setCurrentItem(incompleteItem);
       } else {
-        // Create next item
+        // Create next item - get a random question from question_bank
         const promptIndex = items?.length || 0;
-        const prompt = CALIBRATION_PROMPTS[promptIndex % CALIBRATION_PROMPTS.length];
+        
+        // Get a random question from question_bank for calibration
+        const { data: questions } = await supabase
+          .from('question_bank')
+          .select('id')
+          .limit(50);
+        
+        if (!questions || questions.length === 0) {
+          toast({
+            title: 'No questions available',
+            description: 'Please contact admin to add calibration questions',
+            variant: 'destructive'
+          });
+          setLoading(false);
+          return;
+        }
+        
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
         
         const { data: newItem, error } = await supabase
           .from('train_ai_items')
           .insert([{
             session_id: existingSession.id,
-            question_id: '00000000-0000-0000-0000-000000000000', // placeholder
-            metadata: { prompt, prompt_index: promptIndex }
+            question_id: randomQuestion.id
           }])
-          .select()
+          .select(`
+            *,
+            question_bank(text)
+          `)
           .single();
 
         if (error) throw error;
@@ -302,7 +322,9 @@ export default function CalibrationNew() {
               <CardTitle>Current Prompt</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg">{currentItem?.metadata?.prompt || 'Loading prompt...'}</p>
+              <p className="text-lg">
+                {currentItem?.question_bank?.text || 'Loading question...'}
+              </p>
             </CardContent>
           </Card>
 
