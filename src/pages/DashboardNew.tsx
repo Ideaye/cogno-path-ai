@@ -183,7 +183,7 @@ export default function DashboardNew() {
             </GlassCard>
           </>
         ) : (
-          <GlassCard className="p-8 sm:p-12 text-center">
+          <GlassCard className="p-6 sm:p-8 text-center">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-black">No Active Exam Selected</h2>
             <p className="text-sm sm:text-base text-black mb-6 font-normal">
               Select an exam from settings to start tracking your progress!

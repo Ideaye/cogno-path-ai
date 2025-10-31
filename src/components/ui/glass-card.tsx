@@ -14,7 +14,7 @@ export function GlassCard({
   return (
     <div 
       className={cn(
-        "bg-white border border-black/[0.08] rounded-xl shadow-sm p-6",
+        "bg-white border border-black/[0.08] rounded-xl shadow-sm p-4",
         hover && "hover:shadow-md transition-all duration-200",
         className
       )}

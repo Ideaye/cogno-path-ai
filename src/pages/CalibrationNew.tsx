@@ -281,7 +281,7 @@ export default function CalibrationNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8 flex items-center justify-center" style={{ backgroundColor: '#f2f2f2' }}>
+        <main className="flex-1 p-6 flex items-center justify-center" style={{ backgroundColor: '#f2f2f2' }}>
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
@@ -292,8 +292,8 @@ export default function CalibrationNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
-          <GlassCard className="p-12 text-center animate-fade-in">
+        <main className="flex-1 p-6" style={{ backgroundColor: '#f2f2f2' }}>
+          <GlassCard className="p-8 text-center animate-fade-in">
             <h2 className="text-2xl font-semibold mb-4 text-black">No Active Exam</h2>
             <p className="text-black mb-6 font-normal">
               You need to select an active exam before starting calibration
@@ -311,8 +311,8 @@ export default function CalibrationNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8" style={{ backgroundColor: '#f2f2f2' }}>
-          <GlassCard className="p-12 text-center animate-fade-in">
+        <main className="flex-1 p-6" style={{ backgroundColor: '#f2f2f2' }}>
+          <GlassCard className="p-8 text-center animate-fade-in">
             <h2 className="text-2xl font-semibold mb-4 text-black">Calibration Complete!</h2>
             <p className="text-black mb-6 font-normal">
               You have completed all calibration items for this exam. Great job!
@@ -329,7 +329,7 @@ export default function CalibrationNew() {
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
-      <main className="flex-1 p-8 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
+      <main className="flex-1 p-6 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
         <div className="mb-6 animate-fade-in">
           <h1 className="text-3xl font-bold text-black">Calibration Lab</h1>
           <div className="flex items-center gap-4 text-sm text-black mt-2 font-normal">

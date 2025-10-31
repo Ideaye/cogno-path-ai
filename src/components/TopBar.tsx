@@ -17,7 +17,7 @@ export default function TopBar(p: TopBarProps) {
     <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
       <div className="flex items-center gap-3">
         <select
-          className="border border-border bg-background rounded px-3 py-2 text-foreground"
+          className="border border-border bg-background rounded px-3 py-2 text-black"
           value={p.activeExam?.exam_id ?? ''}
           onChange={(e) => { 
             p.onExamChange(e.target.value); 
@@ -26,16 +26,16 @@ export default function TopBar(p: TopBarProps) {
         >
           {p.exams.map(e => <option key={e.exam_id} value={e.exam_id}>{e.name}</option>)}
         </select>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-black">
           <Calendar size={16} /> {p.dateRange.from} → {p.dateRange.to}
         </div>
       </div>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 border border-border rounded px-3 py-2">
-          <Search size={16} className="text-muted-foreground" />
+          <Search size={16} className="text-black" />
           <input 
             placeholder="Search" 
-            className="outline-none bg-transparent text-foreground" 
+            className="outline-none bg-transparent text-black"
             onKeyDown={(e) => { 
               if (e.key === 'Enter') { 
                 p.onSearch((e.target as HTMLInputElement).value); 

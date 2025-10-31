@@ -177,7 +177,7 @@ export default function AuthPage() {
       </Button>
       
       <GlassCard className="w-full max-w-md">
-        <div className="p-6 sm:p-8 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           {/* Logo and Title */}
           <div className="text-center space-y-3">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4">

@@ -162,7 +162,7 @@ export default function ProfileNew() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Sidebar */}
             <div className="lg:col-span-3">
-              <div className="bg-card rounded-2xl p-6 space-y-6">
+              <div className="bg-card rounded-2xl p-4 space-y-6">
                 {/* Avatar Section */}
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="relative">
@@ -223,7 +223,7 @@ export default function ProfileNew() {
 
             {/* Main Content */}
             <div className="lg:col-span-9">
-              <div className="bg-card rounded-2xl p-6 lg:p-8">
+              <div className="bg-card rounded-2xl p-4 lg:p-6">
                 {activeTab === 'personal' && (
                   <div className="space-y-6">
                     <h1 className="text-2xl lg:text-3xl font-bold">Personal Information</h1>

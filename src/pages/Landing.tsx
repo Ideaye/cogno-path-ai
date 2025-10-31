@@ -107,7 +107,7 @@ export default function Landing() {
           </div>
 
           <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all animate-fade-in">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all animate-fade-in">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition-colors">
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -118,7 +118,7 @@ export default function Landing() {
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
                 <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -129,7 +129,7 @@ export default function Landing() {
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
                 <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -140,7 +140,7 @@ export default function Landing() {
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
                 <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -151,7 +151,7 @@ export default function Landing() {
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
                 <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -162,7 +162,7 @@ export default function Landing() {
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 group hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 group hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
                 <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
@@ -204,7 +204,7 @@ export default function Landing() {
           </div>
 
           <div className="space-y-6 sm:space-y-8">
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl sm:text-3xl font-bold text-primary">1</span>
               </div>
@@ -217,7 +217,7 @@ export default function Landing() {
               </div>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl sm:text-3xl font-bold text-primary">2</span>
               </div>
@@ -230,7 +230,7 @@ export default function Landing() {
               </div>
             </GlassCard>
 
-            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
+            <GlassCard className="p-4 sm:p-6 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover:shadow-md transition-all">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl sm:text-3xl font-bold text-primary">3</span>
               </div>
@@ -249,7 +249,7 @@ export default function Landing() {
       {/* CTA Section */}
       <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center max-w-4xl">
-          <GlassCard className="p-8 sm:p-12 md:p-16">
+          <GlassCard className="p-6 sm:p-8 md:p-10">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
               Ready to <span className="text-primary">Transform</span> Your Learning?
             </h2>

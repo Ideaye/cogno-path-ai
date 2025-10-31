@@ -195,7 +195,7 @@ export default function PracticeNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8 flex items-center justify-center">
+        <main className="flex-1 p-6 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
@@ -206,10 +206,10 @@ export default function PracticeNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8">
-          <GlassCard className="p-12 text-center">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">No Active Exam</h2>
-            <p className="text-foreground mb-6">
+        <main className="flex-1 p-6">
+          <GlassCard className="p-8 text-center">
+            <h2 className="text-2xl font-semibold mb-4 text-black">No Active Exam</h2>
+            <p className="text-black mb-6">
               You need to select an active exam before starting practice.
             </p>
             <Button onClick={() => navigate('/settings')}>
@@ -225,7 +225,7 @@ export default function PracticeNew() {
     return (
       <div className="flex min-h-screen w-full">
         <CollapsibleSideNav />
-        <main className="flex-1 p-8 flex items-center justify-center">
+        <main className="flex-1 p-6 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
@@ -238,7 +238,7 @@ export default function PracticeNew() {
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-6">
         {/* Stats header */}
         <GlassCard className="mb-6 p-4">
           <div className="flex items-center justify-between">
@@ -259,10 +259,10 @@ export default function PracticeNew() {
 
         {/* Question card */}
         <GlassCard className="max-w-3xl mx-auto">
-          <div className="p-8 space-y-6">
+          <div className="p-6 space-y-6">
             <h2 className="text-2xl font-semibold">Question {questionCount + 1}</h2>
             
-            <div className="text-lg whitespace-pre-wrap leading-relaxed text-foreground">
+            <div className="text-lg whitespace-pre-wrap leading-relaxed text-black">
               {currentQuestion.stem}
             </div>
 

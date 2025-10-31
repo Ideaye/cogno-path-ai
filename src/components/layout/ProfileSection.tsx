@@ -80,13 +80,13 @@ export function ProfileSection({ collapsed, user }: ProfileSectionProps) {
     <div className="space-y-2 w-full">
       <div className="flex items-center gap-3 px-2 py-3">
         <Avatar className="ring-2 ring-highlight">
-          <AvatarFallback className="bg-highlight text-foreground font-semibold">
+          <AvatarFallback className="bg-highlight text-black font-semibold">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <p className="font-medium truncate text-sm">{user.name}</p>
-          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+          <p className="text-xs text-black truncate">{user.email}</p>
         </div>
       </div>
       <Separator />
@@ -148,14 +148,14 @@ export function ProfileSection({ collapsed, user }: ProfileSectionProps) {
             )}
           >
             <Avatar className={cn("ring-2 ring-highlight", collapsed ? "h-10 w-10" : "h-9 w-9")}>
-              <AvatarFallback className="bg-highlight text-foreground font-semibold text-sm">
+              <AvatarFallback className="bg-highlight text-black font-semibold text-sm">
                 {initials}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 text-left ml-3 min-w-0">
                 <p className="font-medium truncate text-sm">{user.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-xs text-black truncate">{user.email}</p>
               </div>
             )}
           </Button>

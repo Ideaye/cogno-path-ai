@@ -90,7 +90,7 @@ export default function SettingsNew() {
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
-      <main className="flex-1 p-8 space-y-6">
+      <main className="flex-1 p-6 space-y-6">
         <h1 className="text-4xl font-bold text-black">Settings</h1>
 
         <GlassCard>
