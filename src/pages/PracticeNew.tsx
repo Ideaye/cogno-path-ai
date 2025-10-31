@@ -308,7 +308,7 @@ export default function PracticeNew() {
             <Button
               onClick={handleSubmit}
               disabled={!selectedKey || submitting}
-              className="w-full bg-primary text-white hover:bg-primary/90"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               size="lg"
             >
               {submitting ? (

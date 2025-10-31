@@ -9,21 +9,21 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 95%;
-    --foreground: 0 0% 10%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 0 0% 0%;
     --primary: 270 100% 80%;
     --primary-hover: 270 100% 75%;
     --primary-muted: 270 100% 90%;
-    --primary-foreground: 0 0% 10%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary-foreground: 0 0% 0%;
     --muted: 0 0% 98%;
-    --muted-foreground: 0 0% 40%;
+    --muted-foreground: 0 0% 0%;
     --accent: 270 100% 80%;
-    --accent-foreground: 0 0% 10%;
+    --accent-foreground: 0 0% 0%;
     --success: 158 64% 52%;
     --success-bg: 152 81% 96%;
     --destructive: 0 84% 60%;
@@ -88,6 +88,11 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  /* Force all headings to pure black */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-black;
   }
 
   /* Disable transitions on inputs for better UX */
