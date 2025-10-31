@@ -1,14 +1,36 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/track';
 import { LayoutDashboard, Target, Dumbbell, Shield, Settings } from 'lucide-react';
 
 export default function SideNav({ activeRoute }: { activeRoute: string }) {
-  const items = [
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setIsAdmin(profile?.is_admin === true);
+    };
+    checkAdmin();
+  }, []);
+
+  const allItems = [
     { key: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { key: '/calibration', label: 'Calibration', icon: Target },
     { key: '/practice', label: 'Practice', icon: Dumbbell },
-    { key: '/admin/content', label: 'Admin', icon: Shield },
+    { key: '/admin/content', label: 'Admin', icon: Shield, adminOnly: true },
     { key: '/settings', label: 'Settings', icon: Settings },
   ];
+
+  const items = allItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <aside className="w-60 border-r border-border bg-sidebar h-screen p-3">

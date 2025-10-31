@@ -214,6 +214,33 @@ export type Database = {
           },
         ]
       }
+      calibration_reports: {
+        Row: {
+          created_at: string
+          exam_id: string
+          id: string
+          report_type: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exam_id: string
+          id?: string
+          report_type: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exam_id?: string
+          id?: string
+          report_type?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cdna_versions: {
         Row: {
           created_at: string
@@ -1156,7 +1183,6 @@ export type Database = {
         Args: never
         Returns: {
           end_time: string
-          jobid: number
           jobname: string
           start_time: string
           status: string
