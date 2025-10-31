@@ -51,7 +51,7 @@ export default function AuthPage() {
         });
         navigate('/dashboard');
       } else {
-        const redirectUrl = `${window.location.origin}/dashboard`;
+        const redirectUrl = `${window.location.origin}/onboarding`;
         
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -70,7 +70,7 @@ export default function AuthPage() {
             title: "Welcome!",
             description: "Account created successfully.",
           });
-          navigate('/dashboard');
+          navigate('/onboarding');
         } else {
           toast({
             title: "Account created!",
@@ -95,7 +95,7 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/onboarding`,
         },
       });
 
@@ -152,7 +152,7 @@ export default function AuthPage() {
         title: "Success!",
         description: "Successfully signed in.",
       });
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (error: any) {
       toast({
         title: "Error",

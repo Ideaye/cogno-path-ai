@@ -82,7 +82,7 @@ export default function DashboardNew() {
                   <span className="text-xs sm:text-sm text-muted-foreground">Total Practice</span>
                   <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-bold gradient-text">{practice.total}</h3>
+                <h3 className="text-2xl sm:text-4xl font-bold text-primary">{practice.total}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
                   {practice.accuracy}% accuracy
                 </p>
@@ -125,7 +125,7 @@ export default function DashboardNew() {
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground mb-1">ECE</p>
-                    <p className="text-xl sm:text-2xl font-bold gradient-text">
+                    <p className="text-xl sm:text-2xl font-bold text-primary">
                       {cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}
                     </p>
                   </div>
@@ -174,7 +174,7 @@ export default function DashboardNew() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 size="lg"
-                className="gradient-lime-purple text-white flex-1"
+                className="bg-primary hover:bg-primary-hover text-white flex-1"
                 onClick={() => {
                   track('dashboard.resume_calibration_clicked');
                   navigate('/calibration');
