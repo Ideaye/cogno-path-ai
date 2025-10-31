@@ -144,60 +144,91 @@ export type Database = {
       }
       attempts: {
         Row: {
+          assumptions: string | null
           attempt_number: number | null
+          checks: string | null
           confidence: number | null
           confidence_0_1: number | null
           correct: boolean
           created_at: string
+          difficulty: number | null
+          final_answer: string | null
           hesitation_count: number | null
           id: string
+          justification_id: string | null
+          latency_ms: number | null
           mode: string | null
           option_switches: number | null
           pressure_mode: string | null
           question_id: string
+          resources: Json | null
           revisited: boolean | null
+          strategy_tags: string[] | null
           time_taken: number
           time_taken_ms: number | null
           ui_variant: string | null
           user_id: string
         }
         Insert: {
+          assumptions?: string | null
           attempt_number?: number | null
+          checks?: string | null
           confidence?: number | null
           confidence_0_1?: number | null
           correct: boolean
           created_at?: string
+          difficulty?: number | null
+          final_answer?: string | null
           hesitation_count?: number | null
           id?: string
+          justification_id?: string | null
+          latency_ms?: number | null
           mode?: string | null
           option_switches?: number | null
           pressure_mode?: string | null
           question_id: string
+          resources?: Json | null
           revisited?: boolean | null
+          strategy_tags?: string[] | null
           time_taken: number
           time_taken_ms?: number | null
           ui_variant?: string | null
           user_id: string
         }
         Update: {
+          assumptions?: string | null
           attempt_number?: number | null
+          checks?: string | null
           confidence?: number | null
           confidence_0_1?: number | null
           correct?: boolean
           created_at?: string
+          difficulty?: number | null
+          final_answer?: string | null
           hesitation_count?: number | null
           id?: string
+          justification_id?: string | null
+          latency_ms?: number | null
           mode?: string | null
           option_switches?: number | null
           pressure_mode?: string | null
           question_id?: string
+          resources?: Json | null
           revisited?: boolean | null
+          strategy_tags?: string[] | null
           time_taken?: number
           time_taken_ms?: number | null
           ui_variant?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "attempts_justification_id_fkey"
+            columns: ["justification_id"]
+            isOneToOne: false
+            referencedRelation: "user_justifications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "attempts_question_id_fkey"
             columns: ["question_id"]
@@ -1117,37 +1148,52 @@ export type Database = {
       }
       user_justifications: {
         Row: {
+          answer: string | null
           audio_url: string | null
+          confidence_0_1: number | null
           created_at: string
           effort_1_5: number | null
           error_cause: string | null
+          exam_id: string | null
           id: string
+          justification: string | null
           strategy_tags: string[] | null
           stress_1_5: number | null
           text: string | null
           train_ai_item_id: string
+          user_id: string | null
         }
         Insert: {
+          answer?: string | null
           audio_url?: string | null
+          confidence_0_1?: number | null
           created_at?: string
           effort_1_5?: number | null
           error_cause?: string | null
+          exam_id?: string | null
           id?: string
+          justification?: string | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null
           train_ai_item_id: string
+          user_id?: string | null
         }
         Update: {
+          answer?: string | null
           audio_url?: string | null
+          confidence_0_1?: number | null
           created_at?: string
           effort_1_5?: number | null
           error_cause?: string | null
+          exam_id?: string | null
           id?: string
+          justification?: string | null
           strategy_tags?: string[] | null
           stress_1_5?: number | null
           text?: string | null
           train_ai_item_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1171,6 +1217,26 @@ export type Database = {
       compute_item_hash: {
         Args: { correct: string; options: string[]; stem: string }
         Returns: string
+      }
+      create_calibration_attempt: {
+        Args: {
+          p_assumptions: string
+          p_checks: string
+          p_confidence_0_1: number
+          p_difficulty: number
+          p_exam_id: string
+          p_final_answer: string
+          p_is_correct: boolean
+          p_justification: string
+          p_latency_ms: number
+          p_resources: Json
+          p_strategy_tags: string[]
+          p_train_ai_item_id: string
+        }
+        Returns: {
+          attempt_id: string
+          justification_id: string
+        }[]
       }
       get_last_jqs_for_user_exam: {
         Args: { p_exam: string; p_user: string }
