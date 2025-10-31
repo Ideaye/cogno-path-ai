@@ -48,19 +48,19 @@ All colors MUST be HSL.
     --glass-border: rgba(255, 255, 255, 0.18);
   }
   .dark {
-    --background: 222 47% 11%;
+    --background: 222 47% 7%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 222 47% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 47% 10%;
     --popover-foreground: 210 40% 98%;
     --primary: 258 90% 58%;
     --primary-hover: 259 83% 51%;
     --primary-muted: 258 90% 85%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 18%;
+    --secondary: 217 33% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 18%;
+    --muted: 217 33% 15%;
     --muted-foreground: 215 20% 65%;
     --accent: 258 90% 58%;
     --accent-foreground: 0 0% 100%;
@@ -68,10 +68,10 @@ All colors MUST be HSL.
     --success-bg: 152 81% 20%;
     --destructive: 0 63% 31%;
     --warning: 38 92% 50%;
-    --border: 217 33% 18%;
+    --border: 217 33% 15%;
     --input: 217 33% 18%;
     --ring: 258 90% 58%;
-    --sidebar-bg: 222 47% 11%;
+    --sidebar-bg: 222 47% 10%;
     --sidebar-text: 210 40% 98%;
     --chart-1: 258 90% 58%;
     --chart-2: 158 64% 52%;
@@ -81,6 +81,10 @@ All colors MUST be HSL.
     --lime: 82 92% 55%;
     --lavender: 270 60% 70%;
     --soft-purple: 258 80% 65%;
+    --blue-accent: 210 100% 60%;
+    --teal-accent: 174 72% 56%;
+    --glass-bg: rgba(34, 42, 53, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
   }
 }
 

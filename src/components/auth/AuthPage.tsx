@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Loader2, Mail, Smartphone } from "lucide-react";
+import { Brain, Loader2, Mail, Smartphone, ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export default function AuthPage() {
@@ -53,7 +53,7 @@ export default function AuthPage() {
       } else {
         const redirectUrl = `${window.location.origin}/dashboard`;
         
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -64,10 +64,19 @@ export default function AuthPage() {
 
         if (error) throw error;
 
-        toast({
-          title: "Account created!",
-          description: "Welcome to Abhyas AI.",
-        });
+        // With auto-confirm enabled, session should be available immediately
+        if (data.session) {
+          toast({
+            title: "Welcome!",
+            description: "Account created successfully.",
+          });
+          navigate('/dashboard');
+        } else {
+          toast({
+            title: "Account created!",
+            description: "Please check your email to verify your account.",
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -157,6 +166,16 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4 sm:p-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 left-4 sm:top-8 sm:left-8"
+        onClick={() => navigate('/')}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back
+      </Button>
+      
       <GlassCard className="w-full max-w-md">
         <div className="p-6 sm:p-8 space-y-6">
           {/* Logo and Title */}

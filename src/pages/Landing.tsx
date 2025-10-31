@@ -1,22 +1,23 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, Target, TrendingUp, Menu } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Brain, Target, TrendingUp, Zap, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Landing() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate('/dashboard');
       }
-    });
-
-    // Listen for auth changes
+    };
+    
+    checkSession();
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate('/dashboard');
@@ -30,190 +31,261 @@ export default function Landing() {
   const handleSignIn = () => navigate('/auth');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full gradient-lime-purple flex items-center justify-center">
-              <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+    <div className="min-h-screen bg-background dark">
+      {/* Header */}
+      <header className="fixed top-0 w-full z-50 border-b border-border/40 backdrop-blur-lg bg-background/80">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <div className="flex items-center gap-2">
+              <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <span className="text-xl sm:text-2xl font-bold">Abhyas AI</span>
             </div>
-            <span className="text-lg sm:text-xl font-bold gradient-text">Abhyas AI</span>
-          </div>
-          
-          <nav className="hidden lg:flex items-center gap-6 text-sm">
-            <a href="#features" className="hover:text-primary transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-primary transition-colors">How It Works</a>
-            <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
-          </nav>
+            
+            <nav className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition">Features</a>
+              <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition">How It Works</a>
+              <a href="#innovation" className="text-sm text-muted-foreground hover:text-foreground transition">Innovation</a>
+            </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={handleSignIn}>
-              Sign In
-            </Button>
-            <Button size="sm" className="gradient-lime-purple text-white text-xs sm:text-sm" onClick={handleGetStarted}>
-              Get Started
-            </Button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button variant="ghost" size="sm" onClick={handleSignIn} className="text-sm">
+                Sign In
+              </Button>
+              <Button size="sm" onClick={handleGetStarted} className="bg-primary hover:bg-primary-hover text-sm">
+                Get Started
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6">
-        <div className="container mx-auto max-w-6xl">
-          <GlassCard className="text-center p-6 sm:p-12 md:p-16">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
-              Master Your Exam with{' '}
-              <span className="gradient-text">AI-Powered</span>
-              <br className="hidden sm:block" />
-              Adaptive Learning
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-              Personalized practice that adapts to your learning style. 
-              Measure your true capability and improve with intelligent feedback.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
-              <Button 
-                size="lg" 
-                className="gradient-lime-purple text-white text-base sm:text-lg px-6 sm:px-8"
-                onClick={handleGetStarted}
-              >
-                Get Started Free
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-primary text-base sm:text-lg px-6 sm:px-8"
-                onClick={handleSignIn}
-              >
-                Sign In
-              </Button>
-            </div>
-          </GlassCard>
+      <section className="pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto text-center max-w-5xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 sm:mb-8">
+            Master Your Exam with{' '}
+            <span className="text-primary">AI-Powered</span>{' '}
+            <span className="text-lime">Adaptive</span>{' '}
+            Learning
+          </h1>
+          
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto">
+            Experience the future of exam preparation with intelligent calibration, 
+            personalized practice, and cognitive insights that evolve with you
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              size="lg" 
+              onClick={handleGetStarted}
+              className="w-full sm:w-auto gradient-lime-purple text-white text-lg px-8 py-6 h-auto"
+            >
+              Start Learning Today
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={handleSignIn}
+              className="w-full sm:w-auto text-lg px-8 py-6 h-auto border-2"
+            >
+              Watch Demo
+            </Button>
+          </div>
         </div>
       </section>
 
-      {/* USP Section */}
-      <section id="features" className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 px-4">
-            Why Choose <span className="gradient-text">Abhyas AI</span>
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <GlassCard className="text-center">
-              <div className="w-16 h-16 rounded-full gradient-purple-lavender flex items-center justify-center mx-auto mb-4">
-                <Brain className="h-8 w-8 text-white" />
+      {/* Features Grid */}
+      <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="container mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              Unlock Your <span className="text-primary">Potential</span>
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Intelligent features designed to transform how you learn and excel
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary/20 transition">
+                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">AI-Driven Calibration</h3>
-              <p className="text-muted-foreground">
-                Measure your true capability with intelligent prompts that adapt to your skill level
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">AI-Driven Calibration</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Train your confidence alongside knowledge. Our system learns your 
+                patterns to optimize both accuracy and self-assessment
               </p>
             </GlassCard>
 
-            <GlassCard className="text-center">
-              <div className="w-16 h-16 rounded-full gradient-lime-purple flex items-center justify-center mx-auto mb-4">
-                <Target className="h-8 w-8 text-white" />
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lime/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-lime/20 transition">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-lime" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Adaptive Practice</h3>
-              <p className="text-muted-foreground">
-                Questions that evolve with your progress, keeping you in the optimal learning zone
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Adaptive Practice</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Questions that evolve with your progress. Focus on what matters 
+                most with AI-selected content tailored to your learning curve
               </p>
             </GlassCard>
 
-            <GlassCard className="text-center">
-              <div className="w-16 h-16 rounded-full gradient-purple-lavender flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="h-8 w-8 text-white" />
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lavender/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-lavender/20 transition">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-lavender" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Cognitive Insights</h3>
-              <p className="text-muted-foreground">
-                Deep analytics on your learning patterns to identify strengths and areas for improvement
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Cognitive Insights</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Deep analytics on your learning patterns. Understand your strengths,
+                identify gaps, and track improvement with precision metrics
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-blue-accent/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-blue-accent/20 transition">
+                <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-blue-accent" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Real-Time Feedback</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Instant insights after every question. Learn from mistakes 
+                immediately with AI-generated explanations and improvement tips
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-teal-accent/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-teal-accent/20 transition">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-teal-accent" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Progress Tracking</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Visualize your journey to mastery. Comprehensive dashboards 
+                show your growth across topics, time, and confidence levels
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-6 sm:p-8 group hover:scale-105 transition-all">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-soft-purple/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-soft-purple/20 transition">
+                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-soft-purple" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Smart Reviews</h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Never forget what you've learned. Spaced repetition powered by
+                AI ensures long-term retention and exam-day confidence
               </p>
             </GlassCard>
           </div>
         </div>
       </section>
 
-      {/* Problem/Solution Section */}
-      <section id="how-it-works" className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-center">
-            <GlassCard className="p-8">
-              <h3 className="text-3xl font-bold mb-4 text-destructive">The Problem</h3>
-              <p className="text-lg text-muted-foreground mb-4">
-                Traditional practice is one-size-fits-all. Students waste time on questions that are too easy or get frustrated with material that's too hard.
-              </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-destructive">✗</span>
-                  <span>No personalization to your skill level</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-destructive">✗</span>
-                  <span>Limited feedback on your thought process</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-destructive">✗</span>
-                  <span>No insights into your learning patterns</span>
-                </li>
-              </ul>
+      {/* Innovation Section */}
+      <section id="innovation" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6 sm:mb-8">
+            <span className="text-primary">Innovation</span> is central to our ethos.{' '}
+            <span className="text-blue-accent">Advanced technologies</span> and{' '}
+            <span className="text-lime">adaptive algorithms</span> work together to{' '}
+            <span className="text-lavender">revolutionize</span> how you prepare for exams
+          </h2>
+          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
+            We combine cutting-edge machine learning, cognitive science, and educational 
+            psychology to create a learning experience that's uniquely yours
+          </p>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              How <span className="text-primary">Abhyas AI</span> Works
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground">
+              Your path to exam mastery in three simple steps
+            </p>
+          </div>
+
+          <div className="space-y-6 sm:space-y-8">
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl sm:text-3xl font-bold text-primary">1</span>
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Calibrate Your Baseline</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Start with our intelligent calibration phase that assesses both your knowledge 
+                  and confidence levels. This creates a personalized learning profile
+                </p>
+              </div>
             </GlassCard>
 
-            <GlassCard className="p-8">
-              <h3 className="text-3xl font-bold mb-4 gradient-text">The Solution</h3>
-              <p className="text-lg text-muted-foreground mb-4">
-                Abhyas AI personalizes every question to your current skill level and provides deep insights into your reasoning process.
-              </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-lime">✓</span>
-                  <span>Adaptive difficulty that matches your ability</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-lime">✓</span>
-                  <span>Detailed analysis of your justifications</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-lime">✓</span>
-                  <span>Cognitive profiling to optimize your learning</span>
-                </li>
-              </ul>
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lime/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl sm:text-3xl font-bold text-lime">2</span>
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Practice Adaptively</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Engage with AI-selected questions that target your weak areas while 
+                  reinforcing strengths. The difficulty adapts in real-time to your performance
+                </p>
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lavender/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl sm:text-3xl font-bold text-lavender">3</span>
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Track & Excel</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Monitor your progress with detailed analytics and cognitive insights. 
+                  Watch your confidence grow as you approach exam-ready mastery
+                </p>
+              </div>
             </GlassCard>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="container mx-auto max-w-4xl">
-          <GlassCard className="text-center p-6 sm:p-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-4">
-              Ready to Transform Your Learning?
+      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto text-center max-w-4xl">
+          <GlassCard className="p-8 sm:p-12 md:p-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
+              Ready to <span className="text-primary">Transform</span> Your Learning?
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 px-4">
-              Join thousands of students improving their exam performance with AI
+            <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto">
+              Join thousands of students who are already mastering their exams 
+              with AI-powered adaptive learning
             </p>
             <Button 
               size="lg" 
-              className="gradient-lime-purple text-white text-base sm:text-lg px-8 sm:px-12"
               onClick={handleGetStarted}
+              className="gradient-lime-purple text-white text-lg px-8 sm:px-12 py-6 h-auto"
             >
               Start Learning Today
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </GlassCard>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="glass-card border-t py-6 sm:py-8">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              © 2025 Abhyas AI. All rights reserved.
+      <footer className="border-t border-border/40 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Brain className="h-6 w-6 text-primary" />
+              <span className="text-lg font-bold">Abhyas AI</span>
+            </div>
+            <p className="text-sm text-muted-foreground text-center sm:text-left">
+              © 2025 Abhyas AI. Empowering learners worldwide.
             </p>
-            <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms</a>
-              <a href="#" className="hover:text-primary transition-colors">Contact</a>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Privacy</a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Terms</a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition">Contact</a>
             </div>
           </div>
         </div>

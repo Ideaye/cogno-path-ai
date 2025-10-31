@@ -9,6 +9,7 @@ import { useActiveExam } from '@/hooks/useActiveExam';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { DateRange } from '@/types/domain';
 import { track } from '@/lib/track';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function DashboardNew() {
   const navigate = useNavigate();
@@ -55,18 +56,21 @@ export default function DashboardNew() {
               </p>
             )}
           </div>
-          {reports.weeklyUrl && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-primary hover:bg-primary/10 w-full sm:w-auto"
-              onClick={() => window.open(reports.weeklyUrl, '_blank')}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Download Report</span>
-              <span className="sm:hidden">Report</span>
-            </Button>
-          )}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            {reports.weeklyUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-primary hover:bg-primary/10 w-full sm:w-auto"
+                onClick={() => window.open(reports.weeklyUrl, '_blank')}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Download Report</span>
+                <span className="sm:hidden">Report</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         {activeExam ? (
