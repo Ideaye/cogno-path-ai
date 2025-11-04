@@ -8,11 +8,12 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, User, Lock, LogOut, Edit2, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Loader2, User, Lock, LogOut, Edit2, CheckCircle2, ChevronDown, GraduationCap } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { ExamManagement } from '@/components/settings/ExamManagement';
 
 interface ProfileData {
   name: string;
@@ -31,7 +32,7 @@ export default function ProfileNew() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'personal' | 'security' | 'logout'>('personal');
+  const [activeTab, setActiveTab] = useState<'personal' | 'security' | 'courses'>('personal');
   const [showActivity, setShowActivity] = useState(false);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileData>({
@@ -196,6 +197,18 @@ export default function ProfileNew() {
                   >
                     <User className="h-5 w-5" />
                     <span className="font-medium">Personal Information</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('courses')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                      activeTab === 'courses'
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-muted'
+                    }`}
+                  >
+                    <GraduationCap className="h-5 w-5" />
+                    <span className="font-medium">My Courses</span>
                   </button>
                   
                   <button
@@ -407,6 +420,16 @@ export default function ProfileNew() {
                         </CollapsibleContent>
                       </Collapsible>
                     </div>
+                  </div>
+                )}
+
+                {activeTab === 'courses' && (
+                  <div className="space-y-6">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-black">My Courses</h1>
+                    <p className="text-black mb-6">
+                      Manage your enrolled courses and set which one is currently active for practice.
+                    </p>
+                    <ExamManagement />
                   </div>
                 )}
 
