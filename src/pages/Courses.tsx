@@ -12,14 +12,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 interface Exam {
   id: string;
   name: string;
-  slug: string;
-  category: string;
-  class_range: string;
+  slug: string | null;
+  category: string | null;
+  class_range: string | null;
   admin_only: boolean;
   is_active: boolean;
 }
 
 interface ExamSubject {
+  exam_id: string;
   subject: string;
   stream: string | null;
 }
@@ -61,27 +62,34 @@ export default function Courses() {
       setIsAdmin(profile?.is_admin === true);
 
       // Load exams (public + admin if admin)
-      const { data: examsData, error: examsError } = await supabase
+      const examsQuery = await (supabase as any)
         .from('exams')
         .select('id, name, slug, category, class_range, admin_only, is_active')
         .eq('is_active', true)
         .order('category')
         .order('name');
+      
+      const examsData = examsQuery.data;
+      const examsError = examsQuery.error;
 
       if (examsError) throw examsError;
-      setExams(examsData || []);
+      setExams((examsData || []) as unknown as Exam[]);
 
       // Load subjects for each exam
       const { data: subjectsData, error: subjectsError } = await supabase
-        .from('exam_subjects')
+        .from('exam_subjects' as any)
         .select('exam_id, subject, stream');
 
       if (subjectsError) throw subjectsError;
       
       const subjectsMap: Record<string, ExamSubject[]> = {};
-      subjectsData?.forEach(s => {
+      (subjectsData || []).forEach((s: any) => {
         if (!subjectsMap[s.exam_id]) subjectsMap[s.exam_id] = [];
-        subjectsMap[s.exam_id].push({ subject: s.subject, stream: s.stream });
+        subjectsMap[s.exam_id].push({ 
+          exam_id: s.exam_id,
+          subject: s.subject, 
+          stream: s.stream 
+        });
       });
       setSubjects(subjectsMap);
 
@@ -160,7 +168,7 @@ export default function Courses() {
   const isActiveExam = (examId: string) => enrollments.some(e => e.exam_id === examId && e.is_active);
 
   const filteredExams = exams.filter(exam => {
-    if (categoryFilter !== 'all' && exam.category !== categoryFilter) return false;
+    if (categoryFilter !== 'all' && exam.category && exam.category !== categoryFilter) return false;
     return true;
   });
 
@@ -244,7 +252,7 @@ export default function Courses() {
                           )}
                         </CardTitle>
                         <CardDescription className="text-black/70 mt-1">
-                          {exam.category} • {exam.class_range}
+                          {exam.category || 'General'} • {exam.class_range || 'All Levels'}
                         </CardDescription>
                       </div>
                       {active && (
