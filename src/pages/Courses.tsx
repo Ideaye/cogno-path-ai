@@ -8,6 +8,7 @@ import { Loader2, BookOpen, GraduationCap, CheckCircle2, Star } from 'lucide-rea
 import { APP_BRAND } from '@/lib/brandConfig';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 
 interface Exam {
   id: string;
@@ -176,20 +177,23 @@ export default function Courses() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="flex min-h-screen w-full">
+        <CollapsibleSideNav />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#f2f2f2' }}>
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-black" />
             <span className="ml-2 text-black">Loading courses...</span>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="flex min-h-screen w-full">
+      <CollapsibleSideNav />
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
+        <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-black mb-2">
             <GraduationCap className="inline-block mr-3 h-10 w-10" />
@@ -330,7 +334,8 @@ export default function Courses() {
             })}
           </div>
         )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
