@@ -2,7 +2,7 @@
 'use client';
 
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -67,12 +67,10 @@ export default function HeroHeader() {
     },
   };
 
-  // FIX: Properly encoded SVG for Tailwind JIT compiler
   const ringsBg = `url('data:image/svg+xml,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3e%3ccircle cx="50" cy="50" r="40" stroke="%23B995FF" stroke-width="0.1" fill="none"/%3e%3c/svg%3e')`;
 
   return (
     <header className="relative overflow-hidden bg-white dark:bg-gray-950">
-      {/* Background decoration */}
       <div aria-hidden className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-100/30 via-white to-blue-100/30 dark:from-cyan-900/10 dark:via-gray-950 dark:to-blue-900/10" />
         <div 
@@ -88,7 +86,6 @@ export default function HeroHeader() {
           initial="hidden"
           animate="visible"
         >
-          {/* Left: Copy */}
           <div className="lg:col-span-6 text-center lg:text-left">
             <motion.p variants={itemVariants} className="text-sm font-semibold uppercase tracking-wider text-accent mb-3">
               CognoPath AI
@@ -104,18 +101,17 @@ export default function HeroHeader() {
             </motion.p>
             <motion.div variants={itemVariants} className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <MotionButton asChild size="lg" className="bg-accent hover:bg-accent/90 text-black font-bold">
-                <Link href="/auth">Get Started</Link>
+                <Link to="/auth">Get Started</Link>
               </MotionButton>
               <MotionButton asChild size="lg" variant="ghost">
-                <Link href="/demo">Watch Demo</Link>
+                <Link to="/demo">Watch Demo</Link>
               </MotionButton>
             </motion.div>
             <motion.p variants={itemVariants} className="mt-4 text-xs text-neutral-500 dark:text-neutral-400 text-center lg:text-left">
               HIPAA & GDPR aligned. Privacy-first by design.
-            </motion.p>
+            </p>
           </div>
 
-          {/* Right: Visual */}
           <div className="lg:col-span-6 flex items-center justify-center">
             <HeroVisual />
           </div>

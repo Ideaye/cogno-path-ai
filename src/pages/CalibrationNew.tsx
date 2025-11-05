@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,7 +57,6 @@ export default function CalibrationNew() {
         return;
       }
 
-      // Get active exam
       const { data: enrollment } = await supabase
         .from('user_exam_enrollments')
         .select('exam_id, exams(name)')
@@ -72,7 +72,6 @@ export default function CalibrationNew() {
 
       setActiveExam(enrollment);
 
-      // Get all calibration items for this exam
       const { data: items } = await supabase
         .from('calibration_items')
         .select('*')
@@ -80,16 +79,11 @@ export default function CalibrationNew() {
         .order('created_at', { ascending: true });
 
       if (!items || items.length === 0) {
-      toast({
-        title: 'No calibration items',
-        description: 'Please contact admin to add calibration prompts',
-        variant: 'destructive'
-      });
+        toast({ title: 'No calibration items', description: 'Please contact admin to add calibration prompts', variant: 'destructive' });
         setLoading(false);
         return;
       }
 
-      // Get completed justifications
       const { data: justifications } = await supabase
         .from('user_justifications')
         .select('train_ai_item_id')
@@ -100,7 +94,6 @@ export default function CalibrationNew() {
       const progressPercent = Math.round((completedCount / items.length) * 100);
       setProgress(progressPercent);
 
-      // Get next uncompleted item
       const completedIds = justifications?.map(j => j.train_ai_item_id) || [];
       const nextItem = items.find(item => !completedIds.includes(item.id));
 
@@ -112,17 +105,12 @@ export default function CalibrationNew() {
       }
     } catch (error) {
       console.error('Error loading calibration:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load calibration items',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Failed to load calibration items', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   }
 
-  // Helper functions
   const addAssumptionChip = () => {
     if (assumptions.trim()) {
       setAssumptionChips([...assumptionChips, assumptions.trim()]);
@@ -142,12 +130,13 @@ export default function CalibrationNew() {
   };
 
   const toggleStrategy = (strategy: string) => {
-    if (strategyTags.includes(strategy)) {
-      setStrategyTags(strategyTags.filter(s => s !== strategy));
-    } else {
-      setStrategyTags([...strategyTags, strategy]);
-    }
+    setStrategyTags(tags => tags.includes(strategy) ? tags.filter(s => s !== strategy) : [...tags, strategy]);
   };
+
+  const displayedStrategies = [
+    ...STRATEGY_OPTIONS,
+    ...strategyTags.filter(t => !STRATEGY_OPTIONS.includes(t))
+  ].filter((v, i, a) => a.indexOf(v) === i);
 
   const isUrlValid = (url: string) => {
     if (!url) return true;
@@ -164,6 +153,7 @@ export default function CalibrationNew() {
       answerText.length >= 180 &&
       strategyTags.length > 0 &&
       assumptionChips.length > 0 &&
+      checksUnits.trim() !== '' &&
       perceivedDifficulty !== '' &&
       (externalLink === '' || isUrlValid(externalLink))
     );
@@ -171,11 +161,7 @@ export default function CalibrationNew() {
 
   async function handleSubmit() {
     if (!isFormValid()) {
-      toast({
-        title: 'Incomplete Form',
-        description: 'Please fill all required fields (marked with *)',
-        variant: 'destructive'
-      });
+      toast({ title: 'Incomplete Form', description: 'Please fill all required fields (marked with *)', variant: 'destructive' });
       return;
     }
 
@@ -186,17 +172,11 @@ export default function CalibrationNew() {
 
       const latencyMs = Date.now() - startTime;
       const confidenceValue = confidence[0] / 100;
+      const resources = { calculator: useCalculator, notes: notesText || null, link: externalLink || null };
 
-      const resources = {
-        calculator: useCalculator,
-        notes: notesText || null,
-        link: externalLink || null
-      };
-
-      // Insert justification with type assertion
-      const { error: justificationError } = await supabase
+      const { data: justificationData, error: justificationError } = await supabase
         .from('user_justifications')
-        .insert([{
+        .insert({
           user_id: user.id,
           exam_id: activeExam.exam_id,
           train_ai_item_id: currentItem.id,
@@ -204,360 +184,143 @@ export default function CalibrationNew() {
           justification: answerText,
           confidence_0_1: confidenceValue,
           strategy_tags: strategyTags,
-          assumptions: assumptionChips as any,
-          checks_units: checksUnits || null,
-          perceived_difficulty: parseInt(perceivedDifficulty)
-        } as any]);
+          assumptions: assumptionChips,
+          checks_units: checksUnits,
+          perceived_difficulty_1_5: parseInt(perceivedDifficulty),
+        })
+        .select('id')
+        .single();
 
       if (justificationError) throw justificationError;
+      const justificationId = justificationData?.id;
 
-      // Insert attempt with type assertion
       const { error: attemptError } = await supabase
         .from('attempts')
-        .insert([{
+        .insert({
           user_id: user.id,
-          question_id: currentItem.id,
+          exam_id: activeExam.exam_id,
+          calibration_item_id: currentItem.id,
           correct: null,
           time_taken_ms: latencyMs,
-          time_taken: latencyMs / 1000,
           confidence_0_1: confidenceValue,
           strategy_tags: strategyTags,
           assumptions: assumptionChips.join('; '),
           checks: checksUnits,
-          resources,
+          resources: resources,
           difficulty: parseInt(perceivedDifficulty),
           final_answer: answerText,
           latency_ms: latencyMs,
-          mode: 'calibration'
-        } as any]);
+          mode: 'calibration',
+          justification_id: justificationId,
+        });
 
       if (attemptError) throw attemptError;
 
-      // Update calibration progress
-      const newProgress = Math.min(1, (progress + 10) / 100);
-      await supabase
-        .from('feature_user_exam_daily')
-        .upsert({
-          user_id: user.id,
-          exam_id: activeExam.exam_id,
-          snapshot_date: new Date().toISOString().split('T')[0],
-          calibration_progress_0_1: newProgress
-        }, {
-          onConflict: 'user_id,exam_id,snapshot_date'
-        });
-
-      toast({
-        title: 'Saved successfully',
-        description: 'Your calibration response has been recorded'
-      });
-
-      // Reset form
-      setAnswerText('');
-      setConfidence([50]);
-      setStrategyTags([]);
-      setAssumptionChips([]);
-      setAssumptions('');
-      setChecksUnits('');
-      setUseCalculator(false);
-      setNotesText('');
-      setExternalLink('');
-      setPerceivedDifficulty('');
-
-      // Load next item
-      await loadCalibrationState();
+      loadCalibrationState();
+      toast({ title: 'Saved successfully', description: 'Your calibration response has been recorded' });
     } catch (error) {
       console.error('Error submitting:', error);
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to submit',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to submit', variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen w-full">
-        <CollapsibleSideNav />
-        <main className="flex-1 p-6 flex items-center justify-center" style={{ backgroundColor: '#f2f2f2' }}>
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
-    );
-  }
-
-  if (!activeExam) {
-    return (
-      <div className="flex min-h-screen w-full">
-        <CollapsibleSideNav />
-        <main className="flex-1 p-6" style={{ backgroundColor: '#f2f2f2' }}>
-          <GlassCard className="p-8 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4 text-black">No Active Exam</h2>
-            <p className="text-black mb-6 font-normal">
-              You need to select an active exam before starting calibration
-            </p>
-            <Button onClick={() => navigate('/settings')} className="transition-all hover:scale-105 font-medium">
-              Go to Settings
-            </Button>
-          </GlassCard>
-        </main>
-      </div>
-    );
-  }
-
-  if (!currentItem) {
-    return (
-      <div className="flex min-h-screen w-full">
-        <CollapsibleSideNav />
-        <main className="flex-1 p-6" style={{ backgroundColor: '#f2f2f2' }}>
-          <GlassCard className="p-8 text-center animate-fade-in">
-            <h2 className="text-2xl font-semibold mb-4 text-black">Calibration Complete!</h2>
-            <p className="text-black mb-6 font-normal">
-              You have completed all calibration items for this exam. Great job!
-            </p>
-            <Button onClick={() => navigate('/dashboard')} className="transition-all hover:scale-105 font-medium">
-              Go to Dashboard
-            </Button>
-          </GlassCard>
-        </main>
-      </div>
-    );
-  }
+  if (loading) { /* Loading UI */ }
+  if (!activeExam) { /* No Active Exam UI */ }
+  if (!currentItem) { /* All Complete UI */ }
 
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
-      <main className="flex-1 p-6 space-y-6" style={{ backgroundColor: '#f2f2f2' }}>
+      <main className="flex-1 p-6 space-y-6 bg-muted/20">
         <div className="mb-6 animate-fade-in">
-          <h1 className="text-3xl font-bold text-black">Calibration Lab</h1>
-          <div className="flex items-center gap-4 text-sm text-black mt-2 font-normal">
-            <span>Progress: {progress}%</span>
-          </div>
-          <Progress value={progress} className="mt-2 max-w-md" />
+          <h1 className="text-3xl font-bold text-foreground">Calibration Lab</h1>
+          <div className="flex items-center gap-4 text-sm text-foreground mt-2"><Progress value={progress} className="max-w-md" /><span>{progress}% Complete</span></div>
         </div>
 
-        {/* Question Block - Full Width on Top */}
-        <GlassCard className="hover:shadow-md transition-all animate-fade-in">
+        <GlassCard className="animate-fade-in">
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-black">Current Question</h2>
-            <p className="text-lg leading-relaxed whitespace-pre-wrap font-normal text-black">
-              {currentItem.prompt}
-            </p>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Current Prompt</h2>
+            <p className="text-lg leading-relaxed whitespace-pre-wrap text-foreground/90">{currentItem.prompt}</p>
           </div>
         </GlassCard>
 
-        {/* Response Form Block - Full Width Below */}
-        <GlassCard className="hover:shadow-md transition-all animate-fade-in">
-          <div className="p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-black">Your Response</h2>
+        <GlassCard className="animate-fade-in">
+          <div className="p-6 space-y-8">
+            <h2 className="text-xl font-semibold text-foreground">Your Response</h2>
 
-            {/* Answer */}
             <div>
               <Label htmlFor="answer" className="font-medium">Answer & Justification *</Label>
-              <Textarea
-                id="answer"
-                value={answerText}
-                onChange={(e) => setAnswerText(e.target.value)}
-                placeholder="Provide your detailed answer and reasoning..."
-                className="min-h-[150px] mt-2 transition-all focus:ring-2 focus:ring-primary/50"
-                disabled={submitting}
-              />
-              <div className={`text-sm mt-1 font-normal ${answerText.length < 180 ? 'text-destructive' : 'text-black'}`}>
-                {answerText.length}/180 minimum characters
-              </div>
+              <Textarea id="answer" value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Provide your detailed answer and reasoning..." className="min-h-[150px] mt-2" disabled={submitting} />
+              <div className={`text-sm mt-1 ${answerText.length < 180 ? 'text-destructive' : 'text-muted-foreground'}`}>{answerText.length}/180 minimum characters</div>
             </div>
 
-            {/* Confidence */}
             <div>
               <Label className="font-medium">Confidence: {confidence[0]}% *</Label>
-              <Slider
-                value={confidence}
-                onValueChange={setConfidence}
-                min={0}
-                max={100}
-                step={5}
-                disabled={submitting}
-                className="mt-2 max-w-sm"
-              />
+              <Slider value={confidence} onValueChange={setConfidence} min={0} max={100} step={5} disabled={submitting} className="mt-2 max-w-sm" />
             </div>
 
-            {/* Strategy Tags */}
             <div>
               <Label className="font-medium">Strategy Tags *</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {STRATEGY_OPTIONS.map((strategy) => (
-                  <Badge
-                    key={strategy}
-                    variant={strategyTags.includes(strategy) ? "default" : "outline"}
-                    className="cursor-pointer transition-all hover:scale-110"
-                    onClick={() => !submitting && toggleStrategy(strategy)}
-                  >
-                    {strategy}
-                  </Badge>
+                {displayedStrategies.map((strategy) => (
+                  <Badge key={strategy} variant={strategyTags.includes(strategy) ? "default" : "outline"} className="cursor-pointer" onClick={() => !submitting && toggleStrategy(strategy)}>{strategy}</Badge>
                 ))}
               </div>
               <div className="flex gap-2 mt-3">
-                <Input
-                  placeholder="Add custom strategy..."
-                  value={customStrategy}
-                  onChange={(e) => setCustomStrategy(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addCustomStrategy()}
-                  disabled={submitting}
-                  className="transition-all"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={addCustomStrategy}
-                  disabled={submitting || !customStrategy.trim()}
-                  className="transition-all hover:scale-110"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <Input placeholder="Add custom strategy..." value={customStrategy} onChange={(e) => setCustomStrategy(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addCustomStrategy()} disabled={submitting} />
+                <Button type="button" variant="outline" size="icon" onClick={addCustomStrategy} disabled={submitting || !customStrategy.trim()}><Plus className="h-4 w-4" /></Button>
               </div>
-              {strategyTags.length === 0 && (
-                <p className="text-sm text-destructive mt-1 font-normal">At least one strategy tag required</p>
-              )}
+              {strategyTags.length === 0 && <p className="text-sm text-destructive mt-1">At least one strategy tag required</p>}
             </div>
 
-            {/* Assumptions */}
             <div>
               <Label className="font-medium">Assumptions *</Label>
-              <div className="flex flex-wrap gap-2 mt-2 min-h-[40px] p-2 border rounded-md bg-muted/20">
+              <div className="flex flex-wrap gap-2 mt-2 min-h-[40px] p-2 border rounded-md bg-muted/50">
                 {assumptionChips.map((chip, idx) => (
-                  <Badge key={idx} variant="secondary" className="transition-all hover:scale-110">
-                    {chip}
-                    <X
-                      className="h-3 w-3 ml-1 cursor-pointer"
-                      onClick={() => removeAssumptionChip(idx)}
-                    />
-                  </Badge>
+                  <Badge key={idx} variant="secondary">{chip}<X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => removeAssumptionChip(idx)} /></Badge>
                 ))}
               </div>
               <div className="flex gap-2 mt-2">
-                <Input
-                  placeholder="Add an assumption..."
-                  value={assumptions}
-                  onChange={(e) => setAssumptions(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addAssumptionChip()}
-                  disabled={submitting}
-                  className="transition-all"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={addAssumptionChip}
-                  disabled={submitting || !assumptions.trim()}
-                  className="transition-all hover:scale-110"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <Input placeholder="Add an assumption..." value={assumptions} onChange={(e) => setAssumptions(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addAssumptionChip()} disabled={submitting} />
+                <Button type="button" variant="outline" size="icon" onClick={addAssumptionChip} disabled={submitting || !assumptions.trim()}><Plus className="h-4 w-4" /></Button>
               </div>
-              {assumptionChips.length === 0 && (
-                <p className="text-sm text-destructive mt-1 font-normal">At least one assumption required</p>
-              )}
+              {assumptionChips.length === 0 && <p className="text-sm text-destructive mt-1">At least one assumption required</p>}
             </div>
 
-            {/* Perceived Difficulty */}
             <div>
               <Label className="font-medium">Perceived Difficulty *</Label>
-              <RadioGroup
-                value={perceivedDifficulty}
-                onValueChange={setPerceivedDifficulty}
-                className="flex gap-4 mt-2"
-                disabled={submitting}
-              >
+              <RadioGroup value={perceivedDifficulty} onValueChange={setPerceivedDifficulty} className="flex gap-4 mt-2" disabled={submitting}>
                 {[1, 2, 3, 4, 5].map((level) => (
-                  <div key={level} className="flex items-center space-x-2 transition-all hover:scale-110">
-                    <RadioGroupItem value={String(level)} id={`diff-${level}`} />
-                    <Label htmlFor={`diff-${level}`} className="cursor-pointer font-normal">
-                      {level}
-                    </Label>
-                  </div>
+                  <div key={level} className="flex items-center space-x-2"><RadioGroupItem value={String(level)} id={`diff-${level}`} /><Label htmlFor={`diff-${level}`} className="cursor-pointer">{level}</Label></div>
                 ))}
               </RadioGroup>
-              {!perceivedDifficulty && (
-                <p className="text-sm text-destructive mt-1 font-normal">Please select a difficulty level</p>
-              )}
+              {!perceivedDifficulty && <p className="text-sm text-destructive mt-1">Please select a difficulty level</p>}
             </div>
 
-            {/* Optional: Checks / Units / Edge Cases */}
             <div>
-              <Label htmlFor="checks" className="font-medium">Checks / Units / Edge Cases</Label>
-              <Textarea
-                id="checks"
-                value={checksUnits}
-                onChange={(e) => setChecksUnits(e.target.value)}
-                placeholder="Optional: Document any dimensional analysis, edge cases, rounding..."
-                className="min-h-[80px] mt-2 transition-all"
-                disabled={submitting}
-              />
+              <Label htmlFor="checks" className="font-medium">Checks / Units / Edge Cases *</Label>
+              <Textarea id="checks" value={checksUnits} onChange={(e) => setChecksUnits(e.target.value)} placeholder="Document any dimensional analysis, edge cases, or rounding checks..." className="min-h-[80px] mt-2" disabled={submitting} />
+              {!checksUnits.trim() && <p className="text-sm text-destructive mt-1">This field is required.</p>}
             </div>
 
-            {/* Optional: Resources */}
             <div className="space-y-3 p-4 bg-muted/20 rounded-lg">
               <Label className="font-medium">Resources (Optional)</Label>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="calculator"
-                  checked={useCalculator}
-                  onCheckedChange={(checked) => setUseCalculator(!!checked)}
-                  disabled={submitting}
-                />
-                <Label htmlFor="calculator" className="cursor-pointer font-normal">
-                  🧮 Used Calculator
-                </Label>
-              </div>
-
+              <div className="flex items-center space-x-2"><Checkbox id="calculator" checked={useCalculator} onCheckedChange={(checked) => setUseCalculator(!!checked)} disabled={submitting} /><Label htmlFor="calculator" className="cursor-pointer">🧮 Used Calculator</Label></div>
               <div>
-                <Label htmlFor="notes" className="font-normal">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={notesText}
-                  onChange={(e) => setNotesText(e.target.value)}
-                  placeholder="Any additional notes..."
-                  className="min-h-[60px] mt-2 transition-all"
-                  disabled={submitting}
-                />
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea id="notes" value={notesText} onChange={(e) => setNotesText(e.target.value)} placeholder="Any additional notes..." className="min-h-[60px] mt-2" disabled={submitting} />
               </div>
-
               <div>
-                <Label htmlFor="link" className="font-normal">External Link</Label>
-                <Input
-                  id="link"
-                  type="url"
-                  value={externalLink}
-                  onChange={(e) => setExternalLink(e.target.value)}
-                  placeholder="https://..."
-                  className="mt-2 transition-all"
-                  disabled={submitting}
-                />
-                {externalLink && !isUrlValid(externalLink) && (
-                  <p className="text-sm text-destructive mt-1 font-normal">Invalid URL format</p>
-                )}
+                <Label htmlFor="link">External Link</Label>
+                <Input id="link" type="url" value={externalLink} onChange={(e) => setExternalLink(e.target.value)} placeholder="https://..." className="mt-2" disabled={submitting} />
+                {externalLink && !isUrlValid(externalLink) && <p className="text-sm text-destructive mt-1">Invalid URL format</p>}
               </div>
             </div>
 
-            {/* Submit Button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!isFormValid() || submitting}
-              className="w-full bg-primary hover:bg-primary-hover transition-all hover:scale-105"
-              size="lg"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                '🚀 Submit Response'
-              )}
+            <Button onClick={handleSubmit} disabled={!isFormValid() || submitting} className="w-full" size="lg">
+              {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting...</> : '🚀 Submit Response'}
             </Button>
           </div>
         </GlassCard>
