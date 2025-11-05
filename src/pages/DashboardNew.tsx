@@ -13,7 +13,13 @@ import { track } from '@/lib/track';
 export default function DashboardNew() {
   const navigate = useNavigate();
   const { activeExam, loading: examsLoading } = useActiveExam();
-  const { practice, cdna, calibration, reports, loading: dataLoading } = useDashboardData(activeExam ? activeExam.exam_id : null);
+
+  // ----------------------------------------------------------------------------------
+  // THE FINAL, BULLETPROOF FIX IS HERE: `|| {}`
+  // This ensures that even if useDashboardData returns nothing, we have an empty
+  // object to work with, preventing the crash.
+  // ----------------------------------------------------------------------------------
+  const { practice, cdna, calibration, reports, loading: dataLoading } = useDashboardData(activeExam ? activeExam.exam_id : null) || {};
 
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
@@ -31,7 +37,10 @@ export default function DashboardNew() {
     checkAuthAndRedirect();
   }, [navigate, examsLoading, activeExam]);
 
-  if (examsLoading || dataLoading) {
+  // Use the loading state from our hooks. The || false is a safety net.
+  const isLoading = examsLoading || dataLoading || false;
+
+  if (isLoading) {
     return (
       <div className="flex min-h-screen w-full bg-background items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -43,11 +52,11 @@ export default function DashboardNew() {
   }
 
   if (!activeExam) {
-    // While redirecting to /courses, show nothing to prevent crashes.
+    // While redirecting to /courses, show nothing.
     return null;
   }
 
-  // If we reach here, loading is done and we have an active exam.
+  // If we reach here, it is safe to render.
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
