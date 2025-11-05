@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveExam } from '@/hooks/useActiveExam';
@@ -7,13 +7,20 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Loader2, TrendingUp, Clock, Target, Percent, Download } from 'lucide-react';
+import { Loader2, TrendingUp, Clock, Target, Percent, Download, ChevronsUpDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { track } from '@/lib/track';
 
 export default function DashboardNew() {
   const navigate = useNavigate();
-  const { activeExam, loading: examsLoading } = useActiveExam();
+  const { activeExam, exams, refreshActiveExam, loading: examsLoading } = useActiveExam();
   const { practice, cdna, calibration, reports, loading: dataLoading } = useDashboardData(activeExam ? activeExam.exam_id : null) || {};
+  const [isSwitching, setIsSwitching] = useState(false);
 
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
@@ -29,7 +36,23 @@ export default function DashboardNew() {
     checkAuthAndRedirect();
   }, [navigate, examsLoading, activeExam]);
 
-  const isLoading = examsLoading || dataLoading || false;
+  const handleSwitchCourse = async (examId: string) => {
+    if (examId === activeExam?.exam_id) return;
+    setIsSwitching(true);
+    try {
+      const { error } = await supabase.rpc('ensure_enrolled_and_set_active', { p_exam_id: examId });
+      if (error) throw error;
+      // The useActiveExam hook will refresh the app state automatically on next load,
+      // but for an instant UI update, we can refresh it manually.
+      await refreshActiveExam();
+    } catch (error) {
+      console.error("Error switching course:", error);
+    } finally {
+      setIsSwitching(false);
+    }
+  };
+
+  const isLoading = examsLoading || dataLoading || isSwitching;
 
   if (isLoading) {
     return (
@@ -59,6 +82,27 @@ export default function DashboardNew() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* NEW: Switch Course Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="min-w-[150px] justify-between">
+                  Switch Course
+                  <ChevronsUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {exams.map((exam) => (
+                  <DropdownMenuItem 
+                    key={exam.exam_id} 
+                    onClick={() => handleSwitchCourse(exam.exam_id)}
+                    disabled={exam.exam_id === activeExam.exam_id}
+                  >
+                    {exam.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button variant="outline" className="border-primary hover:bg-primary/10 text-primary" onClick={() => navigate('/calibration')}>
               Resume Calibration
             </Button>
@@ -81,9 +125,7 @@ export default function DashboardNew() {
               <TrendingUp className="h-5 w-5 text-muted-foreground" />
             </div>
             <h3 className="text-4xl font-semibold text-foreground">{practice?.total ?? 0}</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              {practice?.accuracy ?? 0}% accuracy
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">{practice?.accuracy ?? 0}% accuracy</p>
           </GlassCard>
           <GlassCard>
             <div className="flex items-center justify-between mb-4">
