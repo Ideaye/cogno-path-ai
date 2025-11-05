@@ -4,7 +4,6 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 
 const MotionButton = motion(Button);
 
@@ -29,13 +28,12 @@ const HeroVisual = () => {
       <div className="absolute inset-10 bg-gradient-to-br from-cyan-200/20 via-purple-200/20 to-blue-200/20 rounded-full blur-2xl" />
 
       {/* Main Image */}
-      <Image
+      <img
         src="/hero/brain.svg"
         alt="Abstract illustration of a glowing brain representing AI-powered learning"
         width={640}
         height={640}
         className="relative object-contain w-full max-w-[520px] lg:max-w-[640px]"
-        priority
       />
 
       {/* Decorative Particles - aria-hidden */}
