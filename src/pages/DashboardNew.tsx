@@ -7,7 +7,7 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Loader2, TrendingUp, Clock, Target, Percent, Download, ChevronsUpDown } from 'lucide-react';
+import { Loader2, TrendingUp, Clock, Target, Percent, Download, ChevronsUpDown, Settings } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,8 +42,6 @@ export default function DashboardNew() {
     try {
       const { error } = await supabase.rpc('ensure_enrolled_and_set_active', { p_exam_id: examId });
       if (error) throw error;
-      // The useActiveExam hook will refresh the app state automatically on next load,
-      // but for an instant UI update, we can refresh it manually.
       await refreshActiveExam();
     } catch (error) {
       console.error("Error switching course:", error);
@@ -82,7 +80,6 @@ export default function DashboardNew() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {/* NEW: Switch Course Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="min-w-[150px] justify-between">
@@ -114,6 +111,10 @@ export default function DashboardNew() {
                 <Download className="h-4 w-4" />
               </Button>
             )}
+            <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+              <Settings className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+            </Button>
           </div>
         </div>
 
