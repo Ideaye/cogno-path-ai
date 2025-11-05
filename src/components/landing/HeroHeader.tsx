@@ -109,7 +109,7 @@ export default function HeroHeader() {
             </motion.div>
             <motion.p variants={itemVariants} className="mt-4 text-xs text-neutral-500 dark:text-neutral-400 text-center lg:text-left">
               HIPAA & GDPR aligned. Privacy-first by design.
-            </p>
+            </motion.p>
           </div>
 
           <div className="lg:col-span-6 flex items-center justify-center">
