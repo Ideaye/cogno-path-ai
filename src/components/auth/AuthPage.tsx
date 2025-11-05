@@ -101,9 +101,34 @@ export default function AuthPage() {
     }
   };
   
-  // ... (OTP functions are unchanged) ...
-  const handleSendOTP = async () => { /* ... */ };
-  const handleVerifyOTP = async (e: React.FormEvent) => { /* ... */ };
+  const handleSendOTP = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone });
+      if (error) throw error;
+      setOtpSent(true);
+      toast({ title: "OTP Sent!", description: "Check your phone for the verification code." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: 'sms' });
+      if (error) throw error;
+      toast({ title: "Success!", description: "Successfully signed in." });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
@@ -172,7 +197,35 @@ export default function AuthPage() {
             </form>
           )}
           
-          {authMethod === 'otp' && ( /* ... OTP form ... */ )}
+          {authMethod === 'otp' && (
+            <div className="space-y-4">
+              {!otpSent ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1234567890" required disabled={loading} />
+                    <p className="text-xs text-black">Include country code (e.g., +1 for US)</p>
+                  </div>
+                  <Button type="button" onClick={handleSendOTP} disabled={loading || !phone} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
+                    {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending OTP...</> : 'Send OTP'}
+                  </Button>
+                </>
+              ) : (
+                <form onSubmit={handleVerifyOTP} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="otp">Verification Code</Label>
+                    <Input id="otp" type="text" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter 6-digit code" required maxLength={6} disabled={loading} />
+                  </div>
+                  <Button type="submit" disabled={loading || otp.length !== 6} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
+                    {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying...</> : 'Verify & Sign In'}
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={() => setOtpSent(false)} className="w-full" disabled={loading}>
+                    Use different number
+                  </Button>
+                </form>
+              )}
+            </div>
+          )}
 
           <div className="text-center text-sm">
             <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline" disabled={loading}>
