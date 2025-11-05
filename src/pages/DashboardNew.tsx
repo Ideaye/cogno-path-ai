@@ -13,7 +13,6 @@ import { track } from '@/lib/track';
 export default function DashboardNew() {
   const navigate = useNavigate();
   const { activeExam, loading: examsLoading } = useActiveExam();
-  // Pass exam_id only when it's available
   const { practice, cdna, calibration, reports, loading: dataLoading } = useDashboardData(activeExam ? activeExam.exam_id : null);
 
   useEffect(() => {
@@ -24,19 +23,14 @@ export default function DashboardNew() {
         return;
       }
 
-      // After auth check and data hooks have finished loading...
-      if (!examsLoading) {
-        // ...if there's still no active exam, the user needs to choose one.
-        if (!activeExam) {
-          navigate('/courses');
-        }
+      if (!examsLoading && !activeExam) {
+        navigate('/courses');
       }
     };
 
     checkAuthAndRedirect();
   }, [navigate, examsLoading, activeExam]);
 
-  // THE FIX: Wait for BOTH hooks to finish loading.
   if (examsLoading || dataLoading) {
     return (
       <div className="flex min-h-screen w-full bg-background items-center justify-center">
@@ -48,13 +42,12 @@ export default function DashboardNew() {
     );
   }
 
-  // If loading is done, but there's still no active exam,
-  // it means the redirect is in progress. Show nothing to prevent a crash.
   if (!activeExam) {
+    // While redirecting to /courses, show nothing to prevent crashes.
     return null;
   }
 
-  // If we reach here, loading is done and we have an active exam. It's safe to render.
+  // If we reach here, loading is done and we have an active exam.
   return (
     <div className="flex min-h-screen w-full">
       <CollapsibleSideNav />
@@ -66,7 +59,7 @@ export default function DashboardNew() {
             </h1>
             <p className="text-base text-black/80 font-normal">
               Studying for <span className="font-semibold text-black">{activeExam.name}</span>
-              {practice.streak > 0 && ` • ${practice.streak} day streak`}
+              {practice?.streak > 0 && ` • ${practice.streak} day streak`}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -89,7 +82,7 @@ export default function DashboardNew() {
             >
               Start Practice
             </Button>
-            {reports.weeklyUrl && (
+            {reports?.weeklyUrl && (
               <Button
                 variant="outline"
                 size="icon"
@@ -108,9 +101,9 @@ export default function DashboardNew() {
               <span className="text-sm font-medium text-black">Total Practice</span>
               <TrendingUp className="h-5 w-5 text-black" />
             </div>
-            <h3 className="text-4xl font-semibold text-black">{practice.total}</h3>
+            <h3 className="text-4xl font-semibold text-black">{practice?.total ?? 0}</h3>
             <p className="text-sm text-black/80 mt-2 font-normal">
-              {practice.accuracy}% accuracy
+              {practice?.accuracy ?? 0}% accuracy
             </p>
           </GlassCard>
           <GlassCard>
@@ -118,7 +111,7 @@ export default function DashboardNew() {
               <span className="text-sm font-medium text-black">Avg Time</span>
               <Clock className="h-5 w-5 text-black" />
             </div>
-            <h3 className="text-4xl font-semibold text-black">{Math.round(practice.avgTimeMs / 1000)}s</h3>
+            <h3 className="text-4xl font-semibold text-black">{Math.round((practice?.avgTimeMs ?? 0) / 1000)}s</h3>
             <p className="text-sm text-black/80 mt-2 font-normal">per question</p>
           </GlassCard>
           <GlassCard>
@@ -126,9 +119,9 @@ export default function DashboardNew() {
               <span className="text-sm font-medium text-black">Calibration</span>
               <Target className="h-5 w-5 text-black" />
             </div>
-            <h3 className="text-4xl font-semibold text-black">{calibration.progress}%</h3>
+            <h3 className="text-4xl font-semibold text-black">{calibration?.progress ?? 0}%</h3>
             <p className="text-sm text-black/80 mt-2 font-normal">
-              {calibration.progress === 100 ? 'Complete' : `${100 - calibration.progress}% to go`}
+              {(calibration?.progress ?? 0) === 100 ? 'Complete' : `${100 - (calibration?.progress ?? 0)}% to go`}
             </p>
           </GlassCard>
           <GlassCard>
@@ -136,9 +129,9 @@ export default function DashboardNew() {
               <span className="text-sm font-medium text-black">ECE Score</span>
               <Percent className="h-5 w-5 text-black" />
             </div>
-            <h3 className="text-4xl font-semibold text-black">{cdna.ece !== null ? cdna.ece.toFixed(3) : 'N/A'}</h3>
+            <h3 className="text-4xl font-semibold text-black">{cdna?.ece !== null ? cdna?.ece?.toFixed(3) : 'N/A'}</h3>
             <p className="text-sm text-black/80 mt-2 font-normal">
-              {cdna.ece !== null && cdna.ece < 0.1 ? 'Excellent' : 'Lower is better'}
+              {cdna?.ece !== null && cdna?.ece < 0.1 ? 'Excellent' : 'Lower is better'}
             </p>
           </GlassCard>
         </div>
