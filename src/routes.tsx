@@ -10,6 +10,7 @@ import Courses from '@/pages/Courses';
 import AuthPage from '@/components/auth/AuthPage';
 import AdminRoute from '@/components/AdminRoute';
 import { ExamOnboarding } from '@/components/onboarding/ExamOnboarding';
+import DataTools from '@/pages/admin/DataTools';
 
 export const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
   { path: '/calibration', element: <CalibrationNew /> },
   { path: '/practice', element: <PracticeNew /> },
   { path: '/admin/content', element: <AdminRoute><AdminContentNew /></AdminRoute> },
+  { path: '/admin/data-tools', element: <AdminRoute><DataTools /></AdminRoute> },
   { path: '/settings', element: <SettingsNew /> },
   { path: '/profile', element: <ProfileNew /> },
 ]);

@@ -5,6 +5,7 @@ import {
   Target, 
   BookOpen, 
   Shield,
+  Database,
   Menu,
   ChevronLeft
 } from 'lucide-react';
@@ -26,6 +27,7 @@ const navigation: NavItem[] = [
   { icon: Target, label: 'Calibration', route: '/calibration' },
   { icon: BookOpen, label: 'Practice', route: '/practice' },
   { icon: Shield, label: 'Admin', route: '/admin/content', adminOnly: true },
+  { icon: Database, label: 'Data Tools', route: '/admin/data-tools', adminOnly: true },
 ];
 
 export function CollapsibleSideNav() {

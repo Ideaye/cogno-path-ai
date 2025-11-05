@@ -156,6 +156,7 @@ export type Database = {
           final_answer: string | null
           hesitation_count: number | null
           id: string
+          is_synthetic: boolean | null
           justification_id: string | null
           latency_ms: number | null
           mode: string | null
@@ -184,6 +185,7 @@ export type Database = {
           final_answer?: string | null
           hesitation_count?: number | null
           id?: string
+          is_synthetic?: boolean | null
           justification_id?: string | null
           latency_ms?: number | null
           mode?: string | null
@@ -212,6 +214,7 @@ export type Database = {
           final_answer?: string | null
           hesitation_count?: number | null
           id?: string
+          is_synthetic?: boolean | null
           justification_id?: string | null
           latency_ms?: number | null
           mode?: string | null
@@ -297,22 +300,46 @@ export type Database = {
       }
       calibration_items: {
         Row: {
+          choices: Json | null
+          correct_key: string | null
           created_at: string | null
+          difficulty_0_1: number | null
           exam_id: string
           id: string
+          is_synthetic: boolean | null
           prompt: string
+          stem: string | null
+          strategy_tags: string[] | null
+          topic: string | null
+          unit: string | null
         }
         Insert: {
+          choices?: Json | null
+          correct_key?: string | null
           created_at?: string | null
+          difficulty_0_1?: number | null
           exam_id: string
           id?: string
+          is_synthetic?: boolean | null
           prompt: string
+          stem?: string | null
+          strategy_tags?: string[] | null
+          topic?: string | null
+          unit?: string | null
         }
         Update: {
+          choices?: Json | null
+          correct_key?: string | null
           created_at?: string | null
+          difficulty_0_1?: number | null
           exam_id?: string
           id?: string
+          is_synthetic?: boolean | null
           prompt?: string
+          stem?: string | null
+          strategy_tags?: string[] | null
+          topic?: string | null
+          unit?: string | null
         }
         Relationships: [
           {
@@ -518,6 +545,7 @@ export type Database = {
           agreement_kappa: number | null
           created_at: string
           id: string
+          is_synthetic: boolean | null
           jqs_0_1: number
           justification_id: string
           labels_json: Json
@@ -527,6 +555,7 @@ export type Database = {
           agreement_kappa?: number | null
           created_at?: string
           id?: string
+          is_synthetic?: boolean | null
           jqs_0_1: number
           justification_id: string
           labels_json?: Json
@@ -536,6 +565,7 @@ export type Database = {
           agreement_kappa?: number | null
           created_at?: string
           id?: string
+          is_synthetic?: boolean | null
           jqs_0_1?: number
           justification_id?: string
           labels_json?: Json
@@ -771,6 +801,7 @@ export type Database = {
           exam_id: string
           fatigue_index: number | null
           id: string
+          is_synthetic: boolean | null
           latency_ema_long: number | null
           latency_ema_short: number | null
           mastery_vector: Json | null
@@ -793,6 +824,7 @@ export type Database = {
           exam_id: string
           fatigue_index?: number | null
           id?: string
+          is_synthetic?: boolean | null
           latency_ema_long?: number | null
           latency_ema_short?: number | null
           mastery_vector?: Json | null
@@ -815,6 +847,7 @@ export type Database = {
           exam_id?: string
           fatigue_index?: number | null
           id?: string
+          is_synthetic?: boolean | null
           latency_ema_long?: number | null
           latency_ema_short?: number | null
           mastery_vector?: Json | null
@@ -1030,30 +1063,45 @@ export type Database = {
           correct_answer: string | null
           created_at: string | null
           difficulty: number | null
+          difficulty_0_1: number | null
           exam_id: string
           id: string
+          is_synthetic: boolean | null
           stem: string
+          strategy_tags: string[] | null
           tags: string[] | null
+          topic: string | null
+          unit: string | null
         }
         Insert: {
           choices?: Json | null
           correct_answer?: string | null
           created_at?: string | null
           difficulty?: number | null
+          difficulty_0_1?: number | null
           exam_id: string
           id?: string
+          is_synthetic?: boolean | null
           stem: string
+          strategy_tags?: string[] | null
           tags?: string[] | null
+          topic?: string | null
+          unit?: string | null
         }
         Update: {
           choices?: Json | null
           correct_answer?: string | null
           created_at?: string | null
           difficulty?: number | null
+          difficulty_0_1?: number | null
           exam_id?: string
           id?: string
+          is_synthetic?: boolean | null
           stem?: string
+          strategy_tags?: string[] | null
           tags?: string[] | null
+          topic?: string | null
+          unit?: string | null
         }
         Relationships: [
           {
@@ -1073,6 +1121,7 @@ export type Database = {
           exam_type: string
           id: string
           is_admin: boolean | null
+          is_synthetic: boolean | null
           name: string
         }
         Insert: {
@@ -1082,6 +1131,7 @@ export type Database = {
           exam_type: string
           id: string
           is_admin?: boolean | null
+          is_synthetic?: boolean | null
           name: string
         }
         Update: {
@@ -1091,6 +1141,7 @@ export type Database = {
           exam_type?: string
           id?: string
           is_admin?: boolean | null
+          is_synthetic?: boolean | null
           name?: string
         }
         Relationships: []
@@ -1374,6 +1425,7 @@ export type Database = {
           error_cause: string | null
           exam_id: string | null
           id: string
+          is_synthetic: boolean | null
           justification: string | null
           perceived_difficulty: number | null
           perceived_difficulty_1_5: number | null
@@ -1396,6 +1448,7 @@ export type Database = {
           error_cause?: string | null
           exam_id?: string | null
           id?: string
+          is_synthetic?: boolean | null
           justification?: string | null
           perceived_difficulty?: number | null
           perceived_difficulty_1_5?: number | null
@@ -1418,6 +1471,7 @@ export type Database = {
           error_cause?: string | null
           exam_id?: string | null
           id?: string
+          is_synthetic?: boolean | null
           justification?: string | null
           perceived_difficulty?: number | null
           perceived_difficulty_1_5?: number | null
