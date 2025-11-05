@@ -90,15 +90,17 @@ export default function AuthPage() {
     }
   };
 
-  const handleSocialAuth = async (provider: 'google' | 'apple') => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider });
-      if (error) throw error;
-    } catch (error: any)      toast({ title: "Error", description: error.message, variant: "destructive" });
-      setLoading(false);
-    }
-  };
+  // THE CORRECTED CODE:
+    const handleSocialAuth = async (provider: 'google' | 'apple') => {
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({ provider });
+        if (error) throw error;
+      } catch (error: any) { // THE MISSING BRACE IS NOW HERE
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+        setLoading(false);
+      }
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
