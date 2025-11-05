@@ -94,16 +94,18 @@ export default function AuthPage() {
     }
   };
 
-  const handleSocialAuth = async (provider: 'google' | 'apple') => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider });
-      if (error) throw error;
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      setLoading(false);
-    }
-  };
+  // THE CORRECTED CODE:
+    const handleSocialAuth = async (provider: 'google' | 'apple') => {
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({ provider });
+        if (error) throw error;
+      } catch (error: any) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const handleSendOTP = async () => {
     setLoading(true);
