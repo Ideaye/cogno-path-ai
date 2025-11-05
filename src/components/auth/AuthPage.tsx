@@ -1,4 +1,4 @@
-
+tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +49,11 @@ export default function AuthPage() {
         if (error) throw error;
         setExams(data || []);
       } catch (error) {
-        toast.error("Could not load courses.");
+        toast({
+            title: "Error",
+            description: "Could not load courses to select.",
+            variant: "destructive"
+        });
       }
     };
     loadPublicExams();
@@ -100,7 +104,7 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
-  
+
   const handleSendOTP = async () => {
     setLoading(true);
     try {
@@ -146,8 +150,8 @@ export default function AuthPage() {
           </div>
 
           <div className="space-y-3">
-            <Button type="button" variant="outline" className="w-full" onClick={() => handleSocialAuth('google')} disabled={loading}>...</Button>
-            <Button type="button" variant="outline" className="w-full" onClick={() => handleSocialAuth('apple')} disabled={loading}>...</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={() => handleSocialAuth('google')} disabled={loading}>Continue with Google</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={() => handleSocialAuth('apple')} disabled={loading}>Continue with Apple</Button>
           </div>
 
           <div className="relative">
@@ -196,7 +200,7 @@ export default function AuthPage() {
               </Button>
             </form>
           )}
-          
+
           {authMethod === 'otp' && (
             <div className="space-y-4">
               {!otpSent ? (
