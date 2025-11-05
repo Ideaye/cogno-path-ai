@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Loader2, Mail, Smartphone, ArrowLeft } from "lucide-react";
+import { Brain, Loader2, Mail, ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -21,14 +21,10 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(searchParams.get('mode') !== 'signup');
-  const [authMethod, setAuthMethod] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
 
@@ -99,37 +95,7 @@ export default function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({ provider });
       if (error) throw error;
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      setLoading(false);
-    }
-  };
-
-  const handleSendOTP = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ phone });
-      if (error) throw error;
-      setOtpSent(true);
-      toast({ title: "OTP Sent!", description: "Check your phone for the verification code." });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: 'sms' });
-      if (error) throw error;
-      toast({ title: "Success!", description: "Successfully signed in." });
-      navigate('/dashboard');
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
+    } catch (error: any)      toast({ title: "Error", description: error.message, variant: "destructive" });
       setLoading(false);
     }
   };
@@ -156,20 +122,10 @@ export default function AuthPage() {
 
           <div className="relative">
             <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-black">Or continue with</span>
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-black">Or continue with email</span>
           </div>
 
-          <div className="flex gap-2 p-1 bg-muted/50 rounded-lg">
-            <button type="button" onClick={() => setAuthMethod('email')} className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${authMethod === 'email' ? 'bg-background shadow-sm' : 'text-black/70 hover:text-black'}`}>
-              <Mail className="w-4 h-4 inline mr-1" /> Email
-            </button>
-            <button type="button" onClick={() => setAuthMethod('otp')} className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${authMethod === 'otp' ? 'bg-background shadow-sm' : 'text-black/70 hover:text-black'}`}>
-              <Smartphone className="w-4 h-4 inline mr-1" /> Phone
-            </button>
-          </div>
-
-          {authMethod === 'email' && (
-            <form onSubmit={handleEmailAuth} className="space-y-4">
+          <form onSubmit={handleEmailAuth} className="space-y-4">
               {!isLogin && (
                 <>
                   <div className="space-y-2">
@@ -195,41 +151,10 @@ export default function AuthPage() {
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} disabled={loading} />
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
+              <Button type="submit" disabled={loading || (!isLogin && (!name || !selectedExam))} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
               </Button>
             </form>
-          )}
-
-          {authMethod === 'otp' && (
-            <div className="space-y-4">
-              {!otpSent ? (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1234567890" required disabled={loading} />
-                    <p className="text-xs text-black">Include country code (e.g., +1 for US)</p>
-                  </div>
-                  <Button type="button" onClick={handleSendOTP} disabled={loading || !phone} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
-                    {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending OTP...</> : 'Send OTP'}
-                  </Button>
-                </>
-              ) : (
-                <form onSubmit={handleVerifyOTP} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="otp">Verification Code</Label>
-                    <Input id="otp" type="text" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter 6-digit code" required maxLength={6} disabled={loading} />
-                  </div>
-                  <Button type="submit" disabled={loading || otp.length !== 6} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
-                    {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying...</> : 'Verify & Sign In'}
-                  </Button>
-                  <Button type="button" variant="ghost" onClick={() => setOtpSent(false)} className="w-full" disabled={loading}>
-                    Use different number
-                  </Button>
-                </form>
-              )}
-            </div>
-          )}
 
           <div className="text-center text-sm">
             <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline" disabled={loading}>
