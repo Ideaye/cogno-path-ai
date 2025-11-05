@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,51 +6,36 @@ import { CollapsibleSideNav } from '@/components/layout/CollapsibleSideNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, User, Lock, LogOut, Edit2, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Loader2, User, Lock, LogOut, Edit2, BookMarked } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-interface ProfileData {
-  name: string;
-  email: string;
-  gender?: string;
-  first_name?: string;
-  last_name?: string;
-  address?: string;
-  phone?: string;
-  dob?: string;
-  location?: string;
-  postal_code?: string;
+interface EnrolledExam {
+  exam_id: string;
+  is_active: boolean;
+  exams: {
+    name: string;
+  } | null;
 }
 
 export default function ProfileNew() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'personal' | 'security' | 'logout'>('personal');
-  const [showActivity, setShowActivity] = useState(false);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
-  const [profile, setProfile] = useState<ProfileData>({
-    name: '',
-    email: '',
-    gender: 'male',
-    first_name: '',
-    last_name: '',
-    address: '',
-    phone: '',
-    dob: '',
-    location: '',
-    postal_code: '',
-  });
+  const [activeTab, setActiveTab] = useState<'personal' | 'security'>('personal');
+  const [profile, setProfile] = useState({ name: '', email: '' });
+  const [enrollments, setEnrollments] = useState<EnrolledExam[]>([]);
 
   useEffect(() => {
-    loadProfile();
-    loadRecentActivity();
+    const loadData = async () => {
+      setLoading(true);
+      await loadProfile();
+      await loadEnrollments();
+      setLoading(false);
+    }
+    loadData();
   }, []);
 
   const loadProfile = async () => {
@@ -58,83 +44,38 @@ export default function ProfileNew() {
       navigate('/auth');
       return;
     }
-
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profileData) {
-      const cognitiveProfile = profileData.cognitive_profile as any;
-      setProfile({
-        name: profileData.name || '',
-        email: user.email || '',
-        gender: cognitiveProfile?.gender || 'male',
-        first_name: profileData.name?.split(' ')[0] || '',
-        last_name: profileData.name?.split(' ')[1] || '',
-        address: cognitiveProfile?.address || '',
-        phone: cognitiveProfile?.phone || '',
-        dob: cognitiveProfile?.dob || '',
-        location: cognitiveProfile?.location || '',
-        postal_code: cognitiveProfile?.postal_code || '',
-      });
-    } else {
-      setProfile(prev => ({ ...prev, email: user.email || '' }));
-    }
-
-    setLoading(false);
+    setProfile({ name: user.user_metadata.name || '', email: user.email || '' });
   };
 
-  const loadRecentActivity = async () => {
+  const loadEnrollments = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: attempts } = await supabase
-      .from('attempts')
-      .select('id, correct, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    setRecentActivity(attempts || []);
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data, error } = await supabase
+        .from('user_exam_enrollments')
+        .select('exam_id, is_active, exams(name)')
+        .eq('user_id', user.id);
 
-      const fullName = `${profile.first_name} ${profile.last_name}`.trim();
-      
-      await supabase
-        .from('profiles')
-        .update({
-          name: fullName,
-          cognitive_profile: {
-            gender: profile.gender,
-            address: profile.address,
-            phone: profile.phone,
-            dob: profile.dob,
-            location: profile.location,
-            postal_code: profile.postal_code,
-          }
-        })
-        .eq('id', user.id);
-
-      toast.success('Profile updated successfully');
+      if (error) throw error;
+      setEnrollments(data || []);
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
-    } finally {
-      setSaving(false);
+      toast.error("Could not load your courses.");
     }
   };
 
-  const handleDiscard = () => {
-    loadProfile();
-    toast.info('Changes discarded');
+  const handleSetAsActive = async (examId: string) => {
+    setSaving(true);
+    try {
+      const { error } = await supabase.rpc('ensure_enrolled_and_set_active', { p_exam_id: examId });
+      if (error) throw error;
+      toast.success("Active course updated!");
+      await loadEnrollments(); // Refresh the list
+    } catch (error) {
+      toast.error("Failed to update active course.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -159,266 +100,74 @@ export default function ProfileNew() {
       
       <main className="flex-1 p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Sidebar */}
-            <div className="lg:col-span-3">
-              <div className="bg-card rounded-2xl p-4 space-y-6">
-                {/* Avatar Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Sidebar for User Info */}
+            <div className="lg:col-span-4">
+              <Card className="rounded-2xl p-6">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src="" />
-                      <AvatarFallback className="bg-primary/20 text-primary text-2xl">
-                        {profile.first_name?.[0]}{profile.last_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <button className="absolute bottom-0 right-0 bg-primary rounded-full p-2 hover:opacity-90">
-                      <Edit2 className="h-3 w-3 text-black" />
-                    </button>
-                  </div>
+                   <Avatar className="h-24 w-24 border-2 border-primary">
+                     <AvatarImage src="" />
+                     <AvatarFallback className="bg-primary/20 text-primary text-3xl font-bold">
+                       {profile.name?.[0]?.toUpperCase()}
+                     </AvatarFallback>
+                   </Avatar>
                   <div>
-                    <h2 className="text-xl font-bold text-black">
-                      {profile.first_name} {profile.last_name}
-                    </h2>
-                    <p className="text-sm text-black">Student</p>
+                    <h2 className="text-2xl font-bold text-black">{profile.name}</h2>
+                    <p className="text-sm text-black/70">{profile.email}</p>
                   </div>
                 </div>
-
-                {/* Menu Items */}
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setActiveTab('personal')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                      activeTab === 'personal'
-                        ? 'bg-primary/10 text-primary'
-                        : 'hover:bg-muted'
-                    }`}
-                  >
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">Personal Information</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveTab('security')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                      activeTab === 'security'
-                        ? 'bg-primary/10 text-primary'
-                        : 'hover:bg-muted'
-                    }`}
-                  >
-                    <Lock className="h-5 w-5" />
-                    <span className="font-medium">Login & Password</span>
-                  </button>
-
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    <span className="font-medium">Log Out</span>
-                  </button>
+                <div className="mt-8">
+                  <Button onClick={handleSignOut} variant="outline" className="w-full">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log Out
+                  </Button>
                 </div>
-              </div>
+              </Card>
             </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-9">
-              <div className="bg-card rounded-2xl p-4 lg:p-6">
-                {activeTab === 'personal' && (
-                  <div className="space-y-6">
-                    <h1 className="text-2xl lg:text-3xl font-bold">Personal Information</h1>
-
-                    {/* Gender */}
-                    <div className="space-y-3">
-                      <RadioGroup
-                        value={profile.gender}
-                        onValueChange={(value) => setProfile({ ...profile, gender: value })}
-                        className="flex gap-6"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="male" id="male" />
-                          <Label htmlFor="male">Male</Label>
+            {/* Main Content for Courses */}
+            <div className="lg:col-span-8">
+              <Card className="rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 className="text-3xl font-bold text-black">My Courses</h1>
+                    <p className="text-black/70">Manage your enrollments and set your active course.</p>
+                  </div>
+                  <Button onClick={() => navigate('/courses')}>Add New Course</Button>
+                </div>
+                
+                <div className="space-y-4">
+                  {enrollments.length > 0 ? (
+                    enrollments.map(enrollment => (
+                      <div key={enrollment.exam_id} className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-3">
+                          <BookMarked className="h-5 w-5 text-primary" />
+                          <p className="font-semibold text-black">{enrollment.exams?.name || 'Unnamed Course'}</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="female" id="female" />
-                          <Label htmlFor="female">Female</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-
-                    {/* Name Fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-black">First Name</Label>
-                        <Input
-                          id="firstName"
-                          value={profile.first_name}
-                          onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                          className="bg-muted/50 border-0 h-12"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-black">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          value={profile.last_name}
-                          onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                          className="bg-muted/50 border-0 h-12"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-black">Email</Label>
-                      <div className="relative">
-                        <Input
-                          id="email"
-                          type="email"
-                          value={profile.email}
-                          disabled
-                          className="bg-muted/50 border-0 h-12 pr-24"
-                        />
-                        <Badge className="absolute right-3 top-1/2 -translate-y-1/2 bg-success/20 text-success hover:bg-success/20 border-0">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Verified
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="space-y-2">
-                      <Label htmlFor="address" className="text-black">Address</Label>
-                      <Input
-                        id="address"
-                        value={profile.address}
-                        onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                        className="bg-muted/50 border-0 h-12"
-                        placeholder="3605 Parker Rd."
-                      />
-                    </div>
-
-                    {/* Phone and DOB */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-black">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={profile.phone}
-                          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                          className="bg-muted/50 border-0 h-12"
-                          placeholder="(405) 555-0128"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="dob" className="text-black">Date of Birth</Label>
-                        <Input
-                          id="dob"
-                          type="date"
-                          value={profile.dob}
-                          onChange={(e) => setProfile({ ...profile, dob: e.target.value })}
-                          className="bg-muted/50 border-0 h-12"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Location and Postal Code */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="location" className="text-black">Location</Label>
-                        <Select value={profile.location} onValueChange={(value) => setProfile({ ...profile, location: value })}>
-                          <SelectTrigger className="bg-muted/50 border-0 h-12">
-                            <SelectValue placeholder="Select location" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="atlanta">Atlanta, USA</SelectItem>
-                            <SelectItem value="newyork">New York, USA</SelectItem>
-                            <SelectItem value="losangeles">Los Angeles, USA</SelectItem>
-                            <SelectItem value="chicago">Chicago, USA</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="postalCode" className="text-black">Postal Code</Label>
-                        <Input
-                          id="postalCode"
-                          value={profile.postal_code}
-                          onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
-                          className="bg-muted/50 border-0 h-12"
-                          placeholder="30301"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                      <Button
-                        variant="outline"
-                        onClick={handleDiscard}
-                        className="flex-1 h-12 border-2 border-primary text-primary hover:bg-primary/10"
-                      >
-                        Discard Changes
-                      </Button>
-                      <Button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="flex-1 h-12 bg-primary hover:bg-primary-hover text-black"
-                      >
-                        {saving ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </div>
-
-                    {/* Recent Activity - Collapsible */}
-                    <div className="pt-6 border-t">
-                      <Collapsible open={showActivity} onOpenChange={setShowActivity}>
-                        <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-between border-primary hover:bg-primary/10">
-                            Recent Activity
-                            <ChevronDown className={cn("h-4 w-4 transition-transform", showActivity && "rotate-180")} />
-                          </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="mt-4">
-                          {recentActivity.length > 0 ? (
-                            <div className="space-y-2">
-                              {recentActivity.map((item) => (
-                                <div
-                                  key={item.id}
-                                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <span className={item.correct ? 'text-success' : 'text-destructive font-bold'}>
-                                      {item.correct ? '✓' : '✗'}
-                                    </span>
-                                    <span className="text-sm text-black">
-                                      {new Date(item.created_at).toLocaleDateString()}
-                                    </span>
-                                   </div>
-                                   <span className="text-sm font-medium text-black">{item.id.slice(0, 8)}</span>
-                                </div>
-                              ))}
-                            </div>
+                        <div>
+                          {enrollment.is_active ? (
+                            <Badge variant="default" className="bg-primary/20 text-primary border-primary/30">Active</Badge>
                           ) : (
-                            <div className="text-center py-8">
-                              <p className="font-normal text-black">No recent activity yet</p>
-                              <p className="text-sm mt-1 font-normal text-black">Start practicing to see your progress here!</p>
-                            </div>
+                            <Button 
+                              variant="secondary" 
+                              size="sm"
+                              onClick={() => handleSetAsActive(enrollment.exam_id)}
+                              disabled={saving}
+                            >
+                              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Set as Active'}
+                            </Button>
                           )}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'security' && (
-                  <div className="space-y-6">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-black">Login & Password</h1>
-                    <p className="text-black">
-                      Password management features coming soon.
-                    </p>
-                  </div>
-                )}
-              </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                     <div className="text-center py-12">
+                       <p className="text-lg text-black">You are not enrolled in any courses yet.</p>
+                       <Button onClick={() => navigate('/courses')} className="mt-4">Explore Courses</Button>
+                     </div>
+                  )}
+                </div>
+              </Card>
             </div>
           </div>
         </div>

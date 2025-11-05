@@ -1,16 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ExamRef } from "@/types/domain";
-import { mock } from "@/lib/mock";
-
-interface ActiveExam {
-  exam_id: string | null;
-  exam: {
-    id: string;
-    name: string;
-    level: string;
-  } | null;
-}
 
 export function useActiveExam() {
   const [activeExam, setActiveExam] = useState<ExamRef | null>(null);
@@ -25,8 +16,8 @@ export function useActiveExam() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setActiveExam(mock.activeExam);
-        setExams([mock.activeExam]);
+        setActiveExam(null); // CHANGE: No user means no active exam.
+        setExams([]); // CHANGE: No user means no enrolled exams.
         setLoading(false);
         return;
       }
@@ -46,7 +37,7 @@ export function useActiveExam() {
           name: exam.name
         });
       } else {
-        setActiveExam(mock.activeExam);
+        setActiveExam(null); // CHANGE: No active enrollment means no active exam.
       }
 
       // Get all exams
@@ -62,12 +53,12 @@ export function useActiveExam() {
           name: e.exams?.name ?? 'Unknown'
         })));
       } else {
-        setExams([mock.activeExam]);
+        setExams([]);
       }
     } catch (error) {
       console.error('Error checking active exam:', error);
-      setActiveExam(mock.activeExam);
-      setExams([mock.activeExam]);
+      setActiveExam(null); // On any error, there is no active exam.
+      setExams([]); // On any error, there are no exams to show.
     } finally {
       setLoading(false);
     }
