@@ -5,12 +5,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle2, Trash2 } from "lucide-react";
+import { CheckCircle2, Trash2, Loader2 } from "lucide-react";
 
 interface Exam {
   id: string;
   name: string;
-  level: string;
+  slug: string | null;
+  category: string | null;
+  class_range: string | null;
+  admin_only: boolean;
+  is_active: boolean;
 }
 
 interface Enrollment {
@@ -34,40 +38,52 @@ export function ExamManagement() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Load enrollments
-    const { data: enrollmentData } = await supabase
+    // Check admin status
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const isAdmin = profile?.is_admin === true;
+
+    // Load enrollments (cast to any to bypass type issues)
+    const { data: enrollmentData } = await (supabase as any)
       .from('user_exam_enrollments')
       .select('*, exams(*)')
       .eq('user_id', user.id);
 
-    setEnrollments(enrollmentData || []);
+    setEnrollments((enrollmentData || []) as Enrollment[]);
 
-    // Load all available exams
-    const { data: examData } = await supabase
+    // Load all available exams (cast to any to bypass type issues)
+    const { data: examData } = await (supabase as any)
       .from('exams')
-      .select('*')
+      .select('id, name, slug, category, class_range, admin_only, is_active')
+      .eq('is_active', true)
       .order('name');
 
-    // Filter out already enrolled exams
+    // Filter out already enrolled exams and admin-only exams (unless user is admin)
     const enrolledIds = enrollmentData?.map(e => e.exam_id) || [];
-    const available = examData?.filter(e => !enrolledIds.includes(e.id)) || [];
+    const available = (examData || [])
+      .filter((e: Exam) => !enrolledIds.includes(e.id))
+      .filter((e: Exam) => !e.admin_only || isAdmin);
     setAvailableExams(available);
   };
 
   const handleSetActive = async (examId: string) => {
     setLoading(true);
     try {
-      const response = await supabase.functions.invoke('manage-exam-enrollment', {
-        body: { action: 'set_active', exam_id: examId }
+      const { error } = await supabase.rpc('ensure_enrolled_and_set_active', {
+        p_exam_id: examId
       });
 
-      if (response.error) throw response.error;
+      if (error) throw error;
 
-      toast.success('Active exam updated');
+      toast.success('Active course updated');
       loadData();
     } catch (error) {
       console.error('Error setting active exam:', error);
-      toast.error('Failed to update active exam');
+      toast.error('Failed to update active course');
     } finally {
       setLoading(false);
     }
@@ -76,13 +92,18 @@ export function ExamManagement() {
   const handleRemove = async (examId: string) => {
     setLoading(true);
     try {
-      const response = await supabase.functions.invoke('manage-exam-enrollment', {
-        body: { action: 'remove', exam_id: examId }
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (response.error) throw response.error;
+      const { error } = await supabase
+        .from('user_exam_enrollments')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('exam_id', examId);
 
-      toast.success('Enrollment removed');
+      if (error) throw error;
+
+      toast.success('Course enrollment removed');
       loadData();
     } catch (error) {
       console.error('Error removing enrollment:', error);
@@ -94,24 +115,34 @@ export function ExamManagement() {
 
   const handleAddExam = async () => {
     if (!selectedExamId) {
-      toast.error('Please select an exam');
+      toast.error('Please select a course');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await supabase.functions.invoke('manage-exam-enrollment', {
-        body: { action: 'add', exam_id: selectedExamId }
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (response.error) throw response.error;
+      // Check if this is the first enrollment
+      const isFirstEnrollment = enrollments.length === 0;
 
-      toast.success('Exam added');
+      const { error } = await supabase
+        .from('user_exam_enrollments')
+        .insert({ 
+          user_id: user.id, 
+          exam_id: selectedExamId,
+          is_active: isFirstEnrollment
+        });
+
+      if (error) throw error;
+
+      toast.success('Course added successfully');
       setSelectedExamId("");
       loadData();
     } catch (error) {
       console.error('Error adding exam:', error);
-      toast.error('Failed to add exam');
+      toast.error('Failed to add course');
     } finally {
       setLoading(false);
     }
@@ -119,31 +150,31 @@ export function ExamManagement() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle>My Exams</CardTitle>
-          <CardDescription>
-            Manage your enrolled exams and set which one is currently active
+          <CardTitle className="text-black">My Enrolled Courses</CardTitle>
+          <CardDescription className="text-black/70">
+            Manage your enrolled courses and set which one is currently active for practice
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {enrollments.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No exams enrolled yet</p>
+            <p className="text-black/70 text-sm">No courses enrolled yet. Visit the Courses page to enroll.</p>
           ) : (
             enrollments.map((enrollment) => (
               <div
                 key={enrollment.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                className="flex items-center justify-between p-4 border border-border rounded-lg bg-background"
               >
                 <div className="flex items-center gap-3">
                   <div>
-                    <div className="font-medium">{enrollment.exams.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {enrollment.exams.level}
+                    <div className="font-medium text-black">{enrollment.exams.name}</div>
+                    <div className="text-sm text-black/70">
+                      {enrollment.exams.category || 'General'} • {enrollment.exams.class_range || 'All Levels'}
                     </div>
                   </div>
                   {enrollment.is_active && (
-                    <Badge variant="default" className="ml-2">
+                    <Badge className="ml-2 bg-purple-600 text-white hover:bg-purple-700">
                       Active
                     </Badge>
                   )}
@@ -155,9 +186,16 @@ export function ExamManagement() {
                       size="sm"
                       onClick={() => handleSetActive(enrollment.exam_id)}
                       disabled={loading}
+                      className="text-black border-black/20 hover:bg-purple-50"
                     >
-                      <CheckCircle2 className="h-4 w-4 mr-1" />
-                      Set Active
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <CheckCircle2 className="h-4 w-4 mr-1" />
+                          Set Active
+                        </>
+                      )}
                     </Button>
                   )}
                   <Button
@@ -165,8 +203,13 @@ export function ExamManagement() {
                     size="sm"
                     onClick={() => handleRemove(enrollment.exam_id)}
                     disabled={loading}
+                    className="text-destructive hover:bg-destructive/10"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -176,22 +219,22 @@ export function ExamManagement() {
       </Card>
 
       {availableExams.length > 0 && (
-        <Card>
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Add Another Exam</CardTitle>
-            <CardDescription>
-              Enroll in additional exams to track progress separately
+            <CardTitle className="text-black">Add Another Course</CardTitle>
+            <CardDescription className="text-black/70">
+              Enroll in additional courses to track progress separately
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
             <Select value={selectedExamId} onValueChange={setSelectedExamId}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select an exam" />
+              <SelectTrigger className="flex-1 bg-background border-border text-black">
+                <SelectValue placeholder="Select a course" />
               </SelectTrigger>
               <SelectContent>
                 {availableExams.map((exam) => (
                   <SelectItem key={exam.id} value={exam.id}>
-                    {exam.name} ({exam.level})
+                    {exam.name} {exam.category && `(${exam.category})`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -199,8 +242,13 @@ export function ExamManagement() {
             <Button 
               onClick={handleAddExam} 
               disabled={loading || !selectedExamId}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
             >
-              Add Exam
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Add Course'
+              )}
             </Button>
           </CardContent>
         </Card>

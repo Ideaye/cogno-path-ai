@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/track';
 import { LayoutDashboard, Target, Dumbbell, Shield, Settings, GraduationCap } from 'lucide-react';
@@ -40,9 +41,9 @@ export default function SideNav({ activeRoute }: { activeRoute: string }) {
         {items.map(i => {
           const Icon = i.icon;
           return (
-            <a 
+            <Link 
               key={i.key} 
-              href={i.key} 
+              to={i.key} 
               onClick={() => track('ui.nav_click', { route: i.key })}
               className={`px-3 py-2 rounded flex items-center gap-2 ${
                 activeRoute === i.key 
@@ -52,7 +53,7 @@ export default function SideNav({ activeRoute }: { activeRoute: string }) {
             >
               <Icon size={18} />
               {i.label}
-            </a>
+            </Link>
           );
         })}
       </nav>
