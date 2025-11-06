@@ -158,12 +158,12 @@ export default function CalibrationNew() {
 
       const { data: justificationData, error: justificationError } = await supabase
         .from('user_justifications')
-        .insert({ /* ... */ })
+        .insert([{ /* ... */ }] as any)
         .select('id').single();
 
       if (justificationError) throw justificationError;
 
-      await supabase.from('attempts').insert({ /* ... */ });
+      await supabase.from('attempts').insert([{ /* ... */ }] as any);
 
       toast({ title: 'Saved successfully' });
       loadCalibrationState();
