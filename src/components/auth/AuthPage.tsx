@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,68 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Loader2, Mail, Smartphone, ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Exam {
   id: string;
   name: string;
 }
+
+const EXAM_GROUPS = [
+  {
+    label: "Broadest demand + MCQ-friendly",
+    exams: [
+      "NEET-UG",
+      "JEE Main/Advanced",
+      "SSC CGL/CHSL/CPO",
+      "IBPS PO/Clerk",
+      "SBI PO/Clerk",
+      "RRB NTPC/Group-D",
+      "UPSC CSE prelims",
+      "CTET",
+      "State PSC (UP/Bihar/Raj/Maha/TN/Karnataka)",
+      "CUET-UG",
+    ],
+  },
+  {
+    label: "High-value / aspirational",
+    exams: [
+      "GATE",
+      "UGC NET",
+      "CSIR-NET",
+      "CAPF AC",
+      "CDS/NDA",
+      "RBI Grade B",
+      "SEBI/NABARD/IRDAI",
+      "SSC JE",
+      "RRB JE/ALP",
+      "Railways technical",
+      "State Police SI",
+      "Judicial Services (prelims)",
+      "MBA (CAT/XAT/NMAT/SNAP/CMAT)",
+    ],
+  },
+  {
+    label: "Niche but strong pull",
+    exams: [
+      "Design (UCEED/CEED, NID, NIFT)",
+      "Law (CLAT/AILET)",
+      "Hospitality (NCHM JEE)",
+      "PG medical (INI-CET/NEET-PG per policy)",
+      "Olympiad pathways",
+      "State CETs beyond P0 geographies",
+    ],
+  },
+];
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -29,6 +85,7 @@ export default function AuthPage() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [exams, setExams] = useState<Exam[]>([]);
+  const [examsLoading, setExamsLoading] = useState(true);
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,6 +97,7 @@ export default function AuthPage() {
 
     const loadPublicExams = async () => {
       try {
+        setExamsLoading(true);
         const { data, error } = await supabase
           .from('exams')
           .select('id, name')
@@ -49,14 +107,37 @@ export default function AuthPage() {
         setExams(data || []);
       } catch (error) {
         toast({
-            title: "Error",
-            description: "Could not load courses to select.",
-            variant: "destructive"
+          title: "Error",
+          description: "Could not load courses to select.",
+          variant: "destructive",
         });
+      } finally {
+        setExamsLoading(false);
       }
     };
     loadPublicExams();
   }, [navigate, toast]);
+
+  const { groupedExamOptions, otherExamOptions } = useMemo(() => {
+    const examsByName = new Map(exams.map((exam) => [exam.name, exam]));
+    const curatedNames = new Set<string>();
+
+    const groups = EXAM_GROUPS.map((group) => {
+      const options: Exam[] = [];
+      group.exams.forEach((name) => {
+        curatedNames.add(name);
+        const match = examsByName.get(name);
+        if (match) {
+          options.push(match);
+        }
+      });
+      return { label: group.label, options };
+    });
+
+    const others = exams.filter((exam) => !curatedNames.has(exam.name));
+
+    return { groupedExamOptions: groups, otherExamOptions: others };
+  }, [exams]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,38 +250,70 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {authMethod === 'email' && (
-            <form onSubmit={handleEmailAuth} className="space-y-4">
-              {!isLogin && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required disabled={loading} />
-                  </div>
-                   <div className="space-y-2">
-                     <Label htmlFor="exam">Choose your course</Label>
-                     <Select onValueChange={setSelectedExam} required>
-                       <SelectTrigger id="exam"><SelectValue placeholder="Select a course..." /></SelectTrigger>
-                       <SelectContent>
-                         {exams.map(exam => <SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>)}
-                       </SelectContent>
-                     </Select>
-                   </div>
-                </>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} disabled={loading} />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
-              </Button>
-            </form>
-          )}
+            {authMethod === 'email' && (
+              <form onSubmit={handleEmailAuth} className="space-y-4">
+                {!isLogin && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Name</Label>
+                      <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required disabled={loading} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="exam">Choose your course</Label>
+                      <Select
+                        value={selectedExam ?? undefined}
+                        onValueChange={setSelectedExam}
+                        disabled={examsLoading || loading}
+                        required
+                      >
+                        <SelectTrigger id="exam">
+                          <SelectValue placeholder={examsLoading ? "Loading courses..." : "Select a course..."} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {groupedExamOptions.map(
+                            ({ label, options }) =>
+                              options.length > 0 && (
+                                <SelectGroup key={label}>
+                                  <SelectLabel>{label}</SelectLabel>
+                                  {options.map((exam) => (
+                                    <SelectItem key={exam.id} value={exam.id}>
+                                      {exam.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              ),
+                          )}
+                          {otherExamOptions.length > 0 && (
+                            <>
+                              <SelectSeparator />
+                              <SelectGroup>
+                                <SelectLabel>Other exams</SelectLabel>
+                                {otherExamOptions.map((exam) => (
+                                  <SelectItem key={exam.id} value={exam.id}>
+                                    {exam.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} disabled={loading} />
+                </div>
+                <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary-hover text-black" size="lg">
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
+                </Button>
+              </form>
+            )}
 
           {authMethod === 'otp' && (
             <div className="space-y-4">
