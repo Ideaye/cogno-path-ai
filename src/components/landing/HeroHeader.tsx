@@ -20,7 +20,7 @@ const HeroVisual = () => {
       style={parallaxStyle}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.8, ease: 'easeOut', delay: 0.4 }}
+      transition={{ duration: 0.8, delay: 0.4 }}
       className="relative flex items-center justify-center"
     >
       {/* Background slab with gradient */}
@@ -61,7 +61,7 @@ export default function HeroHeader() {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.5, ease: 'easeOut' },
+      transition: { duration: 0.5 },
     },
   };
 
@@ -90,22 +90,22 @@ export default function HeroHeader() {
             </motion.p>
             <motion.h1
               variants={itemVariants}
-              className="text-black dark:text-white text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[0.95] tracking-tight"
+              className="text-foreground text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[0.95] tracking-tight"
             >
               QUALITY LEARNING<br />WITH COGNOPATH
             </motion.h1>
-            <motion.p variants={itemVariants} className="mt-6 text-lg sm:text-xl text-neutral-700 dark:text-neutral-300 max-w-lg mx-auto lg:mx-0">
+            <motion.p variants={itemVariants} className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-lg mx-auto lg:mx-0">
               Fast, accurate and adaptive exam prep with confidence calibration, strategy tracking and personalized practice.
             </motion.p>
             <motion.div variants={itemVariants} className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <MotionButton asChild size="lg" className="bg-accent hover:bg-accent/90 text-black font-bold">
+              <MotionButton asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
                 <Link to="/auth">Get Started</Link>
               </MotionButton>
               <MotionButton asChild size="lg" variant="ghost">
                 <Link to="/demo">Watch Demo</Link>
               </MotionButton>
             </motion.div>
-            <motion.p variants={itemVariants} className="mt-4 text-xs text-neutral-500 dark:text-neutral-400 text-center lg:text-left">
+            <motion.p variants={itemVariants} className="mt-4 text-xs text-muted-foreground text-center lg:text-left">
               HIPAA & GDPR aligned. Privacy-first by design.
             </motion.p>
           </div>
