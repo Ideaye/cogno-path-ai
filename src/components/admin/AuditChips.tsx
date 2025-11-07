@@ -9,19 +9,20 @@ export default function AuditChips() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.rpc('get_recent_cron_runs');
-      if (error) setErr(error.message);
-      else {
-        // Map job_name to jobname
-        const mapped = (data || []).map((r: any) => ({
-          jobid: r.jobid,
-          jobname: r.jobname || r.job_name,
-          status: r.status,
-          start_time: r.start_time,
-          end_time: r.end_time
-        }));
-        setRuns(mapped);
+      const { data, error } = await supabase.rpc<Run>("get_recent_cron_runs");
+      if (error) {
+        setErr(error.message);
+        return;
       }
+
+      const mapped = (data ?? []).map((r) => ({
+        jobid: r.jobid,
+        jobname: r.jobname || r.job_name,
+        status: r.status,
+        start_time: r.start_time,
+        end_time: r.end_time,
+      }));
+      setRuns(mapped);
     })();
   }, []);
 

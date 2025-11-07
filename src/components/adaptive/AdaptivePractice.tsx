@@ -21,10 +21,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+type QuestionOption = string[] | string;
+
 interface Question {
   id: string;
   text: string;
-  options: string[] | any;
+  options: QuestionOption;
   correct_option: string;
   difficulty: number;
 }
@@ -118,43 +120,47 @@ export function AdaptivePractice() {
         body: { user_id: user.id }
       });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      if (data?.question) {
-        const question = data.question;
-        const parsedQuestion = {
-          ...question,
-          options: Array.isArray(question.options) 
-            ? question.options 
-            : JSON.parse(question.options as string)
-        };
-        setCurrentQuestion(parsedQuestion);
-        setStyle(data.style || 'normal');
-        setSelectedAnswer("");
-        setConfidence([50]);
-        setFlagged(false);
-        setStartTime(Date.now());
+        if (data?.question) {
+          const question = data.question;
+          const parsedQuestion = {
+            ...question,
+            options: Array.isArray(question.options)
+              ? question.options
+              : JSON.parse(question.options as string),
+          };
+          setCurrentQuestion(parsedQuestion);
+          setStyle(data.style || "normal");
+          setSelectedAnswer("");
+          setConfidence([50]);
+          setFlagged(false);
+          setStartTime(Date.now());
 
-        // Add to stack
-        const newItem: QItem = {
-          id: parsedQuestion.id,
-          label: qStack.length + 1,
-          state: "seen",
-          difficulty: parsedQuestion.difficulty
-        };
-        setQStack(prev => [...prev, newItem]);
-        setCurrentIndex(qStack.length);
+          // Add to stack
+          setQStack((prev) => {
+            const newItem: QItem = {
+              id: parsedQuestion.id,
+              label: prev.length + 1,
+              state: "seen",
+              difficulty: parsedQuestion.difficulty,
+            };
+            const nextStack = [...prev, newItem];
+            setCurrentIndex(nextStack.length - 1);
+            return nextStack;
+          });
+        }
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        toast({
+          title: "Error loading question",
+          description: message,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
-    } catch (error: any) {
-      toast({
-        title: "Error loading question",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   const handleSubmit = async () => {
     if (!selectedAnswer || !currentQuestion) {
@@ -171,7 +177,8 @@ export function AdaptivePractice() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const timeTaken = (Date.now() - startTime) / 1000;
+        const elapsedMs = Date.now() - startTime;
+        const timeTakenSeconds = elapsedMs / 1000;
       const isCorrect = selectedAnswer === currentQuestion.correct_option;
 
       // Save attempt
@@ -180,7 +187,8 @@ export function AdaptivePractice() {
         .insert({
           user_id: user.id,
           question_id: currentQuestion.id,
-          time_taken: timeTaken,
+            time_taken: timeTakenSeconds,
+            time_taken_ms: elapsedMs,
           correct: isCorrect,
           confidence: confidence[0] / 100,
           attempt_number: 1,
@@ -209,7 +217,7 @@ export function AdaptivePractice() {
       toast({
         title: isCorrect ? "Correct!" : "Incorrect",
         description: isCorrect 
-          ? `Great job! Time: ${timeTaken.toFixed(1)}s` 
+            ? `Great job! Time: ${timeTakenSeconds.toFixed(1)}s` 
           : `The correct answer was: ${currentQuestion.correct_option}`,
         variant: isCorrect ? "default" : "destructive",
       });
@@ -219,10 +227,11 @@ export function AdaptivePractice() {
       } else {
         setTimeout(() => loadNextQuestion(), 1500);
       }
-    } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
       toast({
         title: "Error",
-        description: error.message,
+          description: message,
         variant: "destructive",
       });
     } finally {
